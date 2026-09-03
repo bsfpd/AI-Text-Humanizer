@@ -1,0 +1,133 @@
+/* Custom CSS for HumanizeAI Platform */
+
+@layer base {
+    body {
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.6);
+}
+
+/* Eye-Friendly Glassmorphism & Soft Shadows */
+.card-soft {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.dark .card-soft {
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(51, 65, 85, 0.7);
+    box-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.35);
+}
+
+/* Tone & Intensity Active Buttons */
+.pill-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pill-button.active {
+    background-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    border-color: #4f46e5;
+}
+
+.intensity-pill.active {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    border-color: #059669;
+}
+
+/* AI Detection Sentence Highlighting */
+.highlight-human {
+    background-color: rgba(16, 185, 129, 0.12);
+    border-bottom: 2px solid #10b981;
+    border-radius: 2px;
+    padding: 1px 3px;
+}
+.highlight-mixed {
+    background-color: rgba(245, 158, 11, 0.14);
+    border-bottom: 2px solid #f59e0b;
+    border-radius: 2px;
+    padding: 1px 3px;
+}
+.highlight-ai {
+    background-color: rgba(239, 68, 68, 0.16);
+    border-bottom: 2px solid #ef4444;
+    border-radius: 2px;
+    padding: 1px 3px;
+}
+
+/* Diff Styling */
+.diff-added {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #047857;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+.dark .diff-added {
+    background-color: rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+.diff-removed {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+    text-decoration: line-through;
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+.dark .diff-removed {
+    background-color: rgba(239, 68, 68, 0.22);
+    color: #f87171;
+}
+
+/* Pulsing conversion animation */
+@keyframes subtlePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(0.995); }
+}
+
+.is-converting {
+    animation: subtlePulse 1.4s infinite ease-in-out;
+}
+
+/* Gauge circle styling */
+.gauge-svg {
+    transform: rotate(-90deg);
+}
+.gauge-track {
+    stroke: #e2e8f0;
+}
+.dark .gauge-track {
+    stroke: #334155;
+}
+.gauge-progress {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+}
+
+/* Toast alert notification */
+#toastNotification {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
