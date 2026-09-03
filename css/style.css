@@ -39,22 +39,79 @@
     box-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.35);
 }
 
-/* Tone & Intensity Active Buttons */
+/* Tone & Intensity Interactive Buttons (High Clarity & Eye-Friendly) */
 .pill-button {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
+
+.pill-button:hover:not(.active) {
+    border-color: #818cf8;
+    background-color: #f5f7ff;
+    color: #4338ca;
+    transform: translateY(-1px);
+}
+
+.dark .pill-button:hover:not(.active) {
+    border-color: #6366f1;
+    background-color: rgba(30, 41, 59, 0.9);
+    color: #a5b4fc;
+}
+
 .pill-button.active {
-    background-color: #4f46e5;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-    border-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+    color: #ffffff !important;
+    border-color: #312e81 !important;
+    box-shadow: 0 4px 16px -1px rgba(79, 70, 229, 0.45), 0 0 0 2.5px rgba(99, 102, 241, 0.4) !important;
+    transform: translateY(-1px) scale(1.03);
+    font-weight: 700 !important;
+}
+
+.pill-button .active-dot,
+.intensity-pill .active-dot {
+    display: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    margin-right: 6px;
+}
+
+.pill-button.active .active-dot,
+.intensity-pill.active .active-dot {
+    display: inline-block;
+}
+
+.intensity-pill {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.intensity-pill:hover:not(.active) {
+    border-color: #34d399;
+    background-color: #f0fdf4;
+    color: #065f46;
+    transform: translateY(-1px);
+}
+
+.dark .intensity-pill:hover:not(.active) {
+    border-color: #10b981;
+    background-color: rgba(6, 78, 59, 0.35);
+    color: #6ee7b7;
 }
 
 .intensity-pill.active {
-    background-color: #059669;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-    border-color: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    border-color: #064e3b !important;
+    box-shadow: 0 4px 16px -1px rgba(5, 150, 105, 0.45), 0 0 0 2.5px rgba(16, 185, 129, 0.4) !important;
+    transform: translateY(-1px) scale(1.03);
+    font-weight: 700 !important;
 }
 
 /* AI Detection Sentence Highlighting */
@@ -113,6 +170,20 @@
     animation: subtlePulse 1.4s infinite ease-in-out;
 }
 
+/* Smooth Soft Glow for Support Button */
+@keyframes supportGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.35);
+    }
+    50% {
+        box-shadow: 0 0 14px 2px rgba(245, 158, 11, 0.25);
+    }
+}
+
+.support-pill-glow {
+    animation: supportGlow 3.2s infinite ease-in-out;
+}
+
 /* Gauge circle styling */
 .gauge-svg {
     transform: rotate(-90deg);
@@ -130,4 +201,20 @@
 /* Toast alert notification */
 #toastNotification {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Modal animation */
+.modal-fade-enter {
+    animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }

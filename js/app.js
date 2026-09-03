@@ -69,6 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
         historyList: document.getElementById('historyList'),
         btnClearHistory: document.getElementById('btnClearHistory'),
 
+        // Support QRIS Modal
+        btnOpenSupport: document.getElementById('btnOpenSupport'),
+        btnOpenSupportCallout: document.getElementById('btnOpenSupportCallout'),
+        modalSupport: document.getElementById('modalSupport'),
+        btnCloseSupport: document.getElementById('btnCloseSupport'),
+        btnCloseSupportBtn: document.getElementById('btnCloseSupportBtn'),
+
         // Samples
         sampleAcademic: document.getElementById('sampleAcademic'),
         sampleFormal: document.getElementById('sampleFormal'),
@@ -215,6 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-tone]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.tone = btn.getAttribute('data-tone');
+            const cleanName = btn.innerText.replace(/^\s*•?\s*/, '').trim();
+            showToast(`Gaya bahasa dipilih: ${cleanName}`);
         });
     });
 
@@ -223,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-intensity]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.intensity = btn.getAttribute('data-intensity');
+            const cleanLevel = btn.innerText.replace(/^\s*•?\s*/, '').trim();
+            showToast(`Intensitas bypass: ${cleanLevel}`);
         });
     });
 
@@ -580,7 +591,37 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast("Riwayat berhasil dihapus.");
     });
 
-    // 20. Load Initial Academic Sample for immediate ready-to-test experience
+    // 20. Support QRIS Modal
+    function openSupport() {
+        if (elements.modalSupport) {
+            elements.modalSupport.classList.remove('hidden');
+        }
+    }
+
+    function closeSupport() {
+        if (elements.modalSupport) {
+            elements.modalSupport.classList.add('hidden');
+        }
+    }
+
+    elements.btnOpenSupport?.addEventListener('click', openSupport);
+    elements.btnOpenSupportCallout?.addEventListener('click', openSupport);
+    elements.btnCloseSupport?.addEventListener('click', closeSupport);
+    elements.btnCloseSupportBtn?.addEventListener('click', closeSupport);
+    elements.modalSupport?.addEventListener('click', (e) => {
+        if (e.target === elements.modalSupport) closeSupport();
+    });
+
+    // Close any modal with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeSupport();
+            closeSettings();
+            closeHistory();
+        }
+    });
+
+    // 21. Load Initial Academic Sample for immediate ready-to-test experience
     loadSampleText('academic');
     updateScoreGauge(98);
 });
