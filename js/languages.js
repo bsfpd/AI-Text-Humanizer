@@ -40,12 +40,44 @@ const LANGUAGES = {
             { pattern: /\bkomprehensif dan holistik\b/gi, replacement: "menyeluruh dan terpadu" }
         ],
         transitions: {
-            academic: ["Secara empiris,", "Merujuk pada temuan ini,", "Dalam konteks kajian,", "Ditinjau secara mendasar,", "Argumentasi ini diperkuat oleh fakta bahwa", "Jika ditelaah lebih jauh,", "Implikasinya,", "Secara konseptual,"],
-            formal: ["Terkait hal tersebut,", "Berdasarkan evaluasi,", "Perlu menjadi pertimbangan bahwa", "Sejalan dengan agenda ini,", "Fokus utamanya yakni", "Secara praktis,", "Langkah berikutnya adalah"],
-            casual: ["Nah, menariknya,", "Kalau dilihat lagi,", "Sebenarnya,", "Intinya sih,", "Bisa dibilang,", "Lagipula,", "Jujur saja,", "Yang jelas,"],
-            journalistic: ["Fakta di lapangan menunjukkan,", "Sorotan utama tertuju pada", "Catatan pentingnya,", "Kenyataannya,", "Di sisi lain,", "Dampaknya terasa ketika"],
-            creative: ["Secara perlahan,", "Di balik semua itu,", "Menariknya,", "Bayangkan jika", "Langkah demi langkah,", "Kisah ini berlanjut saat"],
-            simple: ["Artinya,", "Faktanya,", "Selain itu,", "Hasilnya,", "Alasannya,", "Bahkan,"]
+            academic: [
+                "Secara konseptual,",
+                "Ditinjau lebih mendalam,",
+                "Secara empiris,",
+                "Dalam konteks ini,",
+                "Dari sudut pandang teoritis,"
+            ],
+            formal: [
+                "Terkait hal tersebut,",
+                "Secara praktis,",
+                "Lebih lanjut,",
+                "Dalam pelaksanaannya,",
+                "Sebagai tindak lanjut,"
+            ],
+            casual: [
+                "Sebenarnya,",
+                "Menariknya,",
+                "Bisa dibilang,",
+                "Kalau diperhatikan,",
+                "Yang menarik,"
+            ],
+            journalistic: [
+                "Di sisi lain,",
+                "Kenyataannya,",
+                "Fakta di lapangan menunjukkan,",
+                "Catatan pentingnya,"
+            ],
+            creative: [
+                "Perlahan tapi pasti,",
+                "Di balik semua itu,",
+                "Menariknya,"
+            ],
+            simple: [
+                "Artinya,",
+                "Faktanya,",
+                "Selain itu,",
+                "Hasilnya,"
+            ]
         },
         samplePrompts: {
             academic: "Kecerdasan buatan (AI) merupakan inovasi teknologi yang sangat krusial dalam era modern ini. Tidak dapat dipungkiri bahwa AI memainkan peran penting dalam mentransformasi sektor pendidikan dan riset akademik. Sebagai kesimpulan, pemanfaatan AI yang komprehensif dan holistik akan menjadi landasan utama bagi kemajuan peradaban masa depan.",
@@ -79,12 +111,12 @@ const LANGUAGES = {
             { pattern: /\bcomprehensive overview\b/gi, replacement: "clear breakdown" }
         ],
         transitions: {
-            academic: ["Empirical evidence suggests,", "Looking closer at the methodology,", "From a theoretical lens,", "Crucially,", "This correlation suggests that", "In practical terms,"],
-            formal: ["Regarding this matter,", "Operationally speaking,", "Key indicators reflect,", "From a business standpoint,", "Moving forward,", "The primary objective remains"],
-            casual: ["Here's the thing:", "Turns out,", "Honestly,", "At the end of the day,", "You could say,", "What stands out is"],
-            journalistic: ["Reports indicate,", "At the center of this shift,", "Crucially,", "Behind the scenes,", "The broader picture shows"],
-            creative: ["Slowly but surely,", "Beneath the surface,", "Curiously enough,", "Picture this:", "Moment by moment,"],
-            simple: ["In short,", "Simply put,", "Because of this,", "Notice that,", "Consequently,"]
+            academic: ["From a theoretical perspective,", "Empirically speaking,", "Upon closer examination,", "In practical terms,"],
+            formal: ["In this regard,", "Operationally speaking,", "Moving forward,", "From a practical standpoint,"],
+            casual: ["Honestly,", "Interestingly,", "Turns out,", "At the end of the day,"],
+            journalistic: ["Reports indicate,", "Crucially,", "Behind the scenes,", "Meanwhile,"],
+            creative: ["Slowly but surely,", "Beneath the surface,", "Curiously enough,"],
+            simple: ["In short,", "Simply put,", "Because of this,", "Consequently,"]
         },
         samplePrompts: {
             academic: "Artificial intelligence has become a paramount technological breakthrough in today's fast-paced world. It is undeniable that machine learning models play a pivotal role in modern scientific inquiry. Furthermore, this serves as a testament to the power of computational algorithms. In conclusion, delving into these methodologies will foster innovation across interdisciplinary domains.",

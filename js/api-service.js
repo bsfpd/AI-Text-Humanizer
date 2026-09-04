@@ -61,11 +61,15 @@ ATURAN WAJIB (ANTI-DETECTION RULES):
 2. TINGKATKAN PERPLEXITY (KEKAYAAN KATA & KETIDAKTERDUGAAN):
    - JANGAN PERNAH gunakan frasa klise AI seperti: "delve into", "testament to", "pivotal role", "beacon", "furthermore", "moreover", "in conclusion", "merupakan hal yang sangat krusial", "tidak dapat dipungkiri", "dalam era modern ini", "menyelami", "memegang peranan penting", "sebagai kesimpulan".
    - Gunakan transisi alami manusiawi dan idiom yang luwes.
-3. PRESERVASI MAKNA:
+3. PRESERVASI MAKNA & ISTILAH TEKNIS:
    - Jaga seluruh fakta, maksud asli, dan substansi teks agar tetap akurat tanpa halusinasi.
-4. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
-5. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
-6. BAHASA TARGET: ${targetLangName}
+   - Pertahankan istilah teknis, nama model teori, dan akronim (seperti APT, CAPM, IHSG, Beta, dsb.) secara presisi.
+4. TATA BAHASA 100% AMAN & TIDAK AMBIGU:
+   - JANGAN PERNAH menambahkan kata transisi di depan salam pembuka atau sapaan formal (seperti Assalamualaikum, Selamat pagi/siang/malam, Yth, Kepada Yth, dsb.). Biarkan salam tetap alami, sopan, dan utuh.
+   - Jangan membuat kalimat fragment/menggantung yang kehilangan induk kalimat. Susunan subjek-predikat-objek harus jelas dan mengalir.
+5. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
+6. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
+7. BAHASA TARGET: ${targetLangName}
 
 OUTPUT:
 Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pembuka, penutup, atau tanda petik di luar teks.
