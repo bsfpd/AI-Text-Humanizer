@@ -85,8 +85,12 @@ ${text}`;
         const { tone = 'academic', lang = 'id', intensity = 'balanced' } = options;
         const prompt = this.buildPrompt(text, tone, lang, intensity);
 
+        if (this.config.provider === 'puter') {
+            return await this.callPuter(prompt);
+        }
+
         if (!this.config.apiKey) {
-            throw new Error("API Key belum diisi. Silakan masukkan API Key di menu Pengaturan API.");
+            throw new Error("API Key belum diisi. Silakan masukkan API Key di menu Pengaturan API atau gunakan Mode Neural AI (Gratis).");
         }
 
         switch (this.config.provider) {
@@ -101,6 +105,27 @@ ${text}`;
             default:
                 throw new Error("Provider API tidak dikenal.");
         }
+    }
+
+    async callPuter(prompt) {
+        if (typeof window === 'undefined' || typeof window.puter === 'undefined' || !window.puter.ai) {
+            throw new Error("Layanan Neural AI belum siap. Periksa koneksi internet Anda.");
+        }
+        
+        const chatPromise = window.puter.ai.chat(prompt, { model: 'gpt-4o-mini' });
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Batas waktu Neural AI terlampaui (timeout).")), 28000)
+        );
+
+        const res = await Promise.race([chatPromise, timeoutPromise]);
+        if (typeof res === 'string') return res.trim();
+        if (res && res.message && res.message.content) {
+            return res.message.content.trim();
+        }
+        if (res && res.text) {
+            return res.text.trim();
+        }
+        return String(res).trim();
     }
 
     async callGemini(prompt) {

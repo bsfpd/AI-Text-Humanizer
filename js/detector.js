@@ -8,40 +8,57 @@ class AIDetector {
         this.aiWordList = [
             'furthermore', 'moreover', 'in conclusion', 'delve', 'delving', 'testament',
             'pivotal', 'beacon', 'tapestry', 'holistic', 'synergy', 'paramount', 'underscores',
-            'paramount', 'multifaceted', 'crucial role', 'vital role', 'seamlessly',
-            'foster', 'realm', 'vibrant', 'intertwined', 'embarks', 'cornerstone',
-            'krusial', 'menyelami', 'tidak dapat dipungkiri', 'kesimpulannya', 'landasan utama',
-            'memegang peranan', 'memainkan peran', 'komprehensif', 'holistik', 'era digital',
-            'bukti nyata', 'secara keseluruhan', 'oleh karena itu, sangat'
+            'multifaceted', 'crucial role', 'vital role', 'seamlessly', 'foster', 'realm',
+            'vibrant', 'intertwined', 'embarks', 'cornerstone', 'krusial', 'menyelami',
+            'tidak dapat dipungkiri', 'kesimpulannya', 'landasan utama', 'memegang peranan',
+            'memainkan peran', 'komprehensif', 'holistik', 'era digital', 'bukti nyata',
+            'secara keseluruhan', 'oleh karena itu, sangat', 'berdasarkan ilustrasi',
+            'sebagai seorang', 'alasan utamanya adalah', 'memiliki asumsi dasar',
+            'asumsi dasar yang sangat ketat', 'yakni menganggap bahwa', 'hanya dipengaruhi oleh',
+            'satu faktor risiko sistematis tunggal', 'sedang beraksi', 'di sinilah',
+            'tidak mengikat investor', 'hal ini membuktikan bahwa', 'hal ini menunjukkan bahwa',
+            'merupakan salah satu', 'dapat disimpulkan bahwa', 'dalam era modern'
         ];
     }
 
     /**
-     * Splits text into individual sentences accurately across punctuations.
+     * Splits text into individual sentences accurately across punctuations,
+     * protecting abbreviations (Yth., Dr., dsb., etc.) from causing false splits.
      */
     getSentences(text) {
         if (!text || !text.trim()) return [];
-        // Matches sentences ending with . ! ? followed by space or newline
-        const raw = text.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+$/g);
-        return raw ? raw.map(s => s.trim()).filter(s => s.length > 0) : [];
+        // Protect common abbreviations by temporarily replacing their periods
+        const protectedText = text
+            .replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__DOT__');
+
+        const raw = protectedText.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+$/g);
+        if (!raw) return [];
+
+        return raw
+            .map(s => s.replace(/__DOT__/g, '.').trim())
+            .filter(s => s.length > 0);
     }
 
     /**
      * Calculates sentence length variation (Burstiness).
-     * Humans have high standard deviation of sentence lengths.
-     * AI models have low standard deviation (monotonous pacing).
+     * Filter out short greetings or single-word titles to avoid skewing.
      */
     calculateBurstiness(sentences) {
-        if (sentences.length <= 1) return { score: 50, sd: 0 };
+        const bodySentences = sentences.filter(s => {
+            const words = s.split(/\s+/).filter(Boolean);
+            return words.length >= 4 && !/^(assalamu|yth|selamat|halo|dear)/i.test(s);
+        });
 
-        const wordCounts = sentences.map(s => s.split(/\s+/).filter(Boolean).length);
+        if (bodySentences.length <= 1) return { score: 60, sd: 5 };
+
+        const wordCounts = bodySentences.map(s => s.split(/\s+/).filter(Boolean).length);
         const mean = wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length;
         const variance = wordCounts.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / wordCounts.length;
         const sd = Math.sqrt(variance);
 
         // Standard deviation > 8 indicates high burstiness (very human)
-        // SD < 3 indicates mechanical, robotic consistency (AI)
-        let burstinessScore = Math.min(100, Math.max(10, Math.round((sd / 9) * 100)));
+        // SD < 4 indicates mechanical, robotic consistency (AI)
+        let burstinessScore = Math.min(100, Math.max(10, Math.round((sd / 8.5) * 100)));
         return { score: burstinessScore, sd: Math.round(sd * 10) / 10 };
     }
 
@@ -55,8 +72,7 @@ class AIDetector {
         const uniqueWords = new Set(words);
         const ttr = uniqueWords.size / words.length;
 
-        // Higher unique ratio indicates richer, more unpredictable human vocabulary
-        let perplexityScore = Math.min(100, Math.max(15, Math.round(ttr * 115)));
+        let perplexityScore = Math.min(100, Math.max(15, Math.round(ttr * 110)));
         return { score: perplexityScore, ttr: Math.round(ttr * 100) / 100 };
     }
 
@@ -64,11 +80,11 @@ class AIDetector {
      * Checks sentence against AI buzzwords and rhythmic markers.
      */
     analyzeSentence(sentence) {
-        const lower = sentence.toLowerCase();
+        const lower = sentence.toLowerCase().trim();
         let matches = [];
 
         this.aiWordList.forEach(word => {
-            if (lower.includes(word)) {
+            if (lower.includes(word.toLowerCase())) {
                 matches.push(word);
             }
         });
@@ -76,30 +92,43 @@ class AIDetector {
         const words = sentence.split(/\s+/).filter(Boolean);
         const wordCount = words.length;
 
-        // Robotic rhythm check: AI sentences tend to sit between 16 and 24 words
-        const isRoboticLength = wordCount >= 16 && wordCount <= 25;
-
-        // Base AI probability
-        let aiProb = 15;
-
-        if (matches.length > 0) {
-            aiProb += matches.length * 30;
+        // Greetings and salutations are naturally human
+        const isGreeting = /^(assalamu|yth|selamat\s+(pagi|siang|sore|malam|sejahtera)|halo|hai|dear|with\s+regards)/i.test(lower);
+        if (isGreeting) {
+            return {
+                text: sentence,
+                wordCount,
+                matches: [],
+                aiScore: 5,
+                humanScore: 95,
+                label: 'human'
+            };
         }
 
-        if (isRoboticLength) {
+        // Robotic rhythm check: AI sentences tend to sit between 16 and 32 words with heavy clauses
+        const isRoboticLength = wordCount >= 16 && wordCount <= 32;
+
+        // Base AI probability: typical neutral prose sits at 20-30%
+        let aiProb = 25;
+
+        if (matches.length > 0) {
+            aiProb = 60 + (matches.length * 20);
+        }
+
+        if (isRoboticLength && matches.length > 0) {
             aiProb += 15;
         }
 
-        // Penalty for formal transition starters common in AI (Furthermore, In conclusion, etc.)
-        if (/^(furthermore|moreover|in conclusion|additionally|kesimpulannya|dengan demikian|oleh karena itu)/i.test(sentence.trim())) {
-            aiProb += 25;
+        // Check for ChatGPT explanatory transitions
+        if (/^(berdasarkan|alasan utamanya|ketika kondisi|dalam era|sebagai kesimpulan|kesimpulannya|dengan demikian|oleh karena itu|tidak dapat dipungkiri)/i.test(lower)) {
+            aiProb += 15;
         }
 
-        aiProb = Math.min(99, Math.max(2, aiProb));
+        aiProb = Math.min(99, Math.max(3, aiProb));
         const humanProb = 100 - aiProb;
 
         let label = 'human';
-        if (aiProb >= 65) {
+        if (aiProb >= 60) {
             label = 'ai';
         } else if (aiProb >= 35) {
             label = 'mixed';
@@ -148,13 +177,18 @@ class AIDetector {
             aiClicheCount += s.matches.length;
         });
 
-        let avgAiScore = sentences.length > 0 ? Math.round(totalAi / sentences.length) : 10;
+        let avgAiScore = sentences.length > 0 ? Math.round(totalAi / sentences.length) : 25;
 
-        // Penalize / reward based on burstiness & perplexity
-        if (burstiness.score > 70) avgAiScore -= 18;
-        if (burstiness.score < 30) avgAiScore += 20;
-        if (perplexity.score > 70) avgAiScore -= 15;
-        if (perplexity.score < 40) avgAiScore += 18;
+        // If strong AI clichés were detected, reinforce high AI probability (ZeroGPT mimic)
+        if (aiClicheCount >= 3) {
+            avgAiScore = Math.max(88, avgAiScore);
+        } else if (aiClicheCount >= 1) {
+            avgAiScore = Math.max(72, avgAiScore);
+        } else {
+            // No AI cliches present: Reward burstiness and perplexity
+            if (burstiness.score > 65) avgAiScore -= 15;
+            if (perplexity.score > 65) avgAiScore -= 12;
+        }
 
         // Bound to realistic percentages
         let finalAiScore = Math.min(98, Math.max(2, Math.round(avgAiScore)));

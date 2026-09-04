@@ -85,6 +85,16 @@
     display: inline-block;
 }
 
+/* Engine Mode Toggle */
+.engine-mode-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.engine-mode-btn.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px -1px rgba(79, 70, 229, 0.4);
+}
+
 .intensity-pill {
     cursor: pointer;
     user-select: none;

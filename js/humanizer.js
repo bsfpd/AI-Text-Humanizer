@@ -10,24 +10,51 @@ class TextHumanizer {
         this.synonyms = {
             id: {
                 "penting": ["signifikan", "krusial", "utama", "esensial"],
-                "sangat": ["amat", "cukup", "begitu"],
-                "menunjukkan": ["memperlihatkan", "mengindikasikan", "mencerminkan"],
-                "membantu": ["memudahkan", "menunjang", "mendorong"],
-                "masalah": ["kendala", "tantangan", "persoalan"],
+                "sangat": ["amat", "cukup", "begitu", "teramat"],
+                "menunjukkan": ["memperlihatkan", "mengindikasikan", "mencerminkan", "mencatatkan"],
+                "membantu": ["memudahkan", "menunjang", "mendorong", "menyokong"],
+                "masalah": ["kendala", "tantangan", "persoalan", "hambatan"],
                 "membuat": ["menjadikan", "menghasilkan", "menciptakan"],
-                "menggunakan": ["menerapkan", "memanfaatkan"],
+                "menggunakan": ["menerapkan", "memanfaatkan", "mengadopsi", "mengoptimalkan"],
+                "memilih": ["memprioritaskan", "condong pada", "menentukan opsi pada"],
+                "pendekatan": ["metode", "kerangka kerja", "sudut pandang"],
+                "alasan": ["pertimbangan", "dasar pemikiran", "argumen"],
+                "asumsi": ["anggapan dasar", "landasan berpikir", "premis"],
+                "ketat": ["kaku", "restriktif", "terbatas"],
+                "dipengaruhi": ["ditentukan", "didikte", "dikendalikan"],
+                "kondisi": ["situasi", "keadaan"],
+                "stagnan": ["mendatar", "statis", "cenderung datar"],
+                "pergerakan": ["dinamika", "pergeseran", "fluktuasi"],
+                "fluktuatif": ["dinamis", "variatif", "berubah-ubah"],
+                "membuktikan": ["mempertegas", "menegaskan", "mengonfirmasi"],
+                "relevan": ["kontekstual", "aplikatif", "tepat guna"],
+                "mengikat": ["membatasi", "mengunci", "mematok"],
                 "berbeda": ["kontras", "berlainan", "bervariasi"],
-                "berkembang": ["tumbuh pesat", "maju dinamis"],
+                "berkembang": ["tumbuh pesat", "maju dinamis", "berevolusi"],
                 "efektif": ["optimal", "berdaya guna", "tepat sasaran"],
-                "hasil": ["temuan", "capaian", "luaran"]
+                "hasil": ["temuan", "capaian", "luaran"],
+                "tujuan": ["sasaran", "orientasi", "fokus utama"],
+                "banyak": ["sejumlah", "beragam", "berbagai"],
+                "dampak": ["pengaruh", "konsekuensi", "implikasi"],
+                "proses": ["tahapan", "alur", "mekanisme"],
+                "mengetahui": ["mencermati", "menyadari", "memahami"],
+                "menjelaskan": ["memaparkan", "menguraikan", "menjabarkan"],
+                "analisis": ["kajian", "penelaahan", "penelaahan mendalam"],
+                "meneliti": ["mengkaji", "menganalisis", "mengevaluasi"],
+                "faktor": ["variabel", "parameter", "elemen"],
+                "karena": ["lantaran", "mengingat", "disebabkan"],
+                "tetapi": ["namun", "akan tetapi", "hanya saja"]
             },
             en: {
-                "important": ["vital", "essential", "significant", "key"],
-                "shows": ["demonstrates", "reveals", "highlights", "signals"],
-                "helps": ["assists", "enables", "fosters", "supports"],
-                "problem": ["hurdle", "challenge", "obstacle"],
-                "use": ["leverage", "utilize", "apply"],
-                "effective": ["impactful", "productive", "optimal"]
+                "important": ["vital", "essential", "significant", "key", "pivotal"],
+                "shows": ["demonstrates", "reveals", "highlights", "signals", "reflects"],
+                "helps": ["assists", "enables", "fosters", "supports", "empowers"],
+                "problem": ["hurdle", "challenge", "obstacle", "bottleneck"],
+                "use": ["leverage", "utilize", "apply", "adopt"],
+                "make": ["generate", "produce", "craft", "shape"],
+                "effective": ["impactful", "productive", "optimal", "fruitful"],
+                "approach": ["methodology", "framework", "perspective"],
+                "result": ["outcome", "finding", "impact"]
             }
         };
 
@@ -114,8 +141,8 @@ class TextHumanizer {
         const dict = this.synonyms[lang] || this.synonyms['en'];
         if (!dict) return sentence;
 
-        // Controlled probability to prevent unnatural or awkward collocations
-        const changeProbability = intensity === 'ultra' ? 0.20 : intensity === 'balanced' ? 0.14 : 0.08;
+        // Controlled probability to prevent unnatural collocations while breaking predictable AI n-grams
+        const changeProbability = intensity === 'ultra' ? 0.65 : intensity === 'balanced' ? 0.45 : 0.30;
 
         return sentence.replace(/\b([a-zA-Zà-ž]+)\b/g, (match, word, offset, fullStr) => {
             // 1. Preserve capitalized acronyms (e.g. APT, CAPM, IHSG, Beta, AI)
@@ -127,7 +154,12 @@ class TextHumanizer {
             const closeParens = (before.match(/\)/g) || []).length;
             if (openParens > closeParens) return match; // inside parentheses
 
+            // 3. Do not alter fixed compound terms / financial collocations
             const lower = match.toLowerCase();
+            if (lower === 'hasil' && /\bimbal\s+$/i.test(before)) return match;
+            if (lower === 'daya' && /\bsumber\s+$/i.test(before)) return match;
+            if (lower === 'kerja' && /\btata\s+$/i.test(before)) return match;
+            if (lower === 'faktor' && /\b(banyak|multi)\s+$/i.test(before)) return match;
             if (dict[lower] && Math.random() < changeProbability) {
                 const candidates = dict[lower];
                 const replacement = candidates[Math.floor(Math.random() * candidates.length)];
