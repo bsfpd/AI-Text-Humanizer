@@ -233,9 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.modeBtnOffline?.classList.remove('active');
             elements.modeBtnOffline?.classList.add('text-slate-600', 'dark:text-slate-300');
             if (elements.engineStatusLabel) {
-                elements.engineStatusLabel.textContent = "Mode Neural AI Aktif (Restrukturisasi Mendalam, Bebas Pop-up)";
+                elements.engineStatusLabel.textContent = "Mode Neural AI Aktif (Restrukturisasi Mendalam)";
             }
-            if (!silent) showToast("Mode Neural AI Aktif: Restrukturisasi mendalam bebas pop-up");
+            if (!silent) showToast("Mode Neural AI Aktif: Restrukturisasi mendalam");
         } else {
             elements.modeBtnOffline?.classList.add('active');
             elements.modeBtnOffline?.classList.remove('text-slate-600', 'dark:text-slate-300');
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const engineName = usedEngine === 'cloud_ai'
                 ? 'Cloud Neural AI'
                 : usedEngine === 'neural'
-                ? 'Neural AI (Bebas Pop-up)'
+                ? 'Neural AI'
                 : 'Engine Cepat';
             showToast(`Selesai via ${engineName}! Skor Manusia: ${finalHumanScore}%`);
         } catch (err) {

@@ -70,9 +70,12 @@ ATURAN WAJIB ANTISLOP COPYWRITING:
 5. TATA BAHASA MANUSIAWI & AMAN DARI AMBIGUITAS:
    - JANGAN PERNAH menambahkan kata transisi di depan salam pembuka atau sapaan formal (seperti Assalamualaikum, Selamat pagi/siang/malam, Yth, Kepada Yth, dsb.). Biarkan salam tetap alami, sopan, dan utuh.
    - Gunakan kalimat aktif berorientasi pada pelaku, bukan pasif kaku tanpa subjek.
-6. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
-7. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
-8. BAHASA TARGET: ${targetLangName}
+7. ANTI-DETEKSI GPTZERO (BURSTINESS EKSTREM & INVERSI SINTAKSIS):
+   - JANGAN PERNAH mengawali kalimat berulang dengan penanda transisi AI seperti "Faktanya,", "Di sisi lain,", "Pada akhirnya,", "Secara metodologis,". Mulailah kalimat langsung dengan subjek, kata kerja aktif, atau keterangan tempat/waktu wajar.
+   - Pecah kalimat panjang monoton. Sisipkan kalimat jangkar pendek tegas (2-5 kata) untuk menciptakan lonjakan burstiness alami yang mengacaukan pendeteksi AI.
+8. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
+9. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
+10. BAHASA TARGET: ${targetLangName}
 
 OUTPUT:
 Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pengantar, penutup, atau tanda petik di luar teks.

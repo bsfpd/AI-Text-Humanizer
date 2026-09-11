@@ -161,6 +161,14 @@ class TextHumanizer {
      * - Blends excessively clipped adjacent fragments.
      * - Alters monotonous subject-verb-object cadence.
      */
+    /**
+     * LAYER 3: Dynamic Burstiness & Syntactic Restructuring (R-02, R-16, R-36)
+     * Transforms robotic, evenly spaced AI sentences into dynamic human cadence:
+     * - Breaks overly long, monotonous compound sentences (>18 words) into distinct complete thoughts.
+     * - Blends excessively clipped adjacent fragments.
+     * - Inserts punchy short anchoring statements (2-5 words) to create high variance in sentence length.
+     * - Inverts subordinate clauses for natural human rhythm.
+     */
     modulateBurstiness(sentences, tone, lang, intensity) {
         if (sentences.length <= 1) return sentences;
 
@@ -178,25 +186,43 @@ class TextHumanizer {
                 continue;
             }
 
+            // Clause Inversion in Indonesian (moving purpose/conditional clause forward)
+            if (lang === 'id') {
+                // Invert "pekerja dituntut/perlu X agar/supaya tetap kompetitif di Y" -> "Supaya tetap kompetitif di Y, pekerja perlu X"
+                const purposeMatch = current.match(/^(.*?)\s+(?:agar|supaya)\s+(tetap\s+[^\.,;]+?)\s*,\s*(.*)$/i);
+                if (purposeMatch && purposeMatch[1].length > 15) {
+                    const mainClause = purposeMatch[1].trim();
+                    const purposeClause = purposeMatch[2].trim();
+                    const rest = purposeMatch[3] ? " " + purposeMatch[3].trim() : "";
+                    current = `Agar ${purposeClause}, ${mainClause.charAt(0).toLowerCase() + mainClause.slice(1)}${rest}`;
+                }
+            }
+
             const currentWords = current.split(/\s+/).filter(Boolean);
 
-            // Safe sentence split for overly long AI sentences (>24 words) with coordinating conjunctions
-            if (currentWords.length > 24 && !current.includes('__ANTISLOP_TOKEN_0__')) {
-                // Look for natural compound split point (e.g. ", dan ", ", tetapi ", ", sehingga ", ", di mana ")
+            // Safe sentence split for overly long AI sentences (>18 words) with coordinating conjunctions or markers
+            if (currentWords.length > 18 && !current.includes('__ANTISLOP_TOKEN_0__')) {
                 const splitRegex = lang === 'id'
-                    ? /(,\s+(?:namun|tetapi|sedangkan|sehingga|bahkan|sementara\s+itu|di\s+mana)\s+)/i
-                    : /(,\s+(?:however|whereas|meaning\s+that|while|whereby)\s+)/i;
+                    ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s+itu|di\s+mana|yakni|yaitu)\s+)/i
+                    : /(,\s*(?:however|whereas|meaning\s+that|while|whereby|namely)\s+)/i;
 
                 const match = current.match(splitRegex);
-                if (match && match.index > 35 && (current.length - match.index) > 30) {
+                if (match && match.index > 25 && (current.length - match.index) > 20) {
                     const firstPart = current.slice(0, match.index).trim() + '.';
                     let secondPart = current.slice(match.index + match[0].length).trim();
                     
-                    // Capitalize second part
                     if (secondPart.length > 0) {
-                        const connector = match[1].replace(/^[,\s]+|[,\s]+$/g, '');
-                        const capitalizedConnector = connector.charAt(0).toUpperCase() + connector.slice(1);
-                        secondPart = `${capitalizedConnector}, ${secondPart.charAt(0).toLowerCase() + secondPart.slice(1)}`;
+                        const rawConnector = match[1].replace(/^[,\s]+|[,\s]+$/g, '');
+                        // Transform connector into natural independent opener
+                        let opener = rawConnector.charAt(0).toUpperCase() + rawConnector.slice(1);
+                        if (opener.toLowerCase() === 'yakni' || opener.toLowerCase() === 'yaitu') {
+                            opener = 'Secara khusus,';
+                        } else if (opener.toLowerCase() === 'sehingga') {
+                            opener = 'Hal ini membuat';
+                        } else {
+                            opener = `${opener},`;
+                        }
+                        secondPart = `${opener} ${secondPart.charAt(0).toLowerCase() + secondPart.slice(1)}`;
                         result.push(firstPart);
                         result.push(secondPart);
                         i++;
@@ -205,14 +231,14 @@ class TextHumanizer {
                 }
             }
 
-            // Safe merge of two very short adjacent sentences (<8 words) without questions/exclamations
-            if (next && !this.isSalutationOrOpening(next) && currentWords.length < 8 && !/[?!]/.test(current)) {
+            // Safe merge of two very short adjacent sentences (<7 words) without questions/exclamations
+            if (next && !this.isSalutationOrOpening(next) && currentWords.length < 7 && !/[?!:]/.test(current)) {
                 const nextWords = next.split(/\s+/).filter(Boolean);
-                if (nextWords.length < 8 && !/[?!]/.test(next) && Math.random() > 0.45) {
+                if (nextWords.length < 7 && !/[?!:]/.test(next) && Math.random() > 0.50) {
                     const cleanCurrent = current.replace(/[.!?]+$/, '');
                     const cleanNext = next.charAt(0).toLowerCase() + next.slice(1);
                     const glue = lang === 'id'
-                        ? (tone === 'academic' ? ' sekaligus ' : ' dan juga ')
+                        ? (tone === 'academic' ? ' sekaligus ' : ' dan ')
                         : (tone === 'academic' ? ', whereby ' : ', and ');
                     result.push(cleanCurrent + glue + cleanNext);
                     i += 2;
@@ -224,13 +250,37 @@ class TextHumanizer {
             i++;
         }
 
+        // Dynamically inject a human anchor sentence (2-5 words) if sentences lack burstiness variance
+        if (result.length >= 3 && !result[0].startsWith('__ANTISLOP_TOKEN')) {
+            const wordCounts = result.map(s => s.split(/\s+/).filter(Boolean).length);
+            const avg = wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length;
+            const variance = wordCounts.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / wordCounts.length;
+            const stdDev = Math.sqrt(variance);
+
+            // If sentence length variance is too low (< 4 words stdDev), inject an authentic human anchor
+            if (stdDev < 4.0 && wordCounts.every(w => w > 11)) {
+                const anchors = {
+                    academic: ["Dampaknya nyata.", "Dasar pertimbangannya jelas.", "Di sinilah letak pembedanya."],
+                    formal: ["Langkah ini penting.", "Prioritasnya sudah tepat.", "Tantangannya memang nyata."],
+                    casual: ["Simpel sebetulnya.", "Pilihannya jelas.", "Masuk akal, kan?"],
+                    journalistic: ["Faktanya berbicara demikian.", "Kondisinya jelas."],
+                    creative: ["Satu hal yang pasti.", "Jawabannya ada di sana."],
+                    simple: ["Intinya jelas.", "Poinnya sederhana."]
+                };
+                const pool = anchors[tone] || anchors.academic;
+                const anchor = pool[Math.floor(Math.random() * pool.length)];
+                // Insert after sentence 1 or 2
+                const insertIdx = Math.min(2, result.length - 1);
+                result.splice(insertIdx, 0, anchor);
+            }
+        }
+
         return result;
     }
 
     /**
      * LAYER 4: Deep Context-Safe Lexical Humanization
-     * High-coverage synonym substitution matching parts of speech,
-     * powered by 500+ headword dictionary.
+     * Balanced substitution matching parts of speech, avoiding thesaurus-bot over-saturation.
      */
     injectPerplexity(sentence, lang, intensity, isNeural = false) {
         if (this.isSalutationOrOpening(sentence)) return sentence;
@@ -241,8 +291,8 @@ class TextHumanizer {
 
         if (!dictSource) return sentence;
 
-        // Dynamic change probability: higher in Neural & Ultra modes to guarantee substantive humanization
-        const changeProbability = isNeural ? 0.80 : (intensity === 'ultra' ? 0.75 : (intensity === 'balanced' ? 0.60 : 0.45));
+        // Balanced change probability (0.50 - 0.58) ensures authentic human voice without thesaurus stiffness
+        const changeProbability = isNeural ? 0.58 : (intensity === 'ultra' ? 0.55 : (intensity === 'balanced' ? 0.45 : 0.35));
 
         return sentence.replace(/\b([a-zA-Zà-ž]+)\b/g, (match, word, offset, fullStr) => {
             // 1. Never alter protected tokens
@@ -283,13 +333,9 @@ class TextHumanizer {
 
     /**
      * LAYER 5: Tone Voice Modulation (All 6 Styles)
-     * Shapes tone-specific vocabulary, rhetorical pacing, and natural transitions.
+     * Shapes tone-specific vocabulary and rhetorical pacing without robotic transition spam.
      */
     applyToneStyling(sentences, tone, lang, intensity) {
-        const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang])
-            ? window.LANGUAGES[lang]
-            : null;
-
         return sentences.map((sentence, idx) => {
             let processed = sentence.trim();
 
@@ -297,20 +343,11 @@ class TextHumanizer {
                 return processed;
             }
 
-            // Intersperse tone-appropriate transitions to body sentences lacking openers
-            if (!this.hasIntroductoryPhrase(processed) && idx > 0 && idx % 2 === 1 && Math.random() > 0.60) {
-                if (langPack && langPack.transitions && langPack.transitions[tone]) {
-                    const pool = langPack.transitions[tone];
-                    const connector = pool[Math.floor(Math.random() * pool.length)];
-                    processed = connector + " " + processed.charAt(0).toLowerCase() + processed.slice(1);
-                }
-            }
-
             // 1. AKADEMIK (Academic) Tone
             if (tone === 'academic') {
                 processed = processed
                     .replace(/\bsangat\s+bagus\b/gi, "berkualitas tinggi")
-                    .replace(/\bmenguntungkan\b/gi, "memberikan nilai strategis")
+                    .replace(/\bmenguntungkan\b/gi, "memberi keuntungan nyata")
                     .replace(/\bbikin\b/gi, "menghasilkan")
                     .replace(/\bnggak\b/gi, "tidak")
                     .replace(/\bcuma\b/gi, "hanya")
@@ -321,9 +358,9 @@ class TextHumanizer {
             // 2. FORMAL & BISNIS (Formal & Business) Tone
             else if (tone === 'formal') {
                 processed = processed
-                    .replace(/\bkita\s+harus\b/gi, "perlu dilakukan upaya untuk")
-                    .replace(/\bwe\s+must\b/gi, "it is advisable to")
-                    .replace(/\bdiharapkan\b/gi, "menjadi prioritas untuk")
+                    .replace(/\bkita\s+harus\b/gi, "kita perlu")
+                    .replace(/\bwe\s+must\b/gi, "it is recommended to")
+                    .replace(/\bdiharapkan\b/gi, "menjadi fokus utama untuk")
                     .replace(/\bngomong-ngomong\b/gi, "sebagai informasi tambahan");
             }
 
@@ -341,7 +378,7 @@ class TextHumanizer {
             else if (tone === 'journalistic') {
                 processed = processed
                     .replace(/\bdapat\s+dikatakan\s+bahwa\b/gi, "catatannya,")
-                    .replace(/\bmenurut\s+hemat\s+saya\b/gi, "berdasarkan pantauan,")
+                    .replace(/\bmenurut\s+hemat\s+saya\b/gi, "pantauan di lapangan,")
                     .replace(/\bhal\s+ini\s+sangat\s+menarik\b/gi, "kondisi ini memantik perhatian");
             }
 
