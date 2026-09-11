@@ -59,22 +59,21 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Brand Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shadow-sm">
                     <i data-lucide="feather" class="w-5 h-5"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">HumanizeAI</span>
-                        <span class="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">Pro Bypass</span>
+                        <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">HumanizeAI</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Konverter AI Text ke Humanize Text Anti-Deteksi</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Editor teks alami untuk penulisan akademik dan profesional</p>
                 </div>
             </div>
 
             <!-- Right Controls -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Support / Dukung Saya Button (Smooth, eye-catching but non-intrusive) -->
-                <button id="btnOpenSupport" class="support-pill-glow text-xs font-semibold px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-amber-500/15 hover:from-amber-500/25 hover:to-rose-500/25 text-amber-800 dark:text-amber-300 border border-amber-300/80 dark:border-amber-600/60 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer" title="Dukung Pengembang via QRIS">
+                <!-- Support / Dukung Saya Button (Smooth, dignified accent) -->
+                <button id="btnOpenSupport" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs" title="Dukung Pengembang via QRIS">
                     <i data-lucide="coffee" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
                     <span class="hidden sm:inline">Dukung Saya</span>
                     <span class="sm:hidden">Support</span>
@@ -117,24 +116,22 @@
             <!-- Engine Mode Switcher Bar -->
             <div class="mb-4 pb-3.5 border-b border-slate-200/70 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-500"></i> Mode Engine:
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Mode Engine:
                     </span>
                     <div class="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700">
                         <button id="modeBtnNeural" class="engine-mode-btn active text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
                             <span>Neural AI (Bebas Pop-up)</span>
-                            <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-600 text-white font-extrabold tracking-wide">0% ZeroGPT</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-semibold tracking-wide">Restrukturisasi Mendalam</span>
                         </button>
                         <button id="modeBtnOffline" class="engine-mode-btn text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 transition-all flex items-center gap-1.5 cursor-pointer">
-                            <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400"></i>
                             <span>Engine Cepat (Offline)</span>
                         </button>
                     </div>
                 </div>
                 <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="engineStatusLabel">Mode Neural AI Aktif (Restrukturisasi Mendalam, 100% Bebas Pop-up & Lolos ZeroGPT)</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span id="engineStatusLabel">Mode Neural AI Aktif (Restrukturisasi Mendalam, Bebas Pop-up)</span>
                 </div>
             </div>
 
@@ -142,8 +139,8 @@
                 
                 <!-- Tone / Style Selector -->
                 <div class="space-y-2">
-                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Gaya Bahasa (Tone)
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        Gaya Bahasa (Tone)
                     </span>
                     <div class="flex flex-wrap items-center gap-1.5" id="toneSelectorGroup">
                         <button data-tone="academic" class="pill-button active text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
@@ -169,8 +166,8 @@
 
                 <!-- Bypass Intensity & Mode Selector -->
                 <div class="space-y-2">
-                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Intensitas Bypass AI
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        Intensitas Bypass AI
                     </span>
                     <div class="flex items-center gap-1.5">
                         <button data-intensity="standard" class="intensity-pill text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
@@ -179,10 +176,10 @@
                         <button data-intensity="balanced" class="intensity-pill text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                             <span class="active-dot"></span>Seimbang
                         </button>
-                        <button data-intensity="ultra" class="intensity-pill active text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1">
+                        <button data-intensity="ultra" class="intensity-pill active text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                             <span class="active-dot"></span>
-                            <span>🚀 Ultra Bypass</span>
-                            <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-700 text-white font-bold">Turnitin</span>
+                            <span>Maksimal</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-700 text-white font-bold">Turnitin</span>
                         </button>
                     </div>
                 </div>
@@ -192,16 +189,15 @@
             <!-- Quick Samples Banner -->
             <div class="mt-4 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i>
-                    <span>Coba Sampel Teks AI:</span>
+                    <span class="font-medium text-slate-600 dark:text-slate-300">Coba Sampel:</span>
                     <button id="sampleAcademic" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">Esai Akademik</button>
                     <span class="text-slate-300 dark:text-slate-700">•</span>
                     <button id="sampleFormal" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">Laporan Bisnis</button>
                     <span class="text-slate-300 dark:text-slate-700">•</span>
                     <button id="sampleCasual" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">Artikel Santai</button>
                 </div>
-                <div class="text-[11px] text-slate-400">
-                    ✓ Bypass Turnitin, GPTZero, ZeroGPT, Copyleaks
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                    Dioptimalkan untuk pola deteksi Turnitin &amp; ZeroGPT
                 </div>
             </div>
         </div>

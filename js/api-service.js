@@ -52,27 +52,30 @@ class ApiService {
 
         const targetLangName = (window.LANGUAGES && window.LANGUAGES[lang]) ? window.LANGUAGES[lang].name : lang;
 
-        return `Anda adalah pakar linguistik manusia dan editor profesional tingkat dunia. Tugas utama Anda adalah menulis ulang (humanize) teks yang dihasilkan oleh AI agar terdeteksi 100% sebagai tulisan manusia asli dan lolos dari semua pendeteksi AI (seperti Turnitin, GPTZero, ZeroGPT, Copyleaks, dan Quillbot).
+        return `Anda adalah pakar linguistik manusia dan editor profesional tingkat dunia yang menguasai prinsip Antislop Copywriting. Tugas utama Anda adalah menulis ulang (humanize) teks yang dihasilkan oleh AI agar terdeteksi 100% sebagai tulisan manusia asli dan lolos dari semua pendeteksi AI (seperti Turnitin, GPTZero, ZeroGPT, Copyleaks).
 
-ATURAN WAJIB (ANTI-DETECTION RULES):
-1. TINGKATKAN BURSTINESS (RITME KALIMAT):
-   - Pendeteksi AI mencari keseragaman panjang kalimat (15-20 kata berulang-ulang).
-   - Buat variasi panjang kalimat yang dramatis: selingi kalimat pendek tegas (3-7 kata) dengan kalimat majemuk yang mengalir (20-30 kata).
-2. TINGKATKAN PERPLEXITY (KEKAYAAN KATA & KETIDAKTERDUGAAN):
-   - JANGAN PERNAH gunakan frasa klise AI seperti: "delve into", "testament to", "pivotal role", "beacon", "furthermore", "moreover", "in conclusion", "merupakan hal yang sangat krusial", "tidak dapat dipungkiri", "dalam era modern ini", "menyelami", "memegang peranan penting", "sebagai kesimpulan".
-   - Gunakan transisi alami manusiawi dan idiom yang luwes.
-3. PRESERVASI MAKNA & ISTILAH TEKNIS:
-   - Jaga seluruh fakta, maksud asli, dan substansi teks agar tetap akurat tanpa halusinasi.
-   - Pertahankan istilah teknis, nama model teori, dan akronim (seperti APT, CAPM, IHSG, Beta, dsb.) secara presisi.
-4. TATA BAHASA 100% AMAN & TIDAK AMBIGU:
+ATURAN WAJIB ANTISLOP COPYWRITING:
+1. TINGKATKAN BURSTINESS (RITME & PANJANG KALIMAT BERVARIASI):
+   - Pendeteksi AI mencari keseragaman panjang kalimat (15-25 kata berulang-ulang).
+   - Buat variasi panjang kalimat secara dinamis: selingi kalimat pendek tegas (4-8 kata) dengan kalimat majemuk yang mengalir luwes (18-28 kata).
+2. ELIMINASI KATA KLISE & EMPTY AI VOCABULARY (R-16, R-36):
+   - JANGAN PERNAH gunakan frasa klise AI seperti: "delve into", "testament to", "pivotal role", "beacon", "furthermore", "moreover", "in conclusion", "merupakan hal yang sangat krusial", "tidak dapat dipungkiri bahwa", "dalam era modern ini", "menyelami dunia", "memegang peranan penting", "sebagai kesimpulan", "menandai babak baru", "komprehensif dan holistik", "bukti nyata".
+   - Hapus kata pengisi tak berguna seperti "dalam rangka untuk", "perlu dicatat bahwa", "dapat dikatakan bahwa".
+3. DILARANG EM DASH & PARALELISME NEGATIF (R-02, R-36):
+   - Dilarang menggunakan tanda hubung em dash (—) atau ganda (--). Gunakan koma, titik, atau restrukturisasi klausa.
+   - Hindari pola negatif klise seperti "Bukan hanya X, tapi juga Y" atau "Tidak hanya sekadar... melainkan juga...". Gantikan dengan susunan alami ("X dan Y berjalan beriringan" atau "Di samping X, Y turut...").
+4. PRESERVASI KONTEKS & FAKTA 100% (R-17, R-36, R-38 - NEVER INVENT FACTS):
+   - JANGAN PERNAH mengarang data, angka, nama, tahun, atau fakta baru yang tidak ada pada teks asli.
+   - Pertahankan seluruh istilah teknis, nama model, rumus, dan akronim (seperti APT, CAPM, IHSG, Beta, AI, ROE, dsb.) secara presisi tanpa salah tafsir.
+5. TATA BAHASA MANUSIAWI & AMAN DARI AMBIGUITAS:
    - JANGAN PERNAH menambahkan kata transisi di depan salam pembuka atau sapaan formal (seperti Assalamualaikum, Selamat pagi/siang/malam, Yth, Kepada Yth, dsb.). Biarkan salam tetap alami, sopan, dan utuh.
-   - Jangan membuat kalimat fragment/menggantung yang kehilangan induk kalimat. Susunan subjek-predikat-objek harus jelas dan mengalir.
-5. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
-6. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
-7. BAHASA TARGET: ${targetLangName}
+   - Gunakan kalimat aktif berorientasi pada pelaku, bukan pasif kaku tanpa subjek.
+6. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
+7. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
+8. BAHASA TARGET: ${targetLangName}
 
 OUTPUT:
-Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pembuka, penutup, atau tanda petik di luar teks.
+Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pengantar, penutup, atau tanda petik di luar teks.
 
 TEKS YANG HARUS DIHUMANIZE:
 ${text}`;
@@ -85,12 +88,8 @@ ${text}`;
         const { tone = 'academic', lang = 'id', intensity = 'balanced' } = options;
         const prompt = this.buildPrompt(text, tone, lang, intensity);
 
-        if (this.config.provider === 'puter') {
-            return await this.callPuter(prompt);
-        }
-
         if (!this.config.apiKey) {
-            throw new Error("API Key belum diisi. Silakan masukkan API Key di menu Pengaturan API atau gunakan Mode Neural AI (Gratis).");
+            throw new Error("API Key belum diisi. Silakan masukkan API Key di menu Pengaturan API.");
         }
 
         switch (this.config.provider) {
@@ -105,27 +104,6 @@ ${text}`;
             default:
                 throw new Error("Provider API tidak dikenal.");
         }
-    }
-
-    async callPuter(prompt) {
-        if (typeof window === 'undefined' || typeof window.puter === 'undefined' || !window.puter.ai) {
-            throw new Error("Layanan Neural AI belum siap. Periksa koneksi internet Anda.");
-        }
-        
-        const chatPromise = window.puter.ai.chat(prompt, { model: 'gpt-4o-mini' });
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error("Batas waktu Neural AI terlampaui (timeout).")), 28000)
-        );
-
-        const res = await Promise.race([chatPromise, timeoutPromise]);
-        if (typeof res === 'string') return res.trim();
-        if (res && res.message && res.message.content) {
-            return res.message.content.trim();
-        }
-        if (res && res.text) {
-            return res.text.trim();
-        }
-        return String(res).trim();
     }
 
     async callGemini(prompt) {
