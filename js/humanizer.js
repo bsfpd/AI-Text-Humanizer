@@ -52,8 +52,8 @@ class TextHumanizer {
 
         let protectedText = text;
 
-        // 1. Protect formal greetings WITHOUT consuming preceding or following newlines
-        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|yth\.?[^\n\.\,]+|kepada\s+yth\.?[^\n\.\,]+|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)[^\n\.\,]*|dengan\s+hormat,?\s*|dear\s+[^\n\.\,]+)[^\n\.\?!]*(?:[\.\?!]|$)/gi, (match) => {
+        // 1. Protect formal salutation phrases up to comma or period (without greedily capturing subsequent text)
+        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|(?:kepada\s+)?yth\.?\s+[^,\.\n]+(?:,\s*(?:rekan-rekan|saudara|mahasiswa|bapak|ibu)[^,\.\n]*)*|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|dengan\s+hormat|dear\s+[^,\.\n]+)(?:,|\.|\n|$)/gi, (match) => {
             return addToken(match.trim());
         });
 
@@ -62,8 +62,9 @@ class TextHumanizer {
             return addToken(match);
         });
 
-        // 3. Protect numbers, currency, percentages, and dates
-        protectedText = protectedText.replace(/(?:Rp\s*[\d\.,]+|\b\d+(?:[\.,]\d+)?\s*%|\b\d{1,4}(?:[\.,]\d{1,4})*(?:\s*(?:persen|tahun|ribu|juta|miliar|triliun|km|kg|cm|m|USD|EUR|IDR))?\b)/g, (match) => {
+        // 3. Protect currency, percentages, numbers with units, and multi-digit values
+        // Excludes isolated single/double digits (e.g. "1.", "2.") so list items work properly
+        protectedText = protectedText.replace(/(?:Rp\s*[\d\.,]+|\b\d+(?:[\.,]\d+)?\s*%|\b\d+(?:[\.,]\d+)*(?:\s+(?:persen|tahun|ribu|juta|miliar|triliun|km|kg|cm|m|USD|EUR|IDR))\b|\b\d{1,3}(?:\.\d{3})+(?:,\d+)?\b|\b\d{4,}\b)/g, (match) => {
             return addToken(match);
         });
 
@@ -93,7 +94,7 @@ class TextHumanizer {
     isSalutationOrOpening(sentence) {
         if (!sentence) return false;
         const s = sentence.trim().toLowerCase();
-        return /^(?:__antislop_token|assalamu|wa\s*['’`]?\s*alaikum|salam|yth\.?|kepada\s+yth|bapak|ibu|tutor|dosen|saudara|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|mohon\s+izin|dengan\s+hormat|terima\s+kasih|dear|hello|hi|good\s+(?:morning|afternoon|evening)|to\s+whom)/i.test(s);
+        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|salam|yth\.?|kepada\s+yth|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening)|to\s+whom)/i.test(s);
     }
 
     /**
@@ -173,7 +174,7 @@ class TextHumanizer {
      * - Inverts subordinate clauses for natural human rhythm.
      */
     modulateBurstiness(sentences, tone, lang, intensity) {
-        if (sentences.length <= 1) return sentences;
+        if (!sentences || sentences.length === 0) return [];
 
         const result = [];
         let i = 0;
@@ -254,16 +255,16 @@ class TextHumanizer {
         }
 
         // Dynamically inject a human anchor sentence (2-5 words) if sentences lack burstiness variance
-        if (result.length >= 3 && !result[0].startsWith('__ANTISLOP_TOKEN')) {
+        if (result.length >= 2 && !result[0].startsWith('__ANTISLOP_TOKEN')) {
             const wordCounts = result.map(s => s.split(/\s+/).filter(Boolean).length);
             const avg = wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length;
             const variance = wordCounts.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / wordCounts.length;
             const stdDev = Math.sqrt(variance);
 
             // If sentence length variance is too low (< 4 words stdDev), inject an authentic human anchor
-            if (stdDev < 4.0 && wordCounts.every(w => w > 11)) {
+            if (stdDev < 4.0 && wordCounts.every(w => w > 10) && wordCounts.reduce((a, b) => a + b, 0) > 28) {
                 const anchors = {
-                    academic: ["Dampaknya nyata.", "Dasar pertimbangannya jelas.", "Di sinilah letak pembedanya."],
+                    academic: ["Dampaknya nyata.", "Dasar pertimbangannya jelas.", "Fokus kajiannya tegas.", "Pilihannya berdasar kuat."],
                     formal: ["Langkah ini penting.", "Prioritasnya sudah tepat.", "Tantangannya memang nyata."],
                     casual: ["Simpel sebetulnya.", "Pilihannya jelas.", "Masuk akal, kan?"],
                     journalistic: ["Faktanya berbicara demikian.", "Kondisinya jelas."],
@@ -272,9 +273,11 @@ class TextHumanizer {
                 };
                 const pool = anchors[tone] || anchors.academic;
                 const anchor = pool[Math.floor(Math.random() * pool.length)];
-                // Insert after sentence 1 or 2
+                // Insert after sentence 1 or 2, ensuring no colon preceding
                 const insertIdx = Math.min(2, result.length - 1);
-                result.splice(insertIdx, 0, anchor);
+                if (!result[insertIdx - 1]?.endsWith(':') && !result[insertIdx]?.endsWith(':')) {
+                    result.splice(insertIdx, 0, anchor);
+                }
             }
         }
 
