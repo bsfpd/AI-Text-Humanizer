@@ -27,15 +27,17 @@ class AIDetector {
      */
     getSentences(text) {
         if (!text || !text.trim()) return [];
-        // Protect common abbreviations by temporarily replacing their periods
+        // Protect common abbreviations and numeric periods by temporarily replacing their periods
         const protectedText = text
-            .replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__DOT__');
+            .replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__DOT__')
+            .replace(/(\d+)\.(\d+)/g, '$1__NUMDOT__$2')
+            .replace(/^(\s*\d+)\.\s+/gm, '$1__LISTDOT__ ');
 
-        const raw = protectedText.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+$/g);
+        const raw = protectedText.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+(?:\n+|$)/g);
         if (!raw) return [];
 
         return raw
-            .map(s => s.replace(/__DOT__/g, '.').trim())
+            .map(s => s.replace(/__DOT__/g, '.').replace(/__NUMDOT__/g, '.').replace(/__LISTDOT__/g, '. ').trim())
             .filter(s => s.length > 0);
     }
 

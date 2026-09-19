@@ -52,9 +52,9 @@ class TextHumanizer {
 
         let protectedText = text;
 
-        // 1. Protect multi-line / full greeting headers at the beginning of paragraphs
-        protectedText = protectedText.replace(/(?:^|\n)\s*((?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|yth\.?[^\n\.\,]+|kepada\s+yth\.?[^\n\.\,]+|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)[^\n\.\,]*|dengan\s+hormat,?\s*|dear\s+[^\n\.\,]+)[^\n]*?(?:\.|\n|$))/gi, (match) => {
-            return addToken(match);
+        // 1. Protect formal greetings WITHOUT consuming preceding or following newlines
+        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|yth\.?[^\n\.\,]+|kepada\s+yth\.?[^\n\.\,]+|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)[^\n\.\,]*|dengan\s+hormat,?\s*|dear\s+[^\n\.\,]+)[^\n\.\?!]*(?:[\.\?!]|$)/gi, (match) => {
+            return addToken(match.trim());
         });
 
         // 2. Protect parenthetical technical definitions or acronym references (e.g. "(APT)", "(multi-factor model)")
@@ -115,11 +115,14 @@ class TextHumanizer {
     /**
      * Splits paragraph into complete sentences safely, protecting abbreviation dots.
      */
-    splitSentences(paragraph) {
-        const protectedPara = paragraph.replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__ABBR_DOT__');
-        const matches = protectedPara.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+$/g);
-        if (!matches) return [paragraph];
-        return matches.map(s => s.replace(/__ABBR_DOT__/g, '.').trim()).filter(s => s.length > 0);
+    splitSentences(lineText) {
+        if (!lineText || !lineText.trim()) return [];
+        const protectedLine = lineText
+            .replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__ABBR_DOT__')
+            .replace(/(\d+)\.(\d+)/g, '$1__NUMDOT__$2');
+        const matches = protectedLine.match(/[^.!?\n]+[.!?]+(?:\s+|$)|[^.!?\n]+$/g);
+        if (!matches) return [lineText];
+        return matches.map(s => s.replace(/__ABBR_DOT__/g, '.').replace(/__NUMDOT__/g, '.').trim()).filter(s => s.length > 0);
     }
 
     /**
@@ -201,7 +204,7 @@ class TextHumanizer {
             const currentWords = current.split(/\s+/).filter(Boolean);
 
             // Safe sentence split for overly long AI sentences (>18 words) with coordinating conjunctions or markers
-            if (currentWords.length > 18 && !current.includes('__ANTISLOP_TOKEN_0__')) {
+            if (currentWords.length > 18) {
                 const splitRegex = lang === 'id'
                     ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s+itu|di\s+mana|yakni|yaitu)\s+)/i
                     : /(,\s*(?:however|whereas|meaning\s+that|while|whereby|namely)\s+)/i;
@@ -425,12 +428,34 @@ class TextHumanizer {
         // LAYER 1: Token Protection Guard (Acronyms, greetings, numbers, quotes)
         const { text: guardedText, tokens } = this.protectTokens(text);
 
-        const paragraphs = this.splitParagraphs(guardedText);
-        const transformedParagraphs = [];
+        // Split text by lines to preserve 100% of enters, newlines, and paragraph structures
+        const lines = guardedText.split(/\r?\n/);
+        const transformedLines = [];
 
-        for (const para of paragraphs) {
-            // Step 1: Split into individual sentences
-            let sentences = this.splitSentences(para);
+        for (const line of lines) {
+            // If the line is empty or purely whitespace, preserve it exactly (maintains double enters / blank lines)
+            if (line.trim().length === 0) {
+                transformedLines.push(line);
+                continue;
+            }
+
+            // Preserve leading indentation / whitespace (e.g. tabs or spaces)
+            const leadingWhitespaceMatch = line.match(/^[ \t]*/);
+            const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : "";
+            const trimmedLine = line.slice(leadingWhitespace.length);
+
+            // Preserve list prefixes (e.g. "1. ", "a) ", "- ", "• ")
+            const listPrefixMatch = trimmedLine.match(/^(\d+[\.\)]\s*|[-*•]\s*|[a-zA-Z][\.\)]\s*)/);
+            let listPrefix = "";
+            let contentToProcess = trimmedLine;
+
+            if (listPrefixMatch) {
+                listPrefix = listPrefixMatch[0];
+                contentToProcess = trimmedLine.slice(listPrefix.length);
+            }
+
+            // Step 1: Split into individual sentences within this line
+            let sentences = this.splitSentences(contentToProcess);
 
             // Step 2: Layer 2 - De-Slop Cliché & Formulaic AI Removal
             sentences = sentences.map(s => this.replaceCliches(s, lang));
@@ -444,20 +469,23 @@ class TextHumanizer {
             // Step 5: Layer 5 - Tone Voice Modulation
             sentences = this.applyToneStyling(sentences, tone, lang, effectiveIntensity);
 
-            transformedParagraphs.push(sentences.join(' '));
+            // Reassemble line with its original indentation and list prefix
+            const processedContent = sentences.join(' ');
+            transformedLines.push(leadingWhitespace + listPrefix + processedContent);
         }
 
-        let result = transformedParagraphs.join('\n\n');
+        let result = transformedLines.join('\n');
 
         // LAYER 6: Post-Processing & Token Restoration
         result = this.restoreTokens(result, tokens);
 
-        // Normalize spacing around punctuation
+        // Normalize spacing: ONLY touch horizontal whitespace (spaces/tabs)!
+        // NEVER replace \n or \r!
         result = result
-            .replace(/\s+([,\.!\?;:])/g, '$1')
+            .replace(/[ \t]+([,\.!\?;:])/g, '$1')
             .replace(/([,\.!\?;:])([a-zA-Zà-ž])/g, '$1 $2')
-            .replace(/\s{2,}/g, ' ')
-            .replace(/\n\s+\n/g, '\n\n')
+            .replace(/[ \t]{2,}/g, ' ')
+            .replace(/[ \t]+$/gm, '') // Remove trailing whitespace on each line
             .trim();
 
         return result;

@@ -97,7 +97,7 @@ const LANGUAGES = {
             { pattern: /\bsetiap\s+hari\b/gi, replacement: "setiap harinya" },
 
             // 7. Academic Case-Study Clichés (Clean, Human, Rigorous)
-            { pattern: /\bBerdasarkan\s+(?:ilustrasi|analisis|uraian|penjelasan|paparan|data|kajian)?\s*(?:kasus|soal|studi|permasalahan)?\s*(?:di atas|tersebut),?\s*/gi, replacement: "Mencermati paparan kasus di atas, " },
+            { pattern: /\bBerdasarkan\s+(?:studi\s+kasus|ilustrasi|analisis|uraian|penjelasan|paparan|data|kajian|kasus|soal|studi|permasalahan)?\s*(?:di atas|tersebut),?\s*/gi, replacement: "Mencermati paparan kasus di atas, " },
             { pattern: /\bsebagai seorang investor saya lebih memilih pendekatan\s*([a-zA-Z0-9_-]+)?\b/gi, replacement: "pilihan saya jatuh pada pendekatan $1" },
             { pattern: /\bsebagai seorang investor saya lebih memilih\b/gi, replacement: "saya lebih memilih" },
             { pattern: /\bsaya lebih memilih pendekatan\s*([a-zA-Z0-9_-]+)?\b/gi, replacement: "pilihan saya jatuh pada opsi $1" },
@@ -398,7 +398,7 @@ const HUMANIZER_DICTIONARY = {
         "tujuan": ["sasaran", "orientasi", "arah capaian", "fokus utama"],
         "faktor": ["variabel", "parameter", "elemen penggerak", "unsur"],
         "alasan": ["pertimbangan", "alasan", "argumen", "dasar pemikiran"],
-        "asumsi": ["anggapan", "asumsi", "premis", "landasan berpikir"],
+        "asumsi": ["anggapan", "premis", "asumsi dasar"],
         "kondisi": ["situasi", "keadaan", "kondisi di lapangan"],
         "situasi": ["kondisi", "keadaan nyata", "konteks"],
         "peluang": ["kesempatan", "peluang", "potensi"],
@@ -407,6 +407,7 @@ const HUMANIZER_DICTIONARY = {
         "strategi": ["langkah terukur", "strategi", "pendekatan"],
         "efisiensi": ["efisiensi", "penghematan", "daya guna"],
         "kinerja": ["performa", "produktivitas", "kinerja"],
+        "krusial": ["sangat menentukan", "mendasar", "vital", "kunci"],
         "kemampuan": ["kapabilitas", "kemampuan", "keahlian"],
         "kebutuhan": ["keperluan", "kebutuhan", "prioritas"],
         "kebijakan": ["regulasi", "aturan", "kebijakan"],

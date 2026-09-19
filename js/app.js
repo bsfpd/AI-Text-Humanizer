@@ -352,24 +352,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 13. Render Diff View
     function renderDiff() {
-        const originalWords = (state.inputText || '').split(/\s+/).filter(Boolean);
-        const transformedWords = (state.outputText || '').split(/\s+/).filter(Boolean);
-
-        if (!transformedWords.length) {
+        if (!state.outputText) {
             elements.diffContainer.innerHTML = `<div class="p-8 text-center text-slate-400">Konversikan teks terlebih dahulu untuk melihat perbandingan perubahan kata.</div>`;
             return;
         }
 
-        const origSet = new Set(originalWords.map(w => w.toLowerCase()));
-        let html = '<div class="leading-relaxed p-4 font-sans text-slate-800 dark:text-slate-200">';
+        const originalWords = (state.inputText || '').split(/\s+/).filter(Boolean);
+        const origSet = new Set(originalWords.map(w => w.toLowerCase().replace(/[^a-zA-Zà-ž0-9_-]/g, '')));
 
-        transformedWords.forEach(word => {
-            const clean = word.toLowerCase().replace(/[^a-zA-Zà-ž0-9_-]/g, '');
-            if (clean && !origSet.has(clean)) {
-                html += `<span class="diff-added">${word}</span> `;
-            } else {
-                html += `${word} `;
+        const lines = (state.outputText || '').split(/\r?\n/);
+        let html = '<div class="leading-relaxed p-4 font-sans text-slate-800 dark:text-slate-200 space-y-2">';
+
+        lines.forEach(line => {
+            if (line.trim().length === 0) {
+                html += '<div class="h-4"></div>';
+                return;
             }
+            let lineHtml = '<div>';
+            const words = line.split(/[ \t]+/).filter(Boolean);
+            words.forEach(word => {
+                const clean = word.toLowerCase().replace(/[^a-zA-Zà-ž0-9_-]/g, '');
+                if (clean && !origSet.has(clean)) {
+                    lineHtml += `<span class="diff-added">${word}</span> `;
+                } else {
+                    lineHtml += `${word} `;
+                }
+            });
+            lineHtml += '</div>';
+            html += lineHtml;
         });
 
         html += '</div>';
