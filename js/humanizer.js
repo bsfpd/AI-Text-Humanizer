@@ -205,7 +205,11 @@ class TextHumanizer {
             const currentWords = current.split(/\s+/).filter(Boolean);
 
             // Safe sentence split for overly long AI sentences (>18 words) with coordinating conjunctions or markers
-            if (currentWords.length > 18) {
+            // Do NOT split if sentence begins with a subordinate conjunction (e.g. "Ketika...", "Saat...", "Jika...")
+            // because splitting would leave the first part as an incomplete clause fragment!
+            const isSubordinateStart = /^(?:ketika|saat|apabila|jika|meskipun|walaupun|kendati|sebelum|setelah|sewaktu|tatkala|when|while|if|although|despite|even though)\b/i.test(current.trim());
+
+            if (!isSubordinateStart && currentWords.length > 18) {
                 const splitRegex = lang === 'id'
                     ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s+itu|di\s+mana|yakni|yaitu)\s+)/i
                     : /(,\s*(?:however|whereas|meaning\s+that|while|whereby|namely)\s+)/i;
@@ -222,7 +226,14 @@ class TextHumanizer {
                         if (opener.toLowerCase() === 'yakni' || opener.toLowerCase() === 'yaitu') {
                             opener = 'Secara khusus,';
                         } else if (opener.toLowerCase() === 'sehingga') {
-                            opener = 'Hal ini membuat';
+                            const openers = ['Kondisi ini memungkinkan', 'Hal ini membuat', 'Dengan demikian,', 'Dampaknya,', 'Dengan begitu,'];
+                            opener = openers[Math.floor(Math.random() * openers.length)];
+                        } else if (opener.toLowerCase() === 'namun' || opener.toLowerCase() === 'tetapi') {
+                            const openers = ['Namun,', 'Akan tetapi,', 'Hanya saja,', 'Di sisi lain,'];
+                            opener = openers[Math.floor(Math.random() * openers.length)];
+                        } else if (opener.toLowerCase() === 'sementara itu') {
+                            const openers = ['Sementara itu,', 'Di saat bersamaan,'];
+                            opener = openers[Math.floor(Math.random() * openers.length)];
                         } else {
                             opener = `${opener},`;
                         }
@@ -254,33 +265,6 @@ class TextHumanizer {
             i++;
         }
 
-        // Dynamically inject a human anchor sentence (2-5 words) if sentences lack burstiness variance
-        if (result.length >= 2 && !result[0].startsWith('__ANTISLOP_TOKEN')) {
-            const wordCounts = result.map(s => s.split(/\s+/).filter(Boolean).length);
-            const avg = wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length;
-            const variance = wordCounts.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / wordCounts.length;
-            const stdDev = Math.sqrt(variance);
-
-            // If sentence length variance is too low (< 4 words stdDev), inject an authentic human anchor
-            if (stdDev < 4.0 && wordCounts.every(w => w > 10) && wordCounts.reduce((a, b) => a + b, 0) > 28) {
-                const anchors = {
-                    academic: ["Dampaknya nyata.", "Dasar pertimbangannya jelas.", "Fokus kajiannya tegas.", "Pilihannya berdasar kuat."],
-                    formal: ["Langkah ini penting.", "Prioritasnya sudah tepat.", "Tantangannya memang nyata."],
-                    casual: ["Simpel sebetulnya.", "Pilihannya jelas.", "Masuk akal, kan?"],
-                    journalistic: ["Faktanya berbicara demikian.", "Kondisinya jelas."],
-                    creative: ["Satu hal yang pasti.", "Jawabannya ada di sana."],
-                    simple: ["Intinya jelas.", "Poinnya sederhana."]
-                };
-                const pool = anchors[tone] || anchors.academic;
-                const anchor = pool[Math.floor(Math.random() * pool.length)];
-                // Insert after sentence 1 or 2, ensuring no colon preceding
-                const insertIdx = Math.min(2, result.length - 1);
-                if (!result[insertIdx - 1]?.endsWith(':') && !result[insertIdx]?.endsWith(':')) {
-                    result.splice(insertIdx, 0, anchor);
-                }
-            }
-        }
-
         return result;
     }
 
@@ -309,15 +293,48 @@ class TextHumanizer {
 
             const lower = match.toLowerCase();
 
-            // 3. Protect fixed collocations
+            // 3. Protect fixed collocations (both prefix and suffix)
             const before = fullStr.slice(0, offset);
-            if (lower === 'hasil' && /\bimbal\s+$/i.test(before)) return match;
-            if (lower === 'daya' && /\bsumber\s+$/i.test(before)) return match;
-            if (lower === 'kerja' && /\btata\s+$/i.test(before)) return match;
+            const after = fullStr.slice(offset + match.length);
+
+            if (lower === 'tinggi' && /\bperguruan\s+$/i.test(before)) return match;
+            if (lower === 'perguruan' && /^\s+tinggi\b/i.test(after)) return match;
+            if (lower === 'waktu' && /\b(?:menyisihkan|meluangkan|tenggat|kurun|jangka|luang)\s+$/i.test(before)) return match;
+            if (lower === 'kesempatan' && /\b(?:menyisihkan|meluangkan)\s+$/i.test(before)) return match;
             if (lower === 'modal' && /\bpasar\s+$/i.test(before)) return match;
+            if (lower === 'pasar' && /^\s+(?:modal|uang|tenaga\s+kerja)\b/i.test(after)) return match;
+            if (lower === 'asumsi' && /^\s+(?:tambahan|dasar|logis)\b/i.test(after)) return match;
+            if (lower === 'tambahan' && /\basumsi\s+$/i.test(before)) return match;
+            if (lower === 'kurva' && /^\s+(?:pembelajaran|belajar)\b/i.test(after)) return match;
+            if ((lower === 'pembelajaran' || lower === 'belajar') && /\bkurva\s+$/i.test(before)) return match;
+            if (lower === 'daya' && /\bsumber\s+$/i.test(before)) return match;
+            if (lower === 'sumber' && /^\s+daya\b/i.test(after)) return match;
+            if (lower === 'kerja' && /\b(?:tata|pola|ruang)\s+$/i.test(before)) return match;
+            if (lower === 'kelola' && /\btata\s+$/i.test(before)) return match;
+            if (lower === 'tata' && /^\s+(?:kelola|kerja|tertib|ruang)\b/i.test(after)) return match;
+            if (lower === 'pasok' && /\brantai\s+$/i.test(before)) return match;
+            if (lower === 'rantai' && /^\s+pasok\b/i.test(after)) return match;
+            if (lower === 'keluar' && /\bjalan\s+$/i.test(before)) return match;
+            if (lower === 'jalan' && /^\s+keluar\b/i.test(after)) return match;
+            if (lower === 'hasil' && /\bimbal\s+$/i.test(before)) return match;
+            if (lower === 'imbal' && /^\s+hasil\b/i.test(after)) return match;
             if (lower === 'faktor' && /\b(?:banyak|multi)[\s-]*$/i.test(before)) return match;
             if (lower === 'penghasilan' && /\bpajak\s+$/i.test(before)) return match;
             if (lower === 'sistematis' && /\brisiko\s+$/i.test(before)) return match;
+            if (lower === 'risiko' && /^\s+(?:pasar|sistematis)\b/i.test(after)) return match;
+            if (lower === 'kas' && /\barus\s+$/i.test(before)) return match;
+            if (lower === 'arus' && /^\s+kas\b/i.test(after)) return match;
+            if (lower === 'saing' && /\bdaya\s+$/i.test(before)) return match;
+            if (lower === 'daya' && /^\s+saing\b/i.test(after)) return match;
+            if (lower === 'impas' && /\btitik\s+$/i.test(before)) return match;
+            if (lower === 'titik' && /^\s+impas\b/i.test(after)) return match;
+            if (lower === 'tetapi' && /\bakan\s+$/i.test(before)) return match;
+            if (lower === 'akan' && /^\s+tetapi\b/i.test(after)) return match;
+            if (lower === 'hanya' && /^\s+saja\b/i.test(after)) return match;
+            if (lower === 'saja' && /\bhanya\s+$/i.test(before)) return match;
+            if (lower === 'sisi' && /\bdi\s+$/i.test(before) && /^\s+lain\b/i.test(after)) return match;
+            if (lower === 'lain' && /\bdi\s+sisi\s+$/i.test(before)) return match;
+            if (lower === 'hal' && /\b(?:mempelajari|belajar)\s+$/i.test(before)) return match;
 
             // 4. Context-safe synonym injection
             if (dictSource[lower] && Math.random() < changeProbability) {
@@ -455,6 +472,14 @@ class TextHumanizer {
             if (listPrefixMatch) {
                 listPrefix = listPrefixMatch[0];
                 contentToProcess = trimmedLine.slice(listPrefix.length);
+            }
+
+            // Check if line is a header / title / label (e.g., "Asumsi Tambahan:", "Catatan:", "### Header")
+            // Preserve headers verbatim to prevent corrupting titles or section labels
+            const isHeaderOrLabel = /^#{1,6}\s+/.test(contentToProcess) || /^[A-Za-z0-9\s]{1,35}:$/.test(contentToProcess.trim());
+            if (isHeaderOrLabel) {
+                transformedLines.push(leadingWhitespace + listPrefix + contentToProcess);
+                continue;
             }
 
             // Step 1: Split into individual sentences within this line
