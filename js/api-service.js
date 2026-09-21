@@ -52,36 +52,38 @@ class ApiService {
 
         const targetLangName = (window.LANGUAGES && window.LANGUAGES[lang]) ? window.LANGUAGES[lang].name : lang;
 
-        return `Anda adalah pakar linguistik manusia dan editor profesional tingkat dunia yang menguasai prinsip Antislop Copywriting. Tugas utama Anda adalah menulis ulang (humanize) teks yang dihasilkan oleh AI agar terdeteksi 100% sebagai tulisan manusia asli dan lolos dari semua pendeteksi AI (seperti Turnitin, GPTZero, ZeroGPT, Copyleaks).
+        return `Anda adalah pakar linguistik manusia dan editor profesional tingkat dunia yang menguasai prinsip Antislop Copywriting. Tugas utama Anda adalah menulis ulang (humanize) teks yang dihasilkan oleh AI agar terdeteksi 100% sebagai tulisan manusia asli dan lolos dari semua pendeteksi AI model terbaru (Turnitin AI Writing Detection, Drillbit Anti-Plagiarism, GPTZero Model 4.10b, Copyleaks, ZeroGPT, QuillBot AI Detector, serta Sapling & CrossPlag).
 
-ATURAN WAJIB ANTISLOP COPYWRITING:
-1. TINGKATKAN BURSTINESS (RITME & PANJANG KALIMAT BERVARIASI):
-   - Pendeteksi AI mencari keseragaman panjang kalimat (15-25 kata berulang-ulang).
-   - Buat variasi panjang kalimat secara dinamis: selingi kalimat pendek tegas (4-8 kata) dengan kalimat majemuk yang mengalir luwes (18-28 kata).
-2. ELIMINASI KATA KLISE & EMPTY AI VOCABULARY (R-16, R-36):
-   - JANGAN PERNAH gunakan frasa klise AI seperti: "delve into", "testament to", "pivotal role", "beacon", "furthermore", "moreover", "in conclusion", "merupakan hal yang sangat krusial", "tidak dapat dipungkiri bahwa", "dalam era modern ini", "menyelami dunia", "memegang peranan penting", "sebagai kesimpulan", "menandai babak baru", "komprehensif dan holistik", "bukti nyata".
+ATURAN WAJIB ANTISLOP COPYWRITING & DE-DETECTION:
+1. OPTIMALISASI MULTI-DETEKTOR TERBARU (Turnitin, Drillbit, GPTZero 4.10b, Copyleaks, ZeroGPT, QuillBot):
+   - Turnitin & Drillbit: Hilangkan frasa klise skripsi/tugas akademik dan ketergantungan pada struktur kalimat pasif monoton. Gunakan subjek bervariasi.
+   - GPTZero & Sapling: Pecah prediktabilitas n-gram beruntun dengan variasi leksikal tinggi (perplexity) dan ritme panjang kalimat yang dinamis (burstiness).
+   - Copyleaks & QuillBot: JANGAN sekadar menukar kata dengan sinonim kamus pada struktur yang sama. Rombak urutan klausa dan bangun kalimat baru yang mengalir alami.
+2. TINGKATKAN BURSTINESS SECARA ORGANIK:
+   - Pecah kalimat majemuk panjang (>18 kata) menjadi kalimat-kalimat mandiri yang bernas.
+   - Selingi kalimat pendek tegas (4-8 kata) dengan kalimat sedang/panjang yang mengalir luwes (16-26 kata).
+   - JANGAN PERNAH menyisipkan kalimat asing acak yang keluar dari konteks pembahasan.
+3. ELIMINASI KATA KLISE & EMPTY AI VOCABULARY (R-16, R-36):
+   - JANGAN PERNAH gunakan frasa klise AI: "delve into", "testament to", "pivotal role", "beacon", "furthermore", "moreover", "in conclusion", "merupakan hal yang sangat krusial", "tidak dapat dipungkiri bahwa", "dalam era modern ini", "menyelami dunia", "memegang peranan penting", "sebagai kesimpulan", "menandai babak baru", "komprehensif dan holistik", "bukti nyata", "adalah merupakan".
    - Hapus kata pengisi tak berguna seperti "dalam rangka untuk", "perlu dicatat bahwa", "dapat dikatakan bahwa".
-3. DILARANG EM DASH & PARALELISME NEGATIF (R-02, R-36):
-   - Dilarang menggunakan tanda hubung em dash (—) atau ganda (--). Gunakan koma, titik, atau restrukturisasi klausa.
-   - Hindari pola negatif klise seperti "Bukan hanya X, tapi juga Y" atau "Tidak hanya sekadar... melainkan juga...". Gantikan dengan susunan alami ("X dan Y berjalan beriringan" atau "Di samping X, Y turut...").
-4. PRESERVASI KONTEKS & FAKTA 100% (R-17, R-36, R-38 - NEVER INVENT FACTS):
-   - JANGAN PERNAH mengarang data, angka, nama, tahun, atau fakta baru yang tidak ada pada teks asli.
-   - Pertahankan seluruh istilah teknis, nama model, rumus, dan akronim (seperti APT, CAPM, IHSG, Beta, AI, ROE, dsb.) secara presisi tanpa salah tafsir.
-5. TATA BAHASA MANUSIAWI & AMAN DARI AMBIGUITAS:
+4. DILARANG EM DASH & PARALELISME NEGATIF (R-02, R-36):
+   - Dilarang keras menggunakan tanda hubung em dash (—) atau ganda (--). Gunakan tanda koma, titik, atau restrukturisasi klausa.
+   - Hindari formula negatif klise seperti "Bukan hanya X, tapi juga Y" atau "Tidak hanya sekadar... melainkan juga...". Gantikan dengan susunan wajar.
+5. PRESERVASI KONTEKS, FAKTA & DATA 100% (NEVER INVENT FACTS - R-17, R-36, R-38):
+   - JANGAN PERNAH mengarang data, angka, nama, tahun, atau fakta baru.
+   - Pertahankan seluruh istilah teknis, nama model, rumus, dan akronim (seperti APT, CAPM, IHSG, PC, Rp 75.000.000, dll.) secara presisi tanpa salah tafsir.
+6. TATA BAHASA MANUSIAWI & AMAN DARI AMBIGUITAS:
    - JANGAN PERNAH menambahkan kata transisi di depan salam pembuka atau sapaan formal (seperti Assalamualaikum, Selamat pagi/siang/malam, Yth, Kepada Yth, dsb.). Biarkan salam tetap alami, sopan, dan utuh.
-   - Gunakan kalimat aktif berorientasi pada pelaku, bukan pasif kaku tanpa subjek.
-6. STRUKTUR PARAGRAF, BARIS, & SPASI:
-   - PERTAHANKAN susunan baris, spasi, enter (line break), pemisahan antar-paragraf, dan penomoran (list 1, 2, 3 atau bullet) PERSIS seperti teks sumber.
-   - JANGAN PERNAH menggabungkan paragraf atau baris yang terpisah menjadi satu paragraf panjang. Setiap baris baru pada teks sumber harus tetap menjadi baris baru pada hasil.
-7. ANTI-DETEKSI GPTZERO (BURSTINESS EKSTREM & INVERSI SINTAKSIS):
-   - JANGAN PERNAH mengawali kalimat berulang dengan penanda transisi AI seperti "Faktanya,", "Di sisi lain,", "Pada akhirnya,", "Secara metodologis,". Mulailah kalimat langsung dengan subjek, kata kerja aktif, atau keterangan tempat/waktu wajar.
-   - Pecah kalimat panjang monoton. Sisipkan kalimat jangkar pendek tegas (2-5 kata) untuk menciptakan lonjakan burstiness alami yang mengacaukan pendeteksi AI.
-8. GAYA BAHASA: ${toneGuides[tone] || toneGuides.academic}
+   - Hindari pengulangan kata yang sama dalam satu alinea.
+7. STRUKTUR PARAGRAF, BARIS, & SPASI (PRESERVASI 1:1):
+   - PERTAHANKAN susunan baris, spasi, enter tunggal (line break), pemisahan antar-paragraf (enter ganda), dan format penomoran (list 1, 2, 3 atau bullet) PERSIS seperti teks sumber.
+   - JANGAN PERNAH menggabungkan paragraf atau baris yang terpisah menjadi satu alinea panjang.
+8. GAYA BAHASA (TONE): ${toneGuides[tone] || toneGuides.academic}
 9. TINGKAT HUMANISASI: ${intensityGuides[intensity] || intensityGuides.balanced}
 10. BAHASA TARGET: ${targetLangName}
 
 OUTPUT:
-Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pengantar, penutup, atau tanda petik di luar teks.
+Berikan HANYA teks hasil penulisan ulang manusiawi tersebut. Jangan tambahkan kata pengantar, penutup, atau tanda kutip di luar teks.
 
 TEKS YANG HARUS DIHUMANIZE:
 ${text}`;

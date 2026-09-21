@@ -128,9 +128,9 @@ class TextHumanizer {
 
     /**
      * LAYER 2: De-Slop & Cliché Stripping (R-16, R-36, R-02)
-     * Replaces universal AI clichés, announcements, and empty pompous phrasing.
+     * Replaces universal AI clichés, announcements, and empty pompous phrasing across tones.
      */
-    replaceCliches(sentence, lang) {
+    replaceCliches(sentence, lang, tone) {
         let modified = sentence;
         const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang])
             ? window.LANGUAGES[lang]
@@ -138,6 +138,13 @@ class TextHumanizer {
 
         if (langPack && langPack.cliches) {
             langPack.cliches.forEach(rule => {
+                modified = modified.replace(rule.pattern, rule.replacement);
+            });
+        }
+
+        // Apply tone-specific patterns from language pack if available
+        if (tone && langPack && langPack.toneReplacements && langPack.toneReplacements[tone]) {
+            langPack.toneReplacements[tone].forEach(rule => {
                 modified = modified.replace(rule.pattern, rule.replacement);
             });
         }
@@ -151,7 +158,9 @@ class TextHumanizer {
                 .replace(/\bagar\s+supaya\b/gi, "agar")
                 .replace(/\badalah\s+merupakan\b/gi, "merupakan")
                 .replace(/\bsangat\s+amat\b/gi, "sangat")
+                .replace(/\bamat\s+sangat\b/gi, "amat")
                 .replace(/\bhanya\s+sekadar\b/gi, "sekadar")
+                .replace(/\bhanya\s+cuma\b/gi, "cuma")
                 .replace(/\bdemi\s+untuk\b/gi, "demi");
         }
 
@@ -221,19 +230,46 @@ class TextHumanizer {
                     
                     if (secondPart.length > 0) {
                         const rawConnector = match[1].replace(/^[,\s]+|[,\s]+$/g, '');
-                        // Transform connector into natural independent opener
+                        // Transform connector into natural independent opener tailored to the selected tone
                         let opener = rawConnector.charAt(0).toUpperCase() + rawConnector.slice(1);
                         if (opener.toLowerCase() === 'yakni' || opener.toLowerCase() === 'yaitu') {
-                            opener = 'Secara khusus,';
+                            opener = (tone === 'academic' || tone === 'formal') ? 'Secara khusus,' : (tone === 'simple' ? 'Yakni,' : 'Tepatnya,');
                         } else if (opener.toLowerCase() === 'sehingga') {
-                            const openers = ['Kondisi ini memungkinkan', 'Hal ini membuat', 'Dengan demikian,', 'Dampaknya,', 'Dengan begitu,'];
-                            opener = openers[Math.floor(Math.random() * openers.length)];
+                            const openersByTone = {
+                                academic: ['Dengan demikian,', 'Kondisi ini memungkinkan', 'Dampaknya,', 'Hal ini membuat', 'Secara analitis,'],
+                                formal: ['Sejalan dengan itu,', 'Langkah ini memungkinkan', 'Implikasinya,', 'Dengan begitu,', 'Secara operasional,'],
+                                casual: ['Makanya,', 'Di sisi lain,', 'Alhasil,', 'Nah, dari sini', 'Untungnya,'],
+                                journalistic: ['Sementara itu,', 'Catatannya,', 'Di saat bersamaan,', 'Kondisi ini membuat', 'Dampaknya,'],
+                                creative: ['Perlahan,', 'Di balik itu,', 'Tanpa disadari,', 'Pada titik ini,', 'Seketika,'],
+                                simple: ['Hasilnya,', 'Artinya,', 'Maka dari itu,', 'Akibatnya,', 'Dengan ini,']
+                            };
+                            const pool = openersByTone[tone] || openersByTone.academic;
+                            opener = pool[Math.floor(Math.random() * pool.length)];
                         } else if (opener.toLowerCase() === 'namun' || opener.toLowerCase() === 'tetapi') {
-                            const openers = ['Namun,', 'Akan tetapi,', 'Hanya saja,', 'Di sisi lain,'];
+                            const openersByTone = {
+                                academic: ['Namun,', 'Akan tetapi,', 'Hanya saja,', 'Di sisi lain,'],
+                                formal: ['Kendati demikian,', 'Namun secara operasional,', 'Akan tetapi,', 'Di sisi lain,'],
+                                casual: ['Tapi nyatanya,', 'Tapi ya,', 'Hanya saja,', 'Namun,'],
+                                journalistic: ['Namun di lapangan,', 'Sementara itu,', 'Faktanya,', 'Di sisi lain,'],
+                                creative: ['Namun demikian,', 'Di balik tirai itu,', 'Tetapi perlahan,', 'Hanya saja,'],
+                                simple: ['Tapi,', 'Namun,', 'Hanya saja,']
+                            };
+                            const pool = openersByTone[tone] || openersByTone.academic;
+                            opener = pool[Math.floor(Math.random() * pool.length)];
+                        } else if (opener.toLowerCase() === 'sedangkan' || opener.toLowerCase() === 'padahal') {
+                            const openers = ['Padahal,', 'Sebaliknya,', 'Di sisi lain,', 'Sementara itu,'];
                             opener = openers[Math.floor(Math.random() * openers.length)];
                         } else if (opener.toLowerCase() === 'sementara itu') {
-                            const openers = ['Sementara itu,', 'Di saat bersamaan,'];
+                            const openers = ['Sementara itu,', 'Di saat bersamaan,', 'Di waktu yang sama,'];
                             opener = openers[Math.floor(Math.random() * openers.length)];
+                        } else if (lang === 'en') {
+                            if (/however/i.test(opener)) {
+                                opener = tone === 'academic' ? 'Nevertheless,' : (tone === 'casual' ? 'Still,' : 'However,');
+                            } else if (/whereas|while/i.test(opener)) {
+                                opener = tone === 'academic' ? 'In contrast,' : 'Meanwhile,';
+                            } else if (/meaning that/i.test(opener)) {
+                                opener = tone === 'academic' ? 'Consequently,' : 'As a result,';
+                            }
                         } else {
                             opener = `${opener},`;
                         }
@@ -253,7 +289,7 @@ class TextHumanizer {
                     const cleanCurrent = current.replace(/[.!?]+$/, '');
                     const cleanNext = next.charAt(0).toLowerCase() + next.slice(1);
                     const glue = lang === 'id'
-                        ? (tone === 'academic' ? ' sekaligus ' : ' dan ')
+                        ? (tone === 'academic' ? ' sekaligus ' : (tone === 'casual' ? ' dan juga ' : (tone === 'formal' ? ' serta ' : ' dan ')))
                         : (tone === 'academic' ? ', whereby ' : ', and ');
                     result.push(cleanCurrent + glue + cleanNext);
                     i += 2;
@@ -332,9 +368,14 @@ class TextHumanizer {
             if (lower === 'akan' && /^\s+tetapi\b/i.test(after)) return match;
             if (lower === 'hanya' && /^\s+saja\b/i.test(after)) return match;
             if (lower === 'saja' && /\bhanya\s+$/i.test(before)) return match;
-            if (lower === 'sisi' && /\bdi\s+$/i.test(before) && /^\s+lain\b/i.test(after)) return match;
-            if (lower === 'lain' && /\bdi\s+sisi\s+$/i.test(before)) return match;
             if (lower === 'hal' && /\b(?:mempelajari|belajar)\s+$/i.test(before)) return match;
+            if (lower === 'operasional' && /\b(?:efisiensi|biaya|kegiatan)\s+$/i.test(before)) return match;
+            if (lower === 'efisiensi' && /^\s+operasional\b/i.test(after)) return match;
+            if (lower === 'informasi' && /\bsistem\s+$/i.test(before)) return match;
+            if (lower === 'sistem' && /^\s+informasi\b/i.test(after)) return match;
+            if (lower === 'potensi' && /^\s+(?:pemangkasan|risiko|bahaya|konflik|kerugian)\b/i.test(after)) return match;
+            if ((lower === 'cepat' || lower === 'singkat') && /\brelatif\s+$/i.test(before)) return match;
+            if (lower === 'langsung' && /\bsecara\s+$/i.test(before)) return match;
 
             // 4. Context-safe synonym injection
             if (dictSource[lower] && Math.random() < changeProbability) {
@@ -359,6 +400,13 @@ class TextHumanizer {
      * Shapes tone-specific vocabulary and rhetorical pacing without robotic transition spam.
      */
     applyToneStyling(sentences, tone, lang, intensity) {
+        const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang])
+            ? window.LANGUAGES[lang]
+            : null;
+        const toneRules = (langPack && langPack.toneReplacements && langPack.toneReplacements[tone])
+            ? langPack.toneReplacements[tone]
+            : [];
+
         return sentences.map((sentence, idx) => {
             let processed = sentence.trim();
 
@@ -366,56 +414,66 @@ class TextHumanizer {
                 return processed;
             }
 
-            // 1. AKADEMIK (Academic) Tone
+            // 1. Apply tone-specific rules from language pack
+            toneRules.forEach(rule => {
+                processed = processed.replace(rule.pattern, rule.replacement);
+            });
+
+            // 2. Rhetorical and syntactic shaping across all 6 tones
             if (tone === 'academic') {
                 processed = processed
                     .replace(/\bsangat\s+bagus\b/gi, "berkualitas tinggi")
-                    .replace(/\bmenguntungkan\b/gi, "memberi keuntungan nyata")
+                    .replace(/\bmenguntungkan\b/gi, "memberi nilai tambah nyata")
                     .replace(/\bbikin\b/gi, "menghasilkan")
                     .replace(/\bnggak\b/gi, "tidak")
                     .replace(/\bcuma\b/gi, "hanya")
                     .replace(/\bbanget\b/gi, "sangat")
-                    .replace(/\bvery\s+good\b/gi, "notably effective");
-            }
-
-            // 2. FORMAL & BISNIS (Formal & Business) Tone
-            else if (tone === 'formal') {
+                    .replace(/\bvery\s+good\b/gi, "notably effective")
+                    .replace(/\bbig\s+problem\b/gi, "fundamental challenge");
+            } else if (tone === 'formal') {
                 processed = processed
-                    .replace(/\bkita\s+harus\b/gi, "kita perlu")
+                    .replace(/\bkita\s+harus\b/gi, "manajemen perlu")
                     .replace(/\bwe\s+must\b/gi, "it is recommended to")
                     .replace(/\bdiharapkan\b/gi, "menjadi fokus utama untuk")
-                    .replace(/\bngomong-ngomong\b/gi, "sebagai informasi tambahan");
-            }
-
-            // 3. SANTAI (Casual) Tone
-            else if (tone === 'casual') {
+                    .replace(/\bngomong-ngomong\b/gi, "sebagai informasi tambahan")
+                    .replace(/\bkasih\s+tahu\b/gi, "menginformasikan")
+                    .replace(/\bcek\s+lagi\b/gi, "meninjau ulang")
+                    .replace(/\bcepat-cepat\b/gi, "segera")
+                    .replace(/\bget\s+in\s+touch\b/gi, "coordinate directly");
+            } else if (tone === 'casual') {
                 processed = processed
-                    .replace(/\bnamun\s+demikian\b/gi, "tapi nyatanya")
-                    .replace(/\boleh\s+karena\s+itu\b/gi, "makanya")
+                    .replace(/\bnamun\s+demikian,?\b/gi, "tapi nyatanya,")
+                    .replace(/\boleh\s+karena\s+itu,?\b/gi, "makanya,")
                     .replace(/\bdiperlukan\b/gi, "butuh")
                     .replace(/\bsebenarnya\b/gi, "sebetulnya")
-                    .replace(/\bmenurut\s+pendapat\s+saya\b/gi, "kalau menurut saya pribadi");
-            }
-
-            // 4. JURNALISTIK (Journalistic) Tone
-            else if (tone === 'journalistic') {
+                    .replace(/\bmenurut\s+pendapat\s+saya\b/gi, "kalau menurut saya pribadi")
+                    .replace(/\btetapi\b/gi, "tapi")
+                    .replace(/\bsungguh-sungguh\b/gi, "beneran")
+                    .replace(/\bconsequently,?\b/gi, "so basically,")
+                    .replace(/\bfurthermore,?\b/gi, "plus,");
+            } else if (tone === 'journalistic') {
                 processed = processed
                     .replace(/\bdapat\s+dikatakan\s+bahwa\b/gi, "catatannya,")
                     .replace(/\bmenurut\s+hemat\s+saya\b/gi, "pantauan di lapangan,")
-                    .replace(/\bhal\s+ini\s+sangat\s+menarik\b/gi, "kondisi ini memantik perhatian");
-            }
-
-            // 5. KREATIF (Creative) Tone
-            else if (tone === 'creative') {
+                    .replace(/\bhal\s+ini\s+sangat\s+menarik\b/gi, "kondisi ini memantik perhatian")
+                    .replace(/\bberdasarkan\s+data\s+yang\s+ada\b/gi, "merujuk data terkini,")
+                    .replace(/\bpihak\s+manajemen\s+menyatakan\b/gi, "manajemen menegaskan")
+                    .replace(/\breports\s+indicate\s+that\b/gi, "field reports reveal");
+            } else if (tone === 'creative') {
                 processed = processed
                     .replace(/\bpada\s+akhirnya\b/gi, "lambat laun")
-                    .replace(/\bsecara\s+nyata\b/gi, "terasa begitu hidup");
-            }
-
-            // 6. RINGKAS & JELAS (Simple) Tone
-            else if (tone === 'simple') {
+                    .replace(/\bsecara\s+nyata\b/gi, "terasa begitu hidup")
+                    .replace(/\bsangat\s+indah\b/gi, "memesona pandang")
+                    .replace(/\bsangat\s+sunyi\b/gi, "hening mencekam")
+                    .replace(/\bseiring\s+berjalannya\s+waktu,?\s*/gi, "perlahan tapi pasti, ")
+                    .replace(/\bin\s+a\s+vibrant\s+way\b/gi, "vividly alive");
+            } else if (tone === 'simple') {
                 processed = processed
-                    .replace(/\b(?:dapat\s+dikatakan\s+bahwa|pada\s+dasarnya|dalam\s+hal\s+ini)\b/gi, '')
+                    .replace(/\b(?:dapat\s+dikatakan\s+bahwa|pada\s+dasarnya|dalam\s+hal\s+ini|sebagaimana\s+diketahui)\b/gi, '')
+                    .replace(/\bdalam\s+rangka\s+untuk\b/gi, "untuk")
+                    .replace(/\bpada\s+saat\s+ini\b/gi, "kini")
+                    .replace(/\bmemiliki\s+kemampuan\s+untuk\b/gi, "bisa")
+                    .replace(/\bmelakukan\s+kegiatan\b/gi, "menjalankan")
                     .replace(/\s{2,}/g, ' ')
                     .trim();
             }
@@ -486,7 +544,7 @@ class TextHumanizer {
             let sentences = this.splitSentences(contentToProcess);
 
             // Step 2: Layer 2 - De-Slop Cliché & Formulaic AI Removal
-            sentences = sentences.map(s => this.replaceCliches(s, lang));
+            sentences = sentences.map(s => this.replaceCliches(s, lang, tone));
 
             // Step 3: Layer 3 - Dynamic Burstiness & Syntactic Restructuring
             sentences = this.modulateBurstiness(sentences, tone, lang, effectiveIntensity);
@@ -510,6 +568,8 @@ class TextHumanizer {
         // Normalize spacing: ONLY touch horizontal whitespace (spaces/tabs)!
         // NEVER replace \n or \r!
         result = result
+            .replace(/,\s*,+/g, ',') // Clean up accidental duplicate commas
+            .replace(/\bsecara\s+secara\b/gi, 'secara')
             .replace(/[ \t]+([,\.!\?;:])/g, '$1')
             .replace(/([,\.!\?;:])([a-zA-Zà-ž])/g, '$1 $2')
             .replace(/[ \t]{2,}/g, ' ')

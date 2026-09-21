@@ -17,7 +17,13 @@ class AIDetector {
             'asumsi dasar yang sangat ketat', 'yakni menganggap bahwa', 'hanya dipengaruhi oleh',
             'satu faktor risiko sistematis tunggal', 'sedang beraksi', 'di sinilah',
             'tidak mengikat investor', 'hal ini membuktikan bahwa', 'hal ini menunjukkan bahwa',
-            'merupakan salah satu', 'dapat disimpulkan bahwa', 'dalam era modern'
+            'merupakan salah satu', 'dapat disimpulkan bahwa', 'dalam era modern',
+            'adalah merupakan', 'sangat penting untuk diperhatikan', 'dalam rangka mencapai tujuan',
+            'memiliki peranan yang sangat penting', 'dapat ditarik kesimpulan bahwa',
+            'tidak dapat dielakkan bahwa', 'tujuan utama dari penulisan', 'memberikan implikasi yang signifikan',
+            'menghadapi berbagai macam tantangan', 'serves as a reminder', 'paves the way for',
+            'sheds light on', 'with the advent of', 'at the forefront of', 'serves as a cornerstone',
+            'cenderung lekas', 'ramah dipahami', 'perguruan signifikan'
         ];
     }
 

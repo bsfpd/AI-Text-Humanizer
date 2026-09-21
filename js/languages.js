@@ -74,7 +74,6 @@ const LANGUAGES = {
             { pattern: /\bteknologi\s+otomatisasi\b/gi, replacement: "sistem otomatisasi" },
             { pattern: /\bmeningkatkan\s+produktivitas\s+dan\s+efisiensi\s+operasional\b/gi, replacement: "menggenjot produktivitas sekaligus menekan biaya operasional" },
             { pattern: /\bmeningkatkan\s+produktivitas\s+dan\s+efisiensi\b/gi, replacement: "menggenjot produktivitas serta efisiensi" },
-            { pattern: /\befisiensi\s+operasional\b/gi, replacement: "efisiensi operasional kerja" },
             { pattern: /\bdituntut\s+untuk\s+mempelajari\b/gi, replacement: "perlu memperbarui" },
             { pattern: /\bketerampilan\s+baru\b/gi, replacement: "keahlian baru" },
             { pattern: /\bagar\s+tetap\s+relevan\b/gi, replacement: "supaya tetap kompetitif" },
@@ -164,8 +163,113 @@ const LANGUAGES = {
             { pattern: /\blangkah perencanaan sistem informasi mencakup beberapa tahapan krusial\b/gi, replacement: "tahapan perancangan sistem informasi menitikberatkan pada sejumlah fase kunci" },
             { pattern: /\bmencakup beberapa tahapan krusial\b/gi, replacement: "menitikberatkan pada sejumlah tahapan esensial" },
             { pattern: /\bbeberapa tahapan krusial\b/gi, replacement: "sejumlah fase kunci" },
-            { pattern: /\btahapan krusial\b/gi, replacement: "tahapan esensial" }
+            { pattern: /\btahapan krusial\b/gi, replacement: "tahapan esensial" },
+
+            // 9. Multi-Detector Academic Clichés (Turnitin & Drillbit Anti-Plagiarism Targets)
+            { pattern: /\badalah\s+merupakan\s+(?:salah\s+satu\s+)?/gi, replacement: "menjadi salah satu " },
+            { pattern: /\bsangat\s+penting\s+untuk\s+diperhatikan\s+bahwa,?\s*/gi, replacement: "poin kuncinya yakni " },
+            { pattern: /\bsebagaimana\s+(?:telah\s+)?dijelaskan\s+(?:sebelumnya|di\s+atas),?\s*/gi, replacement: "seperti yang diulas sebelumnya, " },
+            { pattern: /\bdalam\s+rangka\s+mencapai\s+tujuan\s+tersebut,?\s*/gi, replacement: "guna meraih target tersebut, " },
+            { pattern: /\bmemiliki\s+peranan\s+yang\s+sangat\s+penting\s+dalam\b/gi, replacement: "berpengaruh besar terhadap" },
+            { pattern: /\bdapat\s+ditarik\s+kesimpulan\s+bahwa,?\s*/gi, replacement: "garis besarnya, " },
+            { pattern: /\bhal\s+ini\s+sejalan\s+dengan\s+(?:penelitian|kajian|studi)\s+yang\s+dilakukan\s+oleh\b/gi, replacement: "temuan ini selaras dengan studi" },
+            { pattern: /\bberdasarkan\s+hasil\s+analisis\s+data\s*(?:di\s+atas|tersebut)?,?\s*/gi, replacement: "menilik hasil telaah data di atas, " },
+            { pattern: /\btidak\s+dapat\s+dielakkan\s+bahwa,?\s*/gi, replacement: "jelas terlihat bahwa " },
+            { pattern: /\btujuan\s+utama\s+dari\s+(?:penulisan|penelitian|kajian)\s+ini\s+adalah\s+(?:untuk)?\b/gi, replacement: "fokus utama kajian ini diarahkan untuk" },
+            { pattern: /\bmerupakan\s+sebuah\s+keniscayaan\s+bahwa,?\s*/gi, replacement: "wajar bila " },
+            { pattern: /\bmenjadi\s+sorotan\s+utama\s+dalam\b/gi, replacement: "menjadi perhatian utama di" },
+            { pattern: /\bdalam\s+konteks\s+ini,?\s*(?:dapat\s+dipahami\s+bahwa)?\s*/gi, replacement: "dalam hal ini, " },
+            { pattern: /\bmemberikan\s+implikasi\s+yang\s+signifikan\s+terhadap\b/gi, replacement: "berdampak langsung pada" },
+            { pattern: /\bmenghadapi\s+berbagai\s+macam\s+tantangan\s+(?:yang\s+)?kompleks\b/gi, replacement: "menghadapi tantangan berlapis" },
+            { pattern: /\bdalam\s+upaya\s+(?:untuk\s+)?meningkatkan\b/gi, replacement: "guna mendorong kenaikan" },
+            { pattern: /\bhal\s+tersebut\s+menunjukkan\s+adanya\b/gi, replacement: "kondisi ini memperlihatkan adanya" },
+            { pattern: /\bmenjadi\s+tolok\s+ukur\s+keberhasilan\b/gi, replacement: "menjadi barometer capaian" },
+            { pattern: /\bmemiliki\s+korelasi\s+positif\s+dengan\b/gi, replacement: "berbanding lurus dengan" }
         ],
+
+        // Comprehensive Per-Tone Lexical and Rhetorical Replacements (6 Styles)
+        toneReplacements: {
+            academic: [
+                { pattern: /\bsangat\s+bagus\b/gi, replacement: "berkualitas tinggi" },
+                { pattern: /\bmenguntungkan\b/gi, replacement: "memberikan nilai tambah nyata" },
+                { pattern: /\bbikin\b/gi, replacement: "menghasilkan" },
+                { pattern: /\bnggak\b/gi, replacement: "tidak" },
+                { pattern: /\bcuma\b/gi, replacement: "hanya" },
+                { pattern: /\bbanget\b/gi, replacement: "sangat" },
+                { pattern: /\bintinya\b/gi, replacement: "pada hakikatnya" },
+                { pattern: /\bjelas\s+banget\b/gi, replacement: "tampak secara eksplisit" },
+                { pattern: /\bmasalah\s+besar\b/gi, replacement: "hambatan fundamental" },
+                { pattern: /\bcara\s+ini\b/gi, replacement: "metodologi ini" },
+                { pattern: /\bhasilnya\s+bagus\b/gi, replacement: "luarannya terbukti optimal" },
+                { pattern: /\bmenurut\s+saya\b/gi, replacement: "berdasarkan telaah kritis," }
+            ],
+            formal: [
+                { pattern: /\bkita\s+harus\b/gi, replacement: "manajemen perlu" },
+                { pattern: /\bkami\s+bermaksud\s+untuk\b/gi, replacement: "kami berencana" },
+                { pattern: /\bdiharapkan\s+dapat\s+memberikan\b/gi, replacement: "ditargetkan menghasilkan" },
+                { pattern: /\bngomong-ngomong\b/gi, replacement: "sebagai catatan tambahan" },
+                { pattern: /\bmelakukan\s+koordinasi\s+lebih\s+lanjut\b/gi, replacement: "berkoordinasi kembali" },
+                { pattern: /\bmengambil\s+langkah\s+strategis\b/gi, replacement: "menjalankan langkah konkret" },
+                { pattern: /\bmeningkatkan\s+nilai\s+tambah\b/gi, replacement: "memperkuat daya saing" },
+                { pattern: /\bsehubungan\s+dengan\s+hal\s+tersebut\b/gi, replacement: "menindaklanjuti poin tersebut" },
+                { pattern: /\bmemaksimalkan\s+efisiensi\s+operasional\b/gi, replacement: "mengoptimalkan efisiensi operasional" },
+                { pattern: /\bmemaksimalkan\s+efisiensi\b/gi, replacement: "mengoptimalkan efisiensi" },
+                { pattern: /\bguna\s+mencapai\s+target\s+yang\s+telah\s+ditetapkan\b/gi, replacement: "demi memenuhi target kerja" },
+                { pattern: /\bmasalah\s+internal\b/gi, replacement: "kendala operasional internal" },
+                { pattern: /\bperlu\s+segera\s+ditangani\b/gi, replacement: "menjadi prioritas penyelesaian" }
+            ],
+            casual: [
+                { pattern: /\bnamun\s+demikian,?\b/gi, replacement: "tapi nyatanya," },
+                { pattern: /\boleh\s+karena\s+itu,?\b/gi, replacement: "makanya," },
+                { pattern: /\bdiperlukan\b/gi, replacement: "butuh" },
+                { pattern: /\bsebenarnya\b/gi, replacement: "sebetulnya" },
+                { pattern: /\bmenurut\s+pendapat\s+saya\b/gi, replacement: "kalau menurut saya pribadi" },
+                { pattern: /\btidak\s+dapat\s+dipungkiri\b/gi, replacement: "jujur saja" },
+                { pattern: /\bsangat\s+menyenangkan\b/gi, replacement: "seru banget" },
+                { pattern: /\bmembutuhkan\s+waktu\b/gi, replacement: "butuh waktu" },
+                { pattern: /\bmerupakan\s+hal\s+yang\s+wajar\b/gi, replacement: "wajar banget" },
+                { pattern: /\bhal\s+ini\s+membuktikan\s+bahwa\b/gi, replacement: "ini bukti kalau" },
+                { pattern: /\btetapi\s+pada\s+akhirnya\b/gi, replacement: "tapi ujung-ujungnya" },
+                { pattern: /\bperlu\s+diingat\s+bahwa\b/gi, replacement: "ingat ya," },
+                { pattern: /\bhanya\s+sekadar\b/gi, replacement: "cuma" }
+            ],
+            journalistic: [
+                { pattern: /\bdapat\s+dikatakan\s+bahwa\b/gi, replacement: "catatannya," },
+                { pattern: /\bmenurut\s+hemat\s+saya\b/gi, replacement: "pantauan di lapangan," },
+                { pattern: /\bhal\s+ini\s+sangat\s+menarik\b/gi, replacement: "kondisi ini memantik perhatian" },
+                { pattern: /\bberdasarkan\s+informasi\s+yang\s+dihimpun,?\s*(?:dapat\s+dilaporkan\s+bahwa)?\s*/gi, replacement: "informasi yang dihimpun di lapangan mencatat bahwa " },
+                { pattern: /\bdapat\s+dilaporkan\s+bahwa,?\s*/gi, replacement: "laporan di lapangan menunjukkan bahwa " },
+                { pattern: /\bhal\s+ini\s+memicu\s+kekhawatiran\b/gi, replacement: "situasi ini menuai sorotan" },
+                { pattern: /\bmenjadi\s+perbincangan\s+hangat\b/gi, replacement: "ramai disorot publik" },
+                { pattern: /\bmemberikan\s+tanggapan\s+resmi\b/gi, replacement: "angkat bicara" },
+                { pattern: /\bhingga\s+berita\s+ini\s+diturunkan\b/gi, replacement: "sampai saat ini," },
+                { pattern: /\bmengalami\s+lonjakan\s+signifikan\b/gi, replacement: "melonjak tajam" },
+                { pattern: /\bpihak\s+terkait\b/gi, replacement: "otoritas berwenang" }
+            ],
+            creative: [
+                { pattern: /\bpada\s+akhirnya\b/gi, replacement: "lambat laun" },
+                { pattern: /\bsecara\s+nyata\b/gi, replacement: "terasa begitu hidup" },
+                { pattern: /\bseiring\s+berjalannya\s+waktu,?\s*/gi, replacement: "perlahan tapi pasti, " },
+                { pattern: /\bmenyimpan\s+sejuta\s+makna\b/gi, replacement: "menyimpan arti mendalam" },
+                { pattern: /\bsebuah\s+perjalanan\s+panjang\b/gi, replacement: "langkah demi langkah" },
+                { pattern: /\bmelukiskan\s+keindahan\b/gi, replacement: "menghadirkan potret nyata" },
+                { pattern: /\bterpatri\s+dalam\s+sanubari\b/gi, replacement: "selalu teringat jelas" },
+                { pattern: /\btak\s+lekang\s+oleh\s+waktu\b/gi, replacement: "tetap bertahan melintasi masa" },
+                { pattern: /\bmenembus\s+ruang\s+dan\s+waktu\b/gi, replacement: "melampaui batasan masa" }
+            ],
+            simple: [
+                { pattern: /\b(?:dapat\s+dikatakan\s+bahwa|pada\s+dasarnya|dalam\s+hal\s+ini)\b/gi, replacement: "" },
+                { pattern: /\bdalam\s+rangka\s+untuk\b/gi, replacement: "untuk" },
+                { pattern: /\bpada\s+saat\s+sekarang\s+ini\b/gi, replacement: "kini" },
+                { pattern: /\bmempunyai\s+kemampuan\s+untuk\b/gi, replacement: "bisa" },
+                { pattern: /\bmelakukan\s+tindakan\s+perbaikan\b/gi, replacement: "memperbaiki" },
+                { pattern: /\bmemberikan\s+bantuan\s+kepada\b/gi, replacement: "membantu" },
+                { pattern: /\bmengakibatkan\s+terjadinya\s+penurunan\b/gi, replacement: "menurunkan" },
+                { pattern: /\bdengan\s+cara\s+melakukan\b/gi, replacement: "dengan" },
+                { pattern: /\bmelakukan\s+peninjauan\s+kembali\b/gi, replacement: "meninjau ulang" },
+                { pattern: /\bmemerlukan\s+alokasi\s+waktu\b/gi, replacement: "memakan waktu" }
+            ]
+        },
 
         // Natural Human Transitions for Sentence Pacing (No inflated academic buzzwords)
         transitions: {
@@ -250,8 +354,62 @@ const LANGUAGES = {
             { pattern: /\ball\s+in\s+all,?\s*/gi, replacement: "on the whole, " },
 
             // 4. Negative Parallelism (R-36)
-            { pattern: /\bnot\s+only\s+([^\.,;]+?)\s*,\s*but\s+also\s+/gi, replacement: "along with $1, it also " }
+            { pattern: /\bnot\s+only\s+([^\.,;]+?)\s*,\s*but\s+also\s+/gi, replacement: "along with $1, it also " },
+
+            // 5. Multi-Detector Academic & Professional AI Clichés (Turnitin & GPTZero Targets)
+            { pattern: /\bin\s+today's\s+world\b/gi, replacement: "today" },
+            { pattern: /\bit\s+is\s+essential\s+to\s+note\s+that,?\s*/gi, replacement: "notably, " },
+            { pattern: /\bserves\s+as\s+a\s+reminder\s+that\b/gi, replacement: "shows that" },
+            { pattern: /\bpaves\s+the\s+way\s+for\b/gi, replacement: "enables" },
+            { pattern: /\bhas\s+revolutionized\s+the\s+way\b/gi, replacement: "fundamentally changed how" },
+            { pattern: /\ba\s+wide\s+variety\s+of\b/gi, replacement: "various" },
+            { pattern: /\bsheds\s+light\s+on\b/gi, replacement: "clarifies" },
+            { pattern: /\bplays\s+a\s+significant\s+role\s+in\b/gi, replacement: "is influential in" },
+            { pattern: /\ba\s+multitude\s+of\b/gi, replacement: "many" },
+            { pattern: /\bfurther\s+analysis\s+reveals\s+that\b/gi, replacement: "closer inspection shows that" },
+            { pattern: /\bwith\s+the\s+advent\s+of\b/gi, replacement: "with the rise of" },
+            { pattern: /\bat\s+the\s+forefront\s+of\b/gi, replacement: "leading" },
+            { pattern: /\bserves\s+as\s+a\s+cornerstone\s+for\b/gi, replacement: "provides a solid foundation for" },
+            { pattern: /\bit\s+is\s+worth\s+emphasizing\s+that\b/gi, replacement: "crucially," }
         ],
+
+        toneReplacements: {
+            academic: [
+                { pattern: /\bvery\s+good\b/gi, replacement: "highly rigorous" },
+                { pattern: /\bbig\s+issue\b/gi, replacement: "substantive problem" },
+                { pattern: /\blot\s+of\b/gi, replacement: "substantial number of" },
+                { pattern: /\bshows\s+clearly\b/gi, replacement: "empirically substantiates" }
+            ],
+            formal: [
+                { pattern: /\bwe\s+must\b/gi, replacement: "the team should" },
+                { pattern: /\bget\s+back\s+to\b/gi, replacement: "follow up regarding" },
+                { pattern: /\bmake\s+sure\b/gi, replacement: "ensure that" },
+                { pattern: /\bbig\s+deal\b/gi, replacement: "critical priority" }
+            ],
+            casual: [
+                { pattern: /\bconsequently,?\b/gi, replacement: "so basically," },
+                { pattern: /\bfurthermore,?\b/gi, replacement: "plus," },
+                { pattern: /\bnevertheless,?\b/gi, replacement: "still," },
+                { pattern: /\butilize\b/gi, replacement: "use" },
+                { pattern: /\bin\s+order\s+to\b/gi, replacement: "to" }
+            ],
+            journalistic: [
+                { pattern: /\breports\s+indicate\s+that\b/gi, replacement: "field reports reveal" },
+                { pattern: /\bit\s+is\s+reported\s+that\b/gi, replacement: "records indicate" },
+                { pattern: /\bofficials\s+stated\s+that\b/gi, replacement: "authorities confirmed that" }
+            ],
+            creative: [
+                { pattern: /\bin\s+a\s+vibrant\s+way\b/gi, replacement: "vividly alive" },
+                { pattern: /\bvery\s+quiet\b/gi, replacement: "hushed and still" },
+                { pattern: /\bas\s+time\s+went\s+by\b/gi, replacement: "with each passing day," }
+            ],
+            simple: [
+                { pattern: /\b(?:it\s+can\s+be\s+said\s+that|at\s+the\s+present\s+moment)\b/gi, replacement: "" },
+                { pattern: /\bhas\s+the\s+ability\s+to\b/gi, replacement: "can" },
+                { pattern: /\bconduct\s+an\s+investigation\b/gi, replacement: "investigate" },
+                { pattern: /\bgive\s+assistance\s+to\b/gi, replacement: "help" }
+            ]
+        },
 
         transitions: {
             academic: [
@@ -443,7 +601,7 @@ const HUMANIZER_DICTIONARY = {
         "kondisi": ["situasi", "keadaan", "kondisi di lapangan"],
         "situasi": ["kondisi", "keadaan nyata", "konteks"],
         "peluang": ["kesempatan", "peluang", "potensi"],
-        "potensi": ["kapasitas", "daya tumbuh", "kemampuan"],
+        "potensi": ["peluang", "kemungkinan", "kapasitas", "potensi"],
         "konsep": ["gagasan", "kerangka konsep", "ide dasar"],
         "strategi": ["langkah terukur", "strategi", "pendekatan"],
         "efisiensi": ["efisiensi", "penghematan", "daya guna"],
@@ -483,7 +641,7 @@ const HUMANIZER_DICTIONARY = {
         "relevan": ["kontekstual", "tepat guna", "aplikatif", "selaras"],
         "besar": ["substansial", "signifikan", "luas"],
         "kecil": ["minor", "terbatas", "relatif sedikit"],
-        "cepat": ["responsif", "akseleratif", "gesit"],
+        "cepat": ["cepat", "akseleratif", "singkat", "gesit"],
         "lambat": ["tertahan", "bertahap pelan", "lamban"],
         "jelas": ["terang", "gamblang", "eksplisit"],
         "nyata": ["konkret", "riil", "faktual"],
@@ -498,8 +656,8 @@ const HUMANIZER_DICTIONARY = {
         "jarang": ["minim dijumpai", "tergolong langka"],
         "umumnya": ["pada umumnya", "lazimnya", "kebanyakan"],
         "khususnya": ["terutama", "utamanya", "lebih spesifik"],
-        "langsung": ["secara mandiri", "tanpa perantara", "seketika"],
-        "bertahap": ["secara gradual", "berjenjang", "fase demi fase"],
+        "langsung": ["langsung", "seketika", "tanpa perantara"],
+        "bertahap": ["gradual", "berjenjang", "fase demi fase"],
         "mendalam": ["komprehensif", "seksama", "tuntas"],
         "sederhana": ["lugas", "ringkas", "mudah dipahami"],
         "rumit": ["kompleks", "berliku", "berlapis"],
@@ -509,7 +667,7 @@ const HUMANIZER_DICTIONARY = {
         "lama": ["terdahulu", "sebelumnya", "usang"],
         "tinggi": ["tinggi", "cukup tinggi", "tinggi"],
         "rendah": ["minim", "terbatas", "moderat"],
-        "mudah": ["praktis", "ramah diakses", "gampang"],
+        "mudah": ["praktis", "mudah", "gampang"],
         "sulit": ["sukar", "penuh tantangan", "kompleks"],
         "pasti": ["niscaya", "sudah barang tentu", "terjamin"],
         "mungkin": ["berpotensi", "boleh jadi", "berpeluang"],
