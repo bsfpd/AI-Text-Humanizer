@@ -37,6 +37,7 @@ class ApiService {
     buildPrompt(text, tone, lang, intensity) {
         const toneGuides = {
             academic: "Akademik & Ilmiah: Gunakan kosakata presisi, nalar kritis, transisi yang kaya nuansa, dan struktur argumentatif yang solid tanpa terdengar kaku atau robotik.",
+            tuton: "Diskusi Forum Tuton UT (Akademik Lugas, Santai & Terarah): Dirancang khusus untuk forum diskusi e-learning Tutorial Online Universitas Terbuka. Berbobot akademik dengan landasan materi BMP/Modul dan studi kasus, namun bernada luwes, bersahabat, lugas, dan santai (tidak kaku seperti skripsi, tidak birokratis berlebihan). Mempertahankan salam pembuka forum mahasiswa, argumen berbasis nalar sehat, dan terbebas dari deteksi Turnitin serta Drillbit.",
             formal: "Formal & Bisnis: Berwibawa, sopan, lugas, profesional, efisien, cocok untuk eksekutif dan komunikasi resmi.",
             casual: "Santai & Percakapan: Mengalir alami seperti ditulis oleh manusia asli yang santai, komunikatif, bersahabat, tanpa jargon berat.",
             journalistic: "Jurnalistik: Kalimat aktif, hook memikat, ringkas, faktual, ritme cepat dan dinamis.",

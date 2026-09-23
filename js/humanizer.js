@@ -53,7 +53,7 @@ class TextHumanizer {
         let protectedText = text;
 
         // 1. Protect formal salutation phrases up to comma or period (without greedily capturing subsequent text)
-        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|(?:kepada\s+)?yth\.?\s+[^,\.\n]+(?:,\s*(?:rekan-rekan|saudara|mahasiswa|bapak|ibu)[^,\.\n]*)*|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|dengan\s+hormat|dear\s+[^,\.\n]+)(?:,|\.|\n|$)/gi, (match) => {
+        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|(?:kepada\s+)?yth\.?\s+[^,\.\n]+(?:,\s*(?:rekan-rekan|saudara|mahasiswa|bapak|ibu|tutor)[^,\.\n]*)*|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)(?:\s+(?:bapak\/ibu\s+)?(?:tutor|dosen|rekan-rekan(?:\s+mahasiswa)?)[^,\.\n]*)?|dengan\s+hormat|dear\s+[^,\.\n]+)(?:,|\.|\n|$)/gi, (match) => {
             return addToken(match.trim());
         });
 
@@ -94,7 +94,7 @@ class TextHumanizer {
     isSalutationOrOpening(sentence) {
         if (!sentence) return false;
         const s = sentence.trim().toLowerCase();
-        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|salam|yth\.?|kepada\s+yth|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening)|to\s+whom)/i.test(s);
+        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|salam|yth\.?|kepada\s+yth|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening)|to\s+whom|izin\s+(?:menanggapi|menyampaikan|menjawab|memberikan|berpendapat)|terima\s+kasih\s+(?:kepada|atas|bapak|ibu|tutor))/i.test(s);
     }
 
     /**
@@ -103,7 +103,7 @@ class TextHumanizer {
     hasIntroductoryPhrase(sentence) {
         if (!sentence) return false;
         const s = sentence.trim().toLowerCase();
-        return /^(?:berdasarkan|menurut|dalam\s+|sehubungan|terkait|merujuk|ditinjau|melihat|sebagai\s+|ketika|saat|jika|apabila|karena|sebab|meskipun|walaupun|adapun|oleh\s+karena\s+itu|dengan\s+demikian|selain\s+itu|namun|tetapi|artinya|faktanya|secara\s+|pada\s+dasarnya|konsep\s+|alasan\s+|di\s+sinilah|based\s+on|according\s+to|regarding|when|if|because|although|however|therefore|moreover|notably)/i.test(s);
+        return /^(?:berdasarkan|menurut|dalam\s+|sehubungan|terkait|merujuk|mengacu|ditinjau|melihat|sebagai\s+|ketika|saat|jika|apabila|karena|sebab|meskipun|walaupun|adapun|oleh\s+karena\s+itu|dengan\s+demikian|selain\s+itu|namun|tetapi|artinya|faktanya|secara\s+|pada\s+dasarnya|konsep\s+|alasan\s+|di\s+sinilah|izin\s+|based\s+on|according\s+to|regarding|when|if|because|although|however|therefore|moreover|notably)/i.test(s);
     }
 
     /**
@@ -136,15 +136,15 @@ class TextHumanizer {
             ? window.LANGUAGES[lang]
             : null;
 
-        if (langPack && langPack.cliches) {
-            langPack.cliches.forEach(rule => {
+        // Apply tone-specific patterns from language pack first if available (gives priority to specific tone nuances)
+        if (tone && langPack && langPack.toneReplacements && langPack.toneReplacements[tone]) {
+            langPack.toneReplacements[tone].forEach(rule => {
                 modified = modified.replace(rule.pattern, rule.replacement);
             });
         }
 
-        // Apply tone-specific patterns from language pack if available
-        if (tone && langPack && langPack.toneReplacements && langPack.toneReplacements[tone]) {
-            langPack.toneReplacements[tone].forEach(rule => {
+        if (langPack && langPack.cliches) {
+            langPack.cliches.forEach(rule => {
                 modified = modified.replace(rule.pattern, rule.replacement);
             });
         }
@@ -233,10 +233,11 @@ class TextHumanizer {
                         // Transform connector into natural independent opener tailored to the selected tone
                         let opener = rawConnector.charAt(0).toUpperCase() + rawConnector.slice(1);
                         if (opener.toLowerCase() === 'yakni' || opener.toLowerCase() === 'yaitu') {
-                            opener = (tone === 'academic' || tone === 'formal') ? 'Secara khusus,' : (tone === 'simple' ? 'Yakni,' : 'Tepatnya,');
+                            opener = (tone === 'academic' || tone === 'formal') ? 'Secara khusus,' : (tone === 'tuton' ? 'Yakni,' : (tone === 'simple' ? 'Yakni,' : 'Tepatnya,'));
                         } else if (opener.toLowerCase() === 'sehingga') {
                             const openersByTone = {
                                 academic: ['Dengan demikian,', 'Kondisi ini memungkinkan', 'Dampaknya,', 'Hal ini membuat', 'Secara analitis,'],
+                                tuton: ['Dengan begitu,', 'Hal ini memungkinkan', 'Dampaknya,', 'Artinya,', 'Dari sini terlihat bahwa'],
                                 formal: ['Sejalan dengan itu,', 'Langkah ini memungkinkan', 'Implikasinya,', 'Dengan begitu,', 'Secara operasional,'],
                                 casual: ['Makanya,', 'Di sisi lain,', 'Alhasil,', 'Nah, dari sini', 'Untungnya,'],
                                 journalistic: ['Sementara itu,', 'Catatannya,', 'Di saat bersamaan,', 'Kondisi ini membuat', 'Dampaknya,'],
@@ -248,6 +249,7 @@ class TextHumanizer {
                         } else if (opener.toLowerCase() === 'namun' || opener.toLowerCase() === 'tetapi') {
                             const openersByTone = {
                                 academic: ['Namun,', 'Akan tetapi,', 'Hanya saja,', 'Di sisi lain,'],
+                                tuton: ['Hanya saja,', 'Namun demikian,', 'Di sisi lain,', 'Akan tetapi,'],
                                 formal: ['Kendati demikian,', 'Namun secara operasional,', 'Akan tetapi,', 'Di sisi lain,'],
                                 casual: ['Tapi nyatanya,', 'Tapi ya,', 'Hanya saja,', 'Namun,'],
                                 journalistic: ['Namun di lapangan,', 'Sementara itu,', 'Faktanya,', 'Di sisi lain,'],
@@ -264,11 +266,11 @@ class TextHumanizer {
                             opener = openers[Math.floor(Math.random() * openers.length)];
                         } else if (lang === 'en') {
                             if (/however/i.test(opener)) {
-                                opener = tone === 'academic' ? 'Nevertheless,' : (tone === 'casual' ? 'Still,' : 'However,');
+                                opener = (tone === 'academic' || tone === 'tuton') ? 'Nevertheless,' : (tone === 'casual' ? 'Still,' : 'However,');
                             } else if (/whereas|while/i.test(opener)) {
-                                opener = tone === 'academic' ? 'In contrast,' : 'Meanwhile,';
+                                opener = (tone === 'academic' || tone === 'tuton') ? 'In contrast,' : 'Meanwhile,';
                             } else if (/meaning that/i.test(opener)) {
-                                opener = tone === 'academic' ? 'Consequently,' : 'As a result,';
+                                opener = (tone === 'academic' || tone === 'tuton') ? 'Consequently,' : 'As a result,';
                             }
                         } else {
                             opener = `${opener},`;
@@ -289,8 +291,8 @@ class TextHumanizer {
                     const cleanCurrent = current.replace(/[.!?]+$/, '');
                     const cleanNext = next.charAt(0).toLowerCase() + next.slice(1);
                     const glue = lang === 'id'
-                        ? (tone === 'academic' ? ' sekaligus ' : (tone === 'casual' ? ' dan juga ' : (tone === 'formal' ? ' serta ' : ' dan ')))
-                        : (tone === 'academic' ? ', whereby ' : ', and ');
+                        ? (tone === 'academic' ? ' sekaligus ' : (tone === 'tuton' ? ' serta ' : (tone === 'casual' ? ' dan juga ' : (tone === 'formal' ? ' serta ' : ' dan '))))
+                        : (tone === 'academic' || tone === 'tuton' ? ', whereby ' : ', and ');
                     result.push(cleanCurrent + glue + cleanNext);
                     i += 2;
                     continue;
@@ -430,6 +432,20 @@ class TextHumanizer {
                     .replace(/\bbanget\b/gi, "sangat")
                     .replace(/\bvery\s+good\b/gi, "notably effective")
                     .replace(/\bbig\s+problem\b/gi, "fundamental challenge");
+            } else if (tone === 'tuton') {
+                processed = processed
+                    .replace(/\bsebagai\s+seorang\s+mahasiswa\s*(?:saya\s+memandang\s+bahwa)?/gi, "menurut pemahaman saya,")
+                    .replace(/\bdalam\s+hal\s+ini\s+penulis\s+berpendapat\s+bahwa\b/gi, "dari sudut pandang saya,")
+                    .replace(/\boleh\s+karena\s+itu\s+sangat\s+disarankan\s+untuk\b/gi, "karena itu, langkah realistisnya adalah")
+                    .replace(/\bsebagaimana\s+telah\s+kita\s+ketahui\b/gi, "seperti yang kita pelajari pada modul,")
+                    .replace(/\bmerupakan\s+hal\s+yang\s+wajar\b/gi, "bisa dipahami secara rasional")
+                    .replace(/\bnggak\b/gi, "tidak")
+                    .replace(/\bbikin\b/gi, "membuat")
+                    .replace(/\bcuma\b/gi, "hanya")
+                    .replace(/\bbanget\b/gi, "sangat")
+                    .replace(/\bintinya\b/gi, "poin utamanya,")
+                    .replace(/\bsangat\s+bagus\b/gi, "sangat tepat dan efektif")
+                    .replace(/\bhasilnya\s+bagus\b/gi, "capaiannya optimal");
             } else if (tone === 'formal') {
                 processed = processed
                     .replace(/\bkita\s+harus\b/gi, "manajemen perlu")

@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCloseSupportBtn: document.getElementById('btnCloseSupportBtn'),
 
         // Samples
+        sampleTuton: document.getElementById('sampleTuton'),
         sampleAcademic: document.getElementById('sampleAcademic'),
         sampleFormal: document.getElementById('sampleFormal'),
         sampleCasual: document.getElementById('sampleCasual'),
@@ -289,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`Sampel teks ${type} dimuat.`);
     }
 
+    elements.sampleTuton?.addEventListener('click', () => loadSampleText('tuton'));
     elements.sampleAcademic?.addEventListener('click', () => loadSampleText('academic'));
     elements.sampleFormal?.addEventListener('click', () => loadSampleText('formal'));
     elements.sampleCasual?.addEventListener('click', () => loadSampleText('casual'));

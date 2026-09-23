@@ -203,6 +203,28 @@ const LANGUAGES = {
                 { pattern: /\bhasilnya\s+bagus\b/gi, replacement: "luarannya terbukti optimal" },
                 { pattern: /\bmenurut\s+saya\b/gi, replacement: "berdasarkan telaah kritis," }
             ],
+            tuton: [
+                { pattern: /\bizin\s+menyampaikan\s+tanggapan\s+atas\s+pertanyaan\s+diskusi\s+(?:sesi\s+\d+\s+)?terkait\b/gi, replacement: "Izin menanggapi diskusi perihal" },
+                { pattern: /\bizin\s+menyampaikan\s+tanggapan\s+atas\s+pertanyaan\s+diskusi\b/gi, replacement: "Izin menyampaikan tanggapan mengenai" },
+                { pattern: /\bizin\s+menyampaikan\s+tanggapan\s+atas\b/gi, replacement: "Izin memberikan pandangan terkait" },
+                { pattern: /\bpertanyaan\s+diskusi\s+terkait\b/gi, replacement: "topik diskusi perihal" },
+                { pattern: /\bpertanyaan\s+diskusi\s+mengenai\b/gi, replacement: "fokus diskusi tentang" },
+                { pattern: /\bberdasarkan\s+(?:studi\s+)?kasus\s*(?:di\s+atas|tersebut)?,?\s*(?:dapat\s+dianalisis\s+bahwa)?/gi, replacement: "mencermati paparan kasus di atas, menurut saya " },
+                { pattern: /\bsesuai\s+dengan\s+materi\s+inisiasi\b/gi, replacement: "mengacu pada materi inisiasi dan BMP," },
+                { pattern: /\bsebagaimana\s+(?:telah\s+)?dijelaskan\s+dalam\s+modul\b/gi, replacement: "seperti yang diuraikan pada modul pokok," },
+                { pattern: /\bdapat\s+ditarik\s+kesimpulan\s+bahwa,?\s*/gi, replacement: "poin penting yang bisa kita petik yakni " },
+                { pattern: /\bsebagai\s+seorang\s+mahasiswa\s*(?:saya\s+memandang\s+bahwa)?/gi, replacement: "menurut pemahaman saya," },
+                { pattern: /\bdalam\s+hal\s+ini\s+penulis\s+berpendapat\s+bahwa\b/gi, replacement: "dari sudut pandang saya," },
+                { pattern: /\boleh\s+karena\s+itu\s+sangat\s+disarankan\s+untuk\b/gi, replacement: "karena itu, langkah realistisnya adalah" },
+                { pattern: /\bmerupakan\s+hal\s+yang\s+sangat\s+penting\b/gi, replacement: "menjadi hal yang sangat krusial" },
+                { pattern: /\bmemberikan\s+kontribusi\s+signifikan\b/gi, replacement: "membawa dampak positif nyata" },
+                { pattern: /\bmemiliki\s+pengaruh\s+yang\s+sangat\s+besar\b/gi, replacement: "sangat menentukan capaian hasil" },
+                { pattern: /\bhal\s+tersebut\s+disebabkan\s+oleh\s+karena\b/gi, replacement: "faktor pendorong utamanya yaitu" },
+                { pattern: /\bperlu\s+ditekankan\s+bahwa\b/gi, replacement: "catatan pentingnya yakni" },
+                { pattern: /\bsebagai\s+kesimpulan,?\s*/gi, replacement: "secara ringkas," },
+                { pattern: /\bdemikian\s+tanggapan\s+yang\s+dapat\s+saya\s+sampaikan,?\s*/gi, replacement: "Demikian tanggapan dari saya, " },
+                { pattern: /\bmohon\s+arahan\s+dan\s+bimbingannya\b/gi, replacement: "mohon masukan dan tanggapannya" }
+            ],
             formal: [
                 { pattern: /\bkita\s+harus\b/gi, replacement: "manajemen perlu" },
                 { pattern: /\bkami\s+bermaksud\s+untuk\b/gi, replacement: "kami berencana" },
@@ -281,6 +303,14 @@ const LANGUAGES = {
                 "Menariknya,",
                 "Catatan pentingnya,"
             ],
+            tuton: [
+                "Menurut pemahaman saya,",
+                "Mengacu pada modul BMP,",
+                "Terkait hal tersebut,",
+                "Menariknya pada kasus ini,",
+                "Dalam praktiknya di lapangan,",
+                "Catatan pentingnya,"
+            ],
             formal: [
                 "Terkait hal tersebut,",
                 "Dalam pelaksanaannya,",
@@ -311,6 +341,15 @@ const LANGUAGES = {
         },
 
         samplePrompts: {
+            tuton: `Selamat pagi Tutor dan rekan-rekan mahasiswa sekalian,
+
+Izin menyampaikan tanggapan atas pertanyaan diskusi sesi ini terkait perencanaan sistem informasi pada CV Rasa Mandiri.
+
+Berdasarkan modul BMP dan paparan studi kasus, berikut adalah dua asumsi rasional yang digunakan dalam analisis tanpa merubah esensi data utama kasus:
+1. CV Rasa Mandiri telah memiliki komputer kantor dan jaringan internet yang berfungsi stabil. Dengan asumsi ini, anggaran Rp75.000.000 dapat dialihkan secara maksimal guna pembiayaan jasa perancangan sistem dan sewa cloud server tanpa terbebani pembelian unit PC baru.
+2. Pemilik serta staf administrasi sudah terbiasa mengoperasikan komputer dasar dan ponsel pintar. Asumsi ini membuat alur adaptasi dan pembelajaran berjalan relatif cepat tanpa memerlukan biaya pelatihan khusus yang mahal.
+
+Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tutor serta rekan-rekan mahasiswa sekalian. Terima kasih.`,
             academic: "Kecerdasan buatan (AI) merupakan inovasi teknologi yang sangat krusial dalam era modern ini. Tidak dapat dipungkiri bahwa AI memainkan peran penting dalam mentransformasi sektor pendidikan dan riset akademik. Sebagai kesimpulan, pemanfaatan AI yang komprehensif dan holistik akan menjadi landasan utama bagi kemajuan peradaban masa depan.",
             formal: "Sehubungan dengan perkembangan implementasi sistem informasi, perlu diingat bahwa koordinasi antar divisi memegang peranan penting dalam pencapaian target. Oleh karena itu, sangat penting untuk meningkatkan efisiensi kerja demi memberikan kontribusi signifikan bagi perusahaan.",
             casual: "Belajar hal baru di era digital saat ini memang sangat menyenangkan. Tidak dapat dipungkiri bahwa banyak sekali aplikasi yang bisa membantu kita belajar lebih cepat. Sebagai kesimpulan, jangan ragu untuk menyelami lebih dalam berbagai ilmu yang kamu minati."
@@ -380,6 +419,11 @@ const LANGUAGES = {
                 { pattern: /\blot\s+of\b/gi, replacement: "substantial number of" },
                 { pattern: /\bshows\s+clearly\b/gi, replacement: "empirically substantiates" }
             ],
+            tuton: [
+                { pattern: /\bin\s+my\s+humble\s+opinion\b/gi, replacement: "from my perspective" },
+                { pattern: /\bas\s+discussed\s+in\s+the\s+module\b/gi, replacement: "as outlined in the course material" },
+                { pattern: /\bit\s+can\s+be\s+concluded\s+that\b/gi, replacement: "the key takeaway is that" }
+            ],
             formal: [
                 { pattern: /\bwe\s+must\b/gi, replacement: "the team should" },
                 { pattern: /\bget\s+back\s+to\b/gi, replacement: "follow up regarding" },
@@ -420,6 +464,12 @@ const LANGUAGES = {
                 "Methodologically,",
                 "In this analytical framework,"
             ],
+            tuton: [
+                "From this case perspective,",
+                "Looking at the course module,",
+                "Importantly,",
+                "In practical terms,"
+            ],
             formal: [
                 "In this regard,",
                 "Operationally speaking,",
@@ -457,6 +507,7 @@ const LANGUAGES = {
         },
 
         samplePrompts: {
+            tuton: "Allow me to share my perspective on this week's discussion forum topic regarding information systems planning. Based on the course materials and case study, prioritizing core software requirements while leveraging existing hardware is the most viable path forward.",
             academic: "Artificial intelligence has become a paramount technological breakthrough in today's fast-paced world. It is undeniable that machine learning models play a pivotal role in modern scientific inquiry. Furthermore, this serves as a testament to the power of computational algorithms. In conclusion, delving into these methodologies will foster innovation across interdisciplinary domains.",
             formal: "In light of the recent operational assessment, it is important to remember that inter-departmental synergy plays a crucial role in project success. Moreover, a comprehensive overview reveals notable efficiency gains. Moving forward, we recommend streamlined communication channels.",
             casual: "Exploring new tech trends in today's digital age can feel a bit overwhelming. But when you really delve into the details, you notice how much everyday tools have improved. In conclusion, embracing these changes makes everyday work a whole lot easier."
