@@ -52,8 +52,9 @@ class TextHumanizer {
 
         let protectedText = text;
 
-        // 1. Protect formal salutation phrases up to comma or period (without greedily capturing subsequent text)
-        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh)?|wa\s*['’`]?\s*alaikum\s*salam|(?:kepada\s+)?yth\.?\s+[^,\.\n]+(?:,\s*(?:rekan-rekan|saudara|mahasiswa|bapak|ibu|tutor)[^,\.\n]*)*|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)(?:\s+(?:bapak\/ibu\s+)?(?:tutor|dosen|rekan-rekan(?:\s+mahasiswa)?)[^,\.\n]*)?|dengan\s+hormat|dear\s+[^,\.\n]+)(?:,|\.|\n|$)/gi, (match) => {
+        // 1. Strictly Protect Islamic religious greetings & closings (Must NEVER be mutated by any tone)
+        // Matches Assalamualaikum, Waalaikumsalam, Wassalamualaikum, with any spellings, apostrophes, and trailing blessings
+        protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?|wa\s*['’`]?\s*alaikum\s*salam(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?|wassalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?)(?:[,\.]|(?=[!\?\r\n]|$))/gi, (match) => {
             return addToken(match.trim());
         });
 
@@ -94,7 +95,16 @@ class TextHumanizer {
     isSalutationOrOpening(sentence) {
         if (!sentence) return false;
         const s = sentence.trim().toLowerCase();
-        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|salam|yth\.?|kepada\s+yth|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening)|to\s+whom|izin\s+(?:menanggapi|menyampaikan|menjawab|memberikan|berpendapat)|terima\s+kasih\s+(?:kepada|atas|bapak|ibu|tutor))/i.test(s);
+        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|wassalamu|salam|yth\.?|kepada\s+yth|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening|day)|to\s+whom|izin\s+(?:menanggapi|menyampaikan|menjawab|memberikan|berpendapat)|greetings)/i.test(s);
+    }
+
+    /**
+     * Checks if a sentence is a closing remark, sign-off, or gratitude expression.
+     */
+    isClosing(sentence) {
+        if (!sentence) return false;
+        const s = sentence.trim().toLowerCase();
+        return /^(?:demikian|sekian|terima\s+kasih|hormat\s+(?:kami|saya)|salam\s+(?:hangat|sukses)|best\s+regards|warm\s+regards|sincerely|thank\s+you|thanks)/i.test(s) || /(?:terima\s+kasih|thank\s+you)\.?$/i.test(s);
     }
 
     /**
@@ -192,8 +202,8 @@ class TextHumanizer {
             let current = sentences[i];
             const next = sentences[i + 1];
 
-            // Protect greetings and salutations
-            if (this.isSalutationOrOpening(current)) {
+            // Protect greetings, salutations, and closings
+            if (this.isSalutationOrOpening(current) || this.isClosing(current)) {
                 result.push(current);
                 i++;
                 continue;
@@ -311,7 +321,7 @@ class TextHumanizer {
      * Balanced substitution matching parts of speech, avoiding thesaurus-bot over-saturation.
      */
     injectPerplexity(sentence, lang, intensity, isNeural = false) {
-        if (this.isSalutationOrOpening(sentence)) return sentence;
+        if (this.isSalutationOrOpening(sentence) || this.isClosing(sentence)) return sentence;
 
         const dictSource = (typeof window !== 'undefined' && window.HUMANIZER_DICTIONARY && window.HUMANIZER_DICTIONARY[lang])
             ? window.HUMANIZER_DICTIONARY[lang]
@@ -412,7 +422,7 @@ class TextHumanizer {
         return sentences.map((sentence, idx) => {
             let processed = sentence.trim();
 
-            if (this.isSalutationOrOpening(processed)) {
+            if (this.isSalutationOrOpening(processed) || this.isClosing(processed)) {
                 return processed;
             }
 
@@ -504,6 +514,67 @@ class TextHumanizer {
     }
 
     /**
+     * Adapts general opening salutations and closing sign-offs according to the active Tone,
+     * while strictly protecting Islamic greetings (which are safely shielded in Layer 1).
+     */
+    harmonizeSalutationsAndClosings(lines, tone, lang) {
+        if (!lines || lines.length === 0) return lines;
+        const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang]) ? window.LANGUAGES[lang] : null;
+        if (!langPack || !langPack.openings || !langPack.closings) return lines;
+
+        const targetOpening = langPack.openings[tone];
+        const targetClosing = langPack.closings[tone];
+
+        // 1. Detect and harmonize opening greeting (within first 3 non-empty lines)
+        for (let i = 0; i < Math.min(lines.length, 3); i++) {
+            const rawLine = lines[i];
+            const trimmed = rawLine.trim();
+            if (!trimmed) continue;
+
+            // If line contains an Islamic greeting token, keep it intact
+            if (/__ANTISLOP_TOKEN_\d+__/.test(trimmed)) {
+                // If it ALSO has a general greeting appended after the token, e.g. "__ANTISLOP_TOKEN_0__ Selamat pagi..."
+                const matchGeneral = trimmed.match(/^(__ANTISLOP_TOKEN_\d+__[\s,]*)(?:selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)[^,\.\n]*|halo\s*[^,\.\n]*|hai\s*[^,\.\n]*|dear\s+[^,\.\n]+|yth\.?\s+[^,\.\n]+|dengan\s+hormat)(?:,|\.|\n|$)/i);
+                if (matchGeneral && targetOpening) {
+                    lines[i] = rawLine.replace(matchGeneral[0], matchGeneral[1] + " " + targetOpening);
+                    break;
+                }
+                continue;
+            }
+
+            // General greetings regex (Indonesian & English)
+            const isGeneralGreeting = /^(?:selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)(?:\s+(?:tutor|dosen|rekan-rekan|bapak|ibu|teman-teman|semuanya|hadirin|civitas|mahasiswa)[^,\.\n]*)?|halo\s*(?:semuanya|teman-teman|kawan-kawan|rekan-rekan)?[^,\.\n]*|hai\s*(?:semuanya|teman-teman|kawan-kawan|guys)?[^,\.\n]*|dear\s+[^,\.\n]+|(?:kepada\s+)?yth\.?\s+[^,\.\n]+|dengan\s+hormat|salam\s+(?:sejahtera|hangat|redaksi|akademis|pembuka)?[^,\.\n]*|good\s+(?:morning|afternoon|evening|day)[^,\.\n]*|hello(?:\s+everyone|\s+there)?[^,\.\n]*|hi(?:\s+everyone|\s+folks|\s+there)?[^,\.\n]*|greetings(?:\s+to\s+all)?[^,\.\n]*)(?:,|\.|$)/i.test(trimmed);
+
+            if (isGeneralGreeting && targetOpening) {
+                const leadingWhitespace = (rawLine.match(/^[ \t]*/) || [""])[0];
+                lines[i] = leadingWhitespace + targetOpening;
+                break;
+            }
+        }
+
+        // 2. Detect and harmonize closing remark (within last 3 non-empty lines)
+        for (let i = lines.length - 1; i >= Math.max(0, lines.length - 3); i--) {
+            const rawLine = lines[i];
+            const trimmed = rawLine.trim();
+            if (!trimmed) continue;
+
+            // If line contains an Islamic greeting token, keep it intact
+            if (/__ANTISLOP_TOKEN_\d+__/.test(trimmed)) continue;
+
+            // General closing regex (Indonesian & English)
+            const isGeneralClosing = /(?:demikian(?:\s+(?:yang\s+dapat\s+kami\s+sampaikan|tanggapan\s+(?:dari\s+saya|yang\s+dapat\s+saya\s+sampaikan)|uraian\s+ini|kajian\s+ini|laporan\s+ini)[^.\n]*)?\.?\s*(?:terima\s+kasih|mohon\s+masukan[^.\n]*)*|terima\s+kasih(?:\s+banyak|\s+atas\s+perhatiannya|\s+atas\s+kerjasamanya|\s+semuanya)?[^.\n]*|sekian(?:\s+dan\s+terima\s+kasih|\s+dari\s+saya|\s+dulu)?[^.\n]*|hormat\s+(?:kami|saya)[^.\n]*|salam\s+hangat[^.\n]*|best\s+regards[^.\n]*|warm\s+regards[^.\n]*|sincerely[^.\n]*|thanks(?:\s+a\s+lot|\s+and\s+regards)?[^.\n]*|thank\s+you(?:\s+very\s+much)?[^.\n]*)\.?$/i.test(trimmed);
+
+            if (isGeneralClosing && targetClosing) {
+                const leadingWhitespace = (rawLine.match(/^[ \t]*/) || [""])[0];
+                lines[i] = leadingWhitespace + targetClosing;
+                break;
+            }
+        }
+
+        return lines;
+    }
+
+    /**
      * MAIN HUMANIZATION PIPELINE
      * Transforms input text into natural, fluent human prose across all topics.
      */
@@ -519,11 +590,15 @@ class TextHumanizer {
 
         const effectiveIntensity = isNeural ? 'ultra' : intensity;
 
-        // LAYER 1: Token Protection Guard (Acronyms, greetings, numbers, quotes)
+        // LAYER 1: Token Protection Guard (Islamic greetings, acronyms, numbers, quotes)
         const { text: guardedText, tokens } = this.protectTokens(text);
 
         // Split text by lines to preserve 100% of enters, newlines, and paragraph structures
-        const lines = guardedText.split(/\r?\n/);
+        let lines = guardedText.split(/\r?\n/);
+
+        // Harmonize non-Islamic greetings and closings according to the active Tone
+        lines = this.harmonizeSalutationsAndClosings(lines, tone, lang);
+
         const transformedLines = [];
 
         for (const line of lines) {

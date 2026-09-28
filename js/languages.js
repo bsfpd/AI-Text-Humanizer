@@ -19,7 +19,10 @@ const LANGUAGES = {
             { pattern: /\b(?:tidak\s+dapat\s+dipungkiri|tak\s+dapat\s+dimungkiri|tidak\s+dapat\s+disangkal|tak\s+bisa\s+dipungkiri)\b/gi, replacement: "" },
             { pattern: /\b(?:sebagaimana\s+(?:telah\s+)?kita\s+ketahui\s+bersama|seperti\s+yang\s+kita\s+ketahui|seperti\s+yang\s+telah\s+diketahui),?\s*/gi, replacement: "sebagaimana dipahami, " },
             { pattern: /\bsudah\s+bukan\s+rahasia\s+lagi\s+(?:bahwa)?,?\s*/gi, replacement: "jelas terlihat bahwa " },
-            { pattern: /\b(?:dalam|di)\s+era\s+(?:digital|modern|globalisasi|serba\s+cepat|informasi)?\s*(?:saat\s+ini|sekarang\s+ini|dewasa\s+ini),?\s*/gi, replacement: "saat ini, " },
+            { pattern: /\b(?:dalam|di)\s+era\s+(?:digital|modern|globalisasi|transformasi\s+digital|informasi|teknologi)?\s*(?:yang\s+serba\s+cepat\s+)?(?:saat\s+ini|sekarang\s+ini|dewasa\s+ini|ini)?,?\s*/gi, replacement: "saat ini, " },
+            { pattern: /\bdalam\s+era\s+(?:modern|digital)\b/gi, replacement: "saat ini" },
+            { pattern: /\bera\s+modern\b/gi, replacement: "masa kini" },
+            { pattern: /\bera\s+digital\b/gi, replacement: "ranah digital" },
             { pattern: /\bdi\s+tengah\s+(?:pesatnya\s+)?(?:perkembangan|kemajuan|laju)\s+(?:teknologi|zaman|digitalisasi),?\s*/gi, replacement: "di tengah pesatnya teknologi saat ini, " },
             { pattern: /\bdalam\s+lanskap\s+(?:bisnis|digital|teknologi|pendidikan)?\s*(?:yang\s+terus\s+berkembang|modern),?\s*/gi, replacement: "pada praktiknya saat ini, " },
 
@@ -29,11 +32,13 @@ const LANGUAGES = {
             { pattern: /\bdapat\s+(?:dikatakan|dipahami|dilihat)\s+bahwa,?\s*/gi, replacement: "" },
             { pattern: /\bpada\s+dasarnya,?\s*/gi, replacement: "intinya, " },
             { pattern: /\boleh\s+karena\s+itu,?\s+(?:sangat\s+)?(?:penting|krusial|esensial)\s+untuk\b/gi, replacement: "karena itu, langkah konkretnya yakni" },
+            { pattern: /\boleh\s+karena\s+itu,?\s*/gi, replacement: "karena itu, " },
+            { pattern: /\boleh\s+sebab\s+itu,?\s*/gi, replacement: "karena itu, " },
             { pattern: /\bdengan\s+demikian,?\s+(?:dapat\s+disimpulkan|dapat\s+dikatakan)\s+bahwa,?\s*/gi, replacement: "artinya, " },
             { pattern: /\bhal\s+(?:ini|tersebut)\s+(?:disebabkan|dikarenakan)\s+oleh,?\s*/gi, replacement: "hal ini terjadi lantaran " },
             { pattern: /\bhal\s+(?:ini|tersebut)\s+dikarenakan\b/gi, replacement: "faktor utamanya karena" },
             { pattern: /\bsehubungan\s+dengan\s+hal\s+tersebut,?\s*/gi, replacement: "menanggapi poin ini, " },
-            { pattern: /\b(?:sebagai\s+kesimpulan|kesimpulannya|pada\s+akhirnya),?\s*/gi, replacement: "pada intinya, " },
+            { pattern: /\b(?:sebagai\s+kesimpulan|kesimpulannya|pada\s+akhirnya),?\s*/gi, replacement: "secara garis besar, " },
             { pattern: /\bsecara\s+keseluruhan,?\s*/gi, replacement: "secara umum, " },
             { pattern: /\bdapat\s+disimpulkan\s+bahwa,?\s*/gi, replacement: "bisa dipastikan bahwa " },
 
@@ -48,6 +53,17 @@ const LANGUAGES = {
             { pattern: /\bsebuah\s+bukti\s+nyata\s+(?:bahwa|dari)?\b/gi, replacement: "bukti jelas bahwa" },
             { pattern: /\bmenyelami\s+(?:lebih\s+dalam|dunia|ranah|berbagai)?\s*/gi, replacement: "mempelajari " },
             { pattern: /\bmenyelami\b/gi, replacement: "mendalami" },
+            { pattern: /\bpermadani\s+(?:inovasi|kehidupan|budaya|sosial|peradaban|teknologi|karya)?\b/gi, replacement: "ragam dinamika" },
+            { pattern: /\bpermadani\b/gi, replacement: "keberagaman" },
+            { pattern: /\bmercusuar\s+(?:harapan|transformasi|perubahan|kemajuan|inovasi|pendidikan)?\b/gi, replacement: "arah panduan" },
+            { pattern: /\bmercusuar\b/gi, replacement: "pijakan utama" },
+            { pattern: /\blanskap\s+(?:pendidikan|bisnis|teknologi|digital|ekonomi|keuangan|sosial|budaya|kontemporer)?\b/gi, replacement: "ranah" },
+            { pattern: /\blanskap\b/gi, replacement: "bidang" },
+            { pattern: /\beksplorasi\s+(?:lebih\s+dalam|lebih\s+jauh)?\b/gi, replacement: "mengkaji lebih jauh" },
+            { pattern: /\bmerangkul\s+(?:perubahan\s+holistik|perubahan|transformasi)\b/gi, replacement: "menyesuaikan perubahan secara menyeluruh" },
+            { pattern: /\bmerangkul\b/gi, replacement: "menerapkan" },
+            { pattern: /\blandasan\s+masa\s+depan\b/gi, replacement: "pijakan ke depan" },
+            { pattern: /\bsangat\s+penting\s+bagi\s+kita\s+untuk\b/gi, replacement: "kita perlu" },
             { pattern: /\bnamun\s+demikian,?\s*/gi, replacement: "namun di lapangan, " },
             { pattern: /\bdi\s+samping\s+itu,?\s*/gi, replacement: "selain itu, " },
             { pattern: /\bkomprehensif\s+dan\s+holistik\b/gi, replacement: "menyeluruh dan terarah" },
@@ -184,10 +200,29 @@ const LANGUAGES = {
             { pattern: /\bdalam\s+upaya\s+(?:untuk\s+)?meningkatkan\b/gi, replacement: "guna mendorong kenaikan" },
             { pattern: /\bhal\s+tersebut\s+menunjukkan\s+adanya\b/gi, replacement: "kondisi ini memperlihatkan adanya" },
             { pattern: /\bmenjadi\s+tolok\s+ukur\s+keberhasilan\b/gi, replacement: "menjadi barometer capaian" },
-            { pattern: /\bmemiliki\s+korelasi\s+positif\s+dengan\b/gi, replacement: "berbanding lurus dengan" }
+            { pattern: /\bmemiliki\s+korelasi\s+positif\s+dengan\b/gi, replacement: "berbanding lurus dengan" },
+
+            // 10. September 2026 Multi-Detector Clichés (Turnitin 2026, Drillbit, GPTZero 4.10b, Copyleaks, ZeroGPT, QuillBot)
+            { pattern: /\bdalam\s+era\s+transformasi\s+digital(?:\s+yang\s+serba\s+cepat)?\b/gi, replacement: "pada era digitalisasi saat ini" },
+            { pattern: /\bperlu\s+digarisbawahi\s+bahwa,?\s*/gi, replacement: "catatannya, " },
+            { pattern: /\bpada\s+hakikatnya,?\s*/gi, replacement: "sejatinya, " },
+            { pattern: /\btidak\s+dapat\s+disangkal\s+bahwa,?\s*/gi, replacement: "terlihat jelas bahwa " },
+            { pattern: /\bmemiliki\s+peran\s+yang\s+tak\s+terelakkan\s+dalam\b/gi, replacement: "mengambil peran sentral dalam" },
+            { pattern: /\bmerupakan\s+instrumen\s+fundamental(?:\s+yang\s+senantiasa)?\b/gi, replacement: "menjadi sarana utama yang" },
+            { pattern: /\bmencerminkan\s+komitmen\s+mendalam(?:\s+untuk)?\b/gi, replacement: "menunjukkan keseriusan dalam" },
+            { pattern: /\bdalam\s+lanskap\s+teknologi\s+saat\s+ini\b/gi, replacement: "pada pemanfaatan teknologi saat ini" },
+            { pattern: /\bsecara\s+garis\s+besar\s+dapat\s+disimpulkan\s+bahwa,?\s*/gi, replacement: "intinya, " },
+            { pattern: /\bpatut\s+dicatat\s+bahwa,?\s*/gi, replacement: "perlu dicermati bahwa " },
+            { pattern: /\bmemegang\s+peranan\s+krusial\b/gi, replacement: "berperan sangat penting" },
+            { pattern: /\bmemberikan\s+kontribusi\s+yang\s+signifikan\b/gi, replacement: "berkontribusi nyata" },
+            { pattern: /\bmenjadi\s+bukti\s+nyata\s+dari\b/gi, replacement: "membuktikan secara langsung" },
+            { pattern: /\bmerupakan\s+salah\s+satu\s+aspek\s+kunci\b/gi, replacement: "menjadi aspek penting" },
+            { pattern: /\bpada\s+dasarnya\s+dapat\s+dipahami\s+bahwa\b/gi, replacement: "wajar dipahami bahwa" },
+            { pattern: /\bdalam\s+konteks\s+ini\s+dapat\s+dikatakan\s+bahwa\b/gi, replacement: "dalam hal ini, " },
+            { pattern: /\blangkah\s+strategis\s+yang\s+harus\s+diambil\s+adalah\b/gi, replacement: "langkah konkretnya yakni" }
         ],
 
-        // Comprehensive Per-Tone Lexical and Rhetorical Replacements (6 Styles)
+        // Comprehensive Per-Tone Lexical and Rhetorical Replacements (7 Styles)
         toneReplacements: {
             academic: [
                 { pattern: /\bsangat\s+bagus\b/gi, replacement: "berkualitas tinggi" },
@@ -196,7 +231,7 @@ const LANGUAGES = {
                 { pattern: /\bnggak\b/gi, replacement: "tidak" },
                 { pattern: /\bcuma\b/gi, replacement: "hanya" },
                 { pattern: /\bbanget\b/gi, replacement: "sangat" },
-                { pattern: /\bintinya\b/gi, replacement: "pada hakikatnya" },
+                { pattern: /\bintinya\b/gi, replacement: "secara substansial" },
                 { pattern: /\bjelas\s+banget\b/gi, replacement: "tampak secara eksplisit" },
                 { pattern: /\bmasalah\s+besar\b/gi, replacement: "hambatan fundamental" },
                 { pattern: /\bcara\s+ini\b/gi, replacement: "metodologi ini" },
@@ -340,6 +375,28 @@ const LANGUAGES = {
             ]
         },
 
+        // Tone-Specific Greetings & Openings (Non-Islamic Greetings Harmonization)
+        openings: {
+            academic: "Salam sejahtera bagi rekan-rekan civitas akademika,",
+            tuton: "Selamat pagi Tutor dan rekan-rekan mahasiswa sekalian,",
+            formal: "Yth. Bapak/Ibu dan rekan-rekan sekalian,",
+            casual: "Halo teman-teman,",
+            journalistic: "Salam redaksi,",
+            creative: "Salam hangat untuk kita semua,",
+            simple: "Halo,"
+        },
+
+        // Tone-Specific Closings & Sign-Offs (Non-Islamic Closings Harmonization)
+        closings: {
+            academic: "Demikian kajian kritis yang dapat penulis sampaikan, semoga memberikan kontribusi konstruktif terhadap pengembangan wacana keilmuan. Terima kasih.",
+            tuton: "Demikian tanggapan dari saya, mohon masukan dan koreksi dari Tutor serta rekan-rekan mahasiswa sekalian. Terima kasih.",
+            formal: "Demikian yang dapat kami sampaikan. Atas perhatian, arahan, dan kerja sama Bapak/Ibu, kami ucapkan terima kasih.",
+            casual: "Sekian dulu dari aku ya, semoga bermanfaat buat teman-teman! Gimana menurut kalian? Yuk diskusi!",
+            journalistic: "Demikian rangkuman informasi terkini dari lapangan yang dapat dihimpun redaksi.",
+            creative: "Demikian sekelumit refleksi, semoga mengendap menjadi wawasan yang bermakna bagi perjalanan kita.",
+            simple: "Sekian dan terima kasih."
+        },
+
         samplePrompts: {
             tuton: `Selamat pagi Tutor dan rekan-rekan mahasiswa sekalian,
 
@@ -373,10 +430,14 @@ Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tut
             { pattern: /\bplays\s+an\s+essential\s+role\s+in\b/gi, replacement: "directly influences" },
             { pattern: /\bin\s+today's\s+(?:digital\s+age|fast-paced\s+world|interconnected\s+society)\b/gi, replacement: "nowadays" },
             { pattern: /\bin\s+the\s+modern\s+era\b/gi, replacement: "today" },
-            { pattern: /\brich\s+tapestry\s+of\b/gi, replacement: "wide array of" },
+            { pattern: /\b(?:rich\s+)?tapestry\s+(?:of|that)?\b/gi, replacement: "wide array of" },
+            { pattern: /\btapestry\b/gi, replacement: "diversity" },
             { pattern: /\bseamlessly\s+integrated?\b/gi, replacement: "smoothly linked" },
             { pattern: /\bfoster\s+a\s+sense\s+of\b/gi, replacement: "encourage" },
-            { pattern: /\bbeacon\s+of\s+hope\b/gi, replacement: "promising sign" },
+            { pattern: /\bbeacon\s+(?:of\s+hope|of\s+transformation|of\s+light|of\s+change)?\b/gi, replacement: "promising guide" },
+            { pattern: /\bbeacon\b/gi, replacement: "clear benchmark" },
+            { pattern: /\blandscape\s+(?:of|in)?\b/gi, replacement: "realm of" },
+            { pattern: /\blandscape\b/gi, replacement: "sector" },
             { pattern: /\bparamount\s+importance\b/gi, replacement: "key priority" },
             { pattern: /\bcomprehensive\s+overview\b/gi, replacement: "clear summary" },
             { pattern: /\bholistic\s+approach\b/gi, replacement: "integrated method" },
@@ -409,7 +470,21 @@ Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tut
             { pattern: /\bwith\s+the\s+advent\s+of\b/gi, replacement: "with the rise of" },
             { pattern: /\bat\s+the\s+forefront\s+of\b/gi, replacement: "leading" },
             { pattern: /\bserves\s+as\s+a\s+cornerstone\s+for\b/gi, replacement: "provides a solid foundation for" },
-            { pattern: /\bit\s+is\s+worth\s+emphasizing\s+that\b/gi, replacement: "crucially," }
+            { pattern: /\bit\s+is\s+worth\s+emphasizing\s+that\b/gi, replacement: "crucially," },
+
+            // 6. September 2026 Multi-Detector Clichés (Turnitin, Copyleaks, GPTZero 4.10b, QuillBot)
+            { pattern: /\bin\s+today's\s+rapidly\s+evolving(?:\s+digital)?\s+landscape\b/gi, replacement: "in modern operations," },
+            { pattern: /\bit\s+is\s+imperative\s+to\s+note\s+that,?\s*/gi, replacement: "notably, " },
+            { pattern: /\bserves\s+as\s+a\s+testament\s+to\b/gi, replacement: "clearly demonstrates" },
+            { pattern: /\bdelves\s+into\s+the\s+multifaceted(?:\s+nature\s+of)?\b/gi, replacement: "examines the various aspects of" },
+            { pattern: /\bplays\s+a\s+pivotal\s+role\s+in\s+shaping\b/gi, replacement: "directly influences" },
+            { pattern: /\bundeniably\s+highlights\s+the\s+significance\s+of\b/gi, replacement: "firmly emphasizes" },
+            { pattern: /\bit\s+is\s+crucial\s+to\s+recognize\s+that\b/gi, replacement: "one key point is that" },
+            { pattern: /\bfosters\s+an\s+environment\s+of\b/gi, replacement: "builds an atmosphere for" },
+            { pattern: /\bby\s+leveraging\s+these\s+insights\b/gi, replacement: "applying these findings" },
+            { pattern: /\bin\s+this\s+comprehensive\s+overview\b/gi, replacement: "across this review" },
+            { pattern: /\bnavigating\s+the\s+complexities\s+of\b/gi, replacement: "managing the challenges of" },
+            { pattern: /\ba\s+nuanced\s+understanding\s+of\b/gi, replacement: "a clear perspective on" }
         ],
 
         toneReplacements: {
@@ -504,6 +579,28 @@ Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tut
                 "Consequently,",
                 "Essentially,"
             ]
+        },
+
+        // Tone-Specific Greetings & Openings
+        openings: {
+            academic: "Greetings to all academic colleagues and peers,",
+            tuton: "Good day to the Tutor and fellow online students,",
+            formal: "Dear esteemed partners and colleagues,",
+            casual: "Hey everyone,",
+            journalistic: "Editorial greetings,",
+            creative: "Warmest greetings to fellow readers,",
+            simple: "Hello,"
+        },
+
+        // Tone-Specific Closings & Sign-Offs
+        closings: {
+            academic: "Thus concludes this academic inquiry. May these observations contribute constructively to the scholarly discourse. Thank you.",
+            tuton: "This concludes my response. I warmly welcome feedback and constructive guidance from the Tutor and peers. Thank you.",
+            formal: "Respectfully submitted. We appreciate your consideration and continued collaboration. Thank you.",
+            casual: "That's all from me for now, hope it helps! What are your thoughts on this?",
+            journalistic: "This summarizes current verified field reports. Further updates will follow as developments unfold.",
+            creative: "A quiet reflection left behind, hoping to offer a meaningful perspective along the journey.",
+            simple: "Thank you."
         },
 
         samplePrompts: {

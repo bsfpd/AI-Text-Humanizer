@@ -214,3 +214,56 @@
         transform: scale(1) translateY(0);
     }
 }
+
+/* Settings Modal Theme Selector */
+.settings-theme-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.settings-theme-btn:hover:not(.active) {
+    border-color: #818cf8;
+    background-color: #e0e7ff;
+}
+.dark .settings-theme-btn:hover:not(.active) {
+    border-color: #6366f1;
+    background-color: #1e293b;
+}
+.settings-theme-btn.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+    color: #ffffff !important;
+    border-color: #312e81 !important;
+    box-shadow: 0 2px 8px -1px rgba(79, 70, 229, 0.45);
+    font-weight: 700 !important;
+}
+
+/* Mobile & Smartphone Ergonomics (Antislop Layoutmobile & UI) */
+@media (max-width: 640px) {
+    html, body {
+        overflow-x: hidden;
+    }
+
+    /* Interactive touch targets >= 40-44px */
+    .pill-button,
+    .intensity-pill {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+
+    #btnHumanize {
+        min-height: 52px;
+        touch-action: manipulation;
+    }
+
+    /* Prevent mobile text zoom on focus */
+    textarea, input[type="text"], input[type="password"], select {
+        font-size: 14px;
+    }
+
+    /* Smooth spacing on narrow screens */
+    .card-soft {
+        padding: 1rem;
+    }
+}
+

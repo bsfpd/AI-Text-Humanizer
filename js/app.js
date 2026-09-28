@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         viewMode: 'raw', // 'raw', 'diff', 'analysis'
         engineMode: localStorage.getItem('humanize_engine_mode') || 'neural', // 'neural' or 'offline'
         history: [],
-        theme: localStorage.getItem('humanize_theme') || 'light'
+        theme: localStorage.getItem('humanize_theme') || 'system'
     };
 
     // 3. Cache DOM Elements
@@ -92,27 +92,91 @@ document.addEventListener('DOMContentLoaded', () => {
         toastMessage: document.getElementById('toastMessage')
     };
 
-    // 4. Initialize Theme
-    function applyTheme(theme) {
+    // 4. Initialize Theme (3-Mode: system / light / dark)
+    const systemMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    function getEffectiveTheme(theme) {
+        if (theme === 'system') {
+            return (systemMedia && systemMedia.matches) ? 'dark' : 'light';
+        }
+        return theme;
+    }
+
+    function applyTheme(theme, showNotification = false) {
         state.theme = theme;
-        if (theme === 'dark') {
+        localStorage.setItem('humanize_theme', theme);
+
+        const effective = getEffectiveTheme(theme);
+        if (effective === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem('humanize_theme', theme);
-        const icon = elements.themeToggle.querySelector('i');
+
+        // Update Theme Toggle Icon & Tooltip
+        const icon = document.getElementById('themeToggleIcon') || elements.themeToggle?.querySelector('i');
         if (icon) {
-            icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
-            lucide.createIcons();
+            let iconName = 'laptop';
+            let titleText = 'Tema: Mengikuti Sistem (Klik untuk ganti)';
+            if (theme === 'light') {
+                iconName = 'sun';
+                titleText = 'Tema: Terang (Klik untuk ganti)';
+            } else if (theme === 'dark') {
+                iconName = 'moon';
+                titleText = 'Tema: Gelap (Klik untuk ganti)';
+            }
+            icon.setAttribute('data-lucide', iconName);
+            if (elements.themeToggle) elements.themeToggle.setAttribute('title', titleText);
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Update Settings Modal Theme Buttons Active State
+        document.querySelectorAll('.settings-theme-btn').forEach(btn => {
+            const choice = btn.getAttribute('data-theme-choice');
+            if (choice === theme) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (showNotification && typeof showToast === 'function') {
+            const labelMap = {
+                system: 'Mengikuti Sistem Perangkat',
+                light: 'Terang (Light Mode)',
+                dark: 'Gelap (Dark Mode)'
+            };
+            showToast(`Tema diubah: ${labelMap[theme] || theme}`);
         }
     }
 
-    applyTheme(state.theme);
+    // Media query listener for system theme changes
+    if (systemMedia) {
+        systemMedia.addEventListener('change', () => {
+            if (state.theme === 'system') {
+                applyTheme('system', false);
+            }
+        });
+    }
 
+    // Toggle button in header cycles: system -> light -> dark -> system
     elements.themeToggle?.addEventListener('click', () => {
-        applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+        const cycle = { system: 'light', light: 'dark', dark: 'system' };
+        const next = cycle[state.theme] || 'system';
+        applyTheme(next, true);
     });
+
+    // Theme buttons inside settings modal
+    document.querySelectorAll('.settings-theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const chosen = btn.getAttribute('data-theme-choice');
+            if (chosen) {
+                applyTheme(chosen, true);
+            }
+        });
+    });
+
+    applyTheme(state.theme);
 
     // 5. Load History from Storage
     function loadHistory() {
@@ -575,6 +639,14 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.apiProviderSelect.value = apiService.config.provider || 'offline';
         elements.apiKeyInput.value = apiService.config.apiKey || '';
         elements.apiModelInput.value = apiService.config.model || '';
+        document.querySelectorAll('.settings-theme-btn').forEach(btn => {
+            const choice = btn.getAttribute('data-theme-choice');
+            if (choice === state.theme) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
         elements.modalSettings.classList.remove('hidden');
     }
 

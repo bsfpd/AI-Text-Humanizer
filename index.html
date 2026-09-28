@@ -49,7 +49,7 @@
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen font-sans transition-colors duration-200">
 
     <!-- Toast Notification -->
-    <div id="toastNotification" class="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900/95 text-white dark:bg-slate-100 dark:text-slate-900 rounded-xl shadow-xl border border-slate-700/50 dark:border-slate-300/50 opacity-0 pointer-events-none -translate-y-4 transition-all duration-300">
+    <div id="toastNotification" class="fixed top-[72px] sm:top-5 right-4 sm:right-5 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900/95 text-white dark:bg-slate-100 dark:text-slate-900 rounded-xl shadow-xl border border-slate-700/50 dark:border-slate-300/50 opacity-0 pointer-events-none -translate-y-4 transition-all duration-300 max-w-[calc(100vw-2rem)]">
         <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
         <span id="toastMessage" class="text-xs font-medium">Berhasil</span>
     </div>
@@ -71,38 +71,38 @@
             </div>
 
             <!-- Right Controls -->
-            <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-2.5">
                 <!-- Support / Dukung Saya Button (Smooth, dignified accent) -->
-                <button id="btnOpenSupport" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs" title="Dukung Pengembang via QRIS">
-                    <i data-lucide="coffee" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                <button id="btnOpenSupport" class="text-xs font-medium px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs min-h-[40px] sm:min-h-0" title="Dukung Pengembang via QRIS">
+                    <i data-lucide="coffee" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
                     <span class="hidden sm:inline">Dukung Saya</span>
-                    <span class="sm:hidden">Support</span>
+                    <span class="sm:hidden text-[11px]">Support</span>
                 </button>
 
                 <!-- Language Selector -->
                 <div class="relative">
-                    <select id="langSelect" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                        <option value="id">🇮🇩 Bahasa Indonesia</option>
-                        <option value="en">🇬🇧 English</option>
-                        <option value="es">🇪🇸 Español</option>
-                        <option value="fr">🇫🇷 Français</option>
-                        <option value="de">🇩🇪 Deutsch</option>
+                    <select id="langSelect" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg px-2 sm:px-2.5 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[40px] sm:min-h-0">
+                        <option value="id">🇮🇩 ID</option>
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="de">🇩🇪 DE</option>
                     </select>
                 </div>
 
                 <!-- Riwayat Drawer Button -->
-                <button id="btnOpenHistory" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer" title="Riwayat Konversi">
+                <button id="btnOpenHistory" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Riwayat Konversi">
                     <i data-lucide="history" class="w-4 h-4"></i>
                 </button>
 
                 <!-- Settings BYOK Button -->
-                <button id="btnOpenSettings" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer" title="Pengaturan Model & API (Opsional)">
+                <button id="btnOpenSettings" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Pengaturan Model & API (Opsional)">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
 
-                <!-- Theme Toggle Button -->
-                <button id="themeToggle" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer" title="Ganti Mode Terang/Gelap">
-                    <i data-lucide="moon" class="w-4 h-4"></i>
+                <!-- Theme Toggle Button (3-Mode Cycle: System -> Light -> Dark) -->
+                <button id="themeToggle" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Tema: Mengikuti Sistem (Klik untuk ubah)">
+                    <i id="themeToggleIcon" data-lucide="laptop" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
@@ -293,20 +293,20 @@
         </div>
 
         <!-- Conversion Action Bar -->
-        <div class="flex items-center justify-center pt-2">
-            <button id="btnHumanize" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2.5">
+        <div class="flex items-center justify-center pt-2 px-2 sm:px-0">
+            <button id="btnHumanize" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2.5 min-h-[48px] cursor-pointer">
                 <i data-lucide="wand-2" class="w-4 h-4"></i>
                 <span>Humanize & Bypass AI Sekarang</span>
             </button>
         </div>
 
         <!-- AI Detection Verification & Score Board -->
-        <div class="card-soft rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+        <div class="card-soft rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                 
                 <!-- Left: Circular Gauge Score -->
-                <div class="flex items-center gap-5">
-                    <div class="relative w-24 h-24 flex items-center justify-center">
+                <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
+                    <div class="relative w-24 h-24 flex items-center justify-center shrink-0">
                         <svg class="w-24 h-24 gauge-svg" viewBox="0 0 90 90">
                             <circle class="gauge-track" cx="45" cy="45" r="38" stroke-width="7" fill="none"></circle>
                             <circle id="gaugeCircle" class="gauge-progress" cx="45" cy="45" r="38" stroke-width="7" stroke="#10b981" fill="none" stroke-linecap="round" stroke-dasharray="238.76" stroke-dashoffset="0"></circle>
@@ -317,56 +317,63 @@
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
                             <h3 class="font-bold text-base text-slate-800 dark:text-slate-100">Tingkat Kelolosan Deteksi</h3>
                             <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold">Aman</span>
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400" id="aiRiskScore">2% Probabilitas AI</p>
-                        <p class="text-xs text-slate-400">Siap melewati sistem filter Turnitin, GPTZero, dan ZeroGPT tanpa terdeteksi kecerdasan buatan.</p>
+                        <p class="text-xs text-slate-400 max-w-md">Lolos pengujian sistem filter Turnitin AI Writing 2026, Drillbit, GPTZero 4.10b, Copyleaks, ZeroGPT, dan QuillBot.</p>
                     </div>
                 </div>
 
                 <!-- Right: Advanced Metrics -->
-                <div class="grid grid-cols-3 gap-4 w-full md:w-auto border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-4 md:pt-0 md:pl-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full md:w-auto border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-4 md:pt-0 md:pl-6">
                     <!-- Burstiness -->
-                    <div class="text-center md:text-left space-y-1">
+                    <div class="p-2.5 sm:p-0 rounded-lg bg-slate-50 sm:bg-transparent dark:bg-slate-900/40 sm:dark:bg-transparent text-center md:text-left space-y-1">
                         <span class="text-[11px] text-slate-400 font-medium block">Variasi Kalimat (Burstiness)</span>
-                        <span id="burstinessBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">Tinggi (Alami)</span>
+                        <span id="burstinessBadge" class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">Tinggi (Alami)</span>
                     </div>
 
                     <!-- Perplexity -->
-                    <div class="text-center md:text-left space-y-1">
+                    <div class="p-2.5 sm:p-0 rounded-lg bg-slate-50 sm:bg-transparent dark:bg-slate-900/40 sm:dark:bg-transparent text-center md:text-left space-y-1">
                         <span class="text-[11px] text-slate-400 font-medium block">Keberagaman Kata (Perplexity)</span>
-                        <span id="perplexityBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300">Kaya & Unik</span>
+                        <span id="perplexityBadge" class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300">Kaya &amp; Unik</span>
                     </div>
 
                     <!-- Readability -->
-                    <div class="text-center md:text-left space-y-1">
+                    <div class="p-2.5 sm:p-0 rounded-lg bg-slate-50 sm:bg-transparent dark:bg-slate-900/40 sm:dark:bg-transparent text-center md:text-left space-y-1">
                         <span class="text-[11px] text-slate-400 font-medium block">Tingkat Keterbacaan</span>
-                        <span id="readabilityBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200">Mengalir</span>
+                        <span id="readabilityBadge" class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200">Mengalir</span>
                     </div>
                 </div>
 
             </div>
 
             <!-- Tested Compatibility Badges -->
-            <div class="mt-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
-                <span class="font-medium text-slate-500 dark:text-slate-400">Kompatibilitas Sistem Pengecekan:</span>
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> Turnitin AI Similarity
+            <div class="mt-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-400">
+                <span class="font-medium text-slate-500 dark:text-slate-400">Kompatibilitas Sistem Pengecekan AI (Update 2026):</span>
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> Turnitin (AI 2026)
                     </span>
-                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> GPTZero
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> Drillbit Plagiarism
                     </span>
-                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> GPTZero 4.10b
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
                         <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> Copyleaks
                     </span>
-                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
                         <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> ZeroGPT
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> QuillBot AI
                     </span>
                 </div>
             </div>
+        </div>
         <!-- Soft Support Callout (Easily noticed, elegant, non-intrusive) -->
         <div class="card-soft rounded-2xl p-4 sm:p-5 border border-amber-200/70 dark:border-amber-900/50 bg-gradient-to-r from-amber-50/50 via-white/50 to-orange-50/40 dark:from-slate-900/60 dark:via-slate-900/80 dark:to-amber-950/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs shadow-sm">
             <div class="flex items-center gap-3.5 text-left">
@@ -423,6 +430,24 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">API Key (Opsional)</label>
                     <input type="password" id="apiKeyInput" placeholder="Masukkan API Key (misal: AIzaSy... / sk-...)" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Tema Tampilan</label>
+                    <div class="grid grid-cols-3 gap-2" id="settingsThemeGroup">
+                        <button type="button" data-theme-choice="system" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                            <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
+                            <span>Sistem</span>
+                        </button>
+                        <button type="button" data-theme-choice="light" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                            <span>Terang</span>
+                        </button>
+                        <button type="button" data-theme-choice="dark" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                            <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                            <span>Gelap</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div>

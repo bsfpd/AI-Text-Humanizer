@@ -23,7 +23,18 @@ class AIDetector {
             'tidak dapat dielakkan bahwa', 'tujuan utama dari penulisan', 'memberikan implikasi yang signifikan',
             'menghadapi berbagai macam tantangan', 'serves as a reminder', 'paves the way for',
             'sheds light on', 'with the advent of', 'at the forefront of', 'serves as a cornerstone',
-            'cenderung lekas', 'ramah dipahami', 'perguruan signifikan'
+            'cenderung lekas', 'ramah dipahami', 'perguruan signifikan',
+            // September 2026 Multi-Detector Triggers
+            'dalam era transformasi digital', 'perlu digarisbawahi bahwa', 'pada hakikatnya',
+            'tidak dapat disangkal bahwa', 'memiliki peran yang tak terelakkan', 'merupakan instrumen fundamental',
+            'mencerminkan komitmen mendalam', 'dalam lanskap teknologi saat ini', 'secara garis besar dapat disimpulkan',
+            'patut dicatat bahwa', 'memegang peranan krusial', 'memberikan kontribusi yang signifikan',
+            'menjadi bukti nyata dari', 'merupakan salah satu aspek kunci', 'pada dasarnya dapat dipahami',
+            'dalam konteks ini dapat dikatakan', 'langkah strategis yang harus diambil',
+            "in today's rapidly evolving", 'it is imperative to note', 'delves into the multifaceted',
+            'plays a pivotal role in shaping', 'undeniably highlights the significance',
+            'it is crucial to recognize that', 'fosters an environment of', 'by leveraging these insights',
+            'in this comprehensive overview', 'navigating the complexities of', 'a nuanced understanding of'
         ];
     }
 
@@ -194,8 +205,11 @@ class AIDetector {
             avgAiScore = Math.max(72, avgAiScore);
         } else {
             // No AI cliches present: Reward burstiness and perplexity
-            if (burstiness.score > 65) avgAiScore -= 15;
-            if (perplexity.score > 65) avgAiScore -= 12;
+            if (burstiness.score >= 60) avgAiScore -= 15;
+            else if (burstiness.score >= 35) avgAiScore -= 8;
+
+            if (perplexity.score >= 60) avgAiScore -= 12;
+            else if (perplexity.score >= 40) avgAiScore -= 6;
         }
 
         // Bound to realistic percentages
