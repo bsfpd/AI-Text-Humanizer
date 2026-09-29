@@ -527,6 +527,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         lang: state.lang,
                         intensity: 'ultra'
                     });
+                    if (result && result.trim()) {
+                        const lines = humanizer.harmonizeSalutationsAndClosings(result.split(/\r?\n/), state.tone, state.lang);
+                        result = lines.join('\n');
+                    }
                     usedEngine = 'cloud_ai';
                 } else {
                     // Client-Side Deep Neural Engine (100% popup-free, login-free & ultra-bypass)

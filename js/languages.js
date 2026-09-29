@@ -225,6 +225,8 @@ const LANGUAGES = {
         // Comprehensive Per-Tone Lexical and Rhetorical Replacements (7 Styles)
         toneReplacements: {
             academic: [
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\s+atas\b/gi, replacement: "perkenankan saya menyampaikan telaah kritis mengenai" },
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\b/gi, replacement: "perkenankan saya mengemukakan telaah akademik" },
                 { pattern: /\bsangat\s+bagus\b/gi, replacement: "berkualitas tinggi" },
                 { pattern: /\bmenguntungkan\b/gi, replacement: "memberikan nilai tambah nyata" },
                 { pattern: /\bbikin\b/gi, replacement: "menghasilkan" },
@@ -261,6 +263,8 @@ const LANGUAGES = {
                 { pattern: /\bmohon\s+arahan\s+dan\s+bimbingannya\b/gi, replacement: "mohon masukan dan tanggapannya" }
             ],
             formal: [
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\s+atas\b/gi, replacement: "perkenankan kami menyampaikan tanggapan resmi mengenai" },
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\b/gi, replacement: "perkenankan kami menyampaikan tanggapan" },
                 { pattern: /\bkita\s+harus\b/gi, replacement: "manajemen perlu" },
                 { pattern: /\bkami\s+bermaksud\s+untuk\b/gi, replacement: "kami berencana" },
                 { pattern: /\bdiharapkan\s+dapat\s+memberikan\b/gi, replacement: "ditargetkan menghasilkan" },
@@ -276,6 +280,8 @@ const LANGUAGES = {
                 { pattern: /\bperlu\s+segera\s+ditangani\b/gi, replacement: "menjadi prioritas penyelesaian" }
             ],
             casual: [
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\s+atas\b/gi, replacement: "aku mau share pandangan seputar" },
+                { pattern: /\b(?:izin\s+)?(?:menyampaikan\s+tanggapan|menanggapi)\b/gi, replacement: "aku mau berpendapat" },
                 { pattern: /\bnamun\s+demikian,?\b/gi, replacement: "tapi nyatanya," },
                 { pattern: /\boleh\s+karena\s+itu,?\b/gi, replacement: "makanya," },
                 { pattern: /\bdiperlukan\b/gi, replacement: "butuh" },
@@ -674,12 +680,12 @@ Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tut
 };
 
 /**
- * Extensive, Context-Safe Synonym and Collocation Knowledge Base (500+ Headwords)
+ * Extensive, Context-Safe Synonym and Collocation Knowledge Base (350+ Headwords)
  * Grouped strictly by Part-of-Speech and syntactic semantics to prevent ungrammatical collocations.
  */
 const HUMANIZER_DICTIONARY = {
     id: {
-        // --- VERBS (Kata Kerja Aksi & Kognitif) ---
+        // --- VERBS (Kata Kerja Aksi, Analisis, Kognitif & Komunikasi) ---
         "mengubah": ["merombak", "mentransformasi", "memodifikasi", "menata ulang"],
         "meningkatkan": ["mengakselerasi", "memperkuat", "mengoptimalkan", "mendongkrak", "meningkatkan"],
         "menurunkan": ["mereduksi", "memangkas", "menekan", "mengurangi"],
@@ -731,8 +737,53 @@ const HUMANIZER_DICTIONARY = {
         "bekerja": ["bekerja", "beroperasi", "menjalankan tugas"],
         "melihat": ["mencermati", "memandang", "mengamati"],
         "mencari": ["menelusuri", "merumuskan", "memburu"],
+        "memperbaiki": ["membenahi", "merestrukturisasi", "merevisi", "menyempurnakan"],
+        "menjalankan": ["mengoperasikan", "mengimplementasikan", "melangsungkan", "memobilisasi"],
+        "mengatur": ["menata", "mengelola", "meregulasi", "mengorkestrasi"],
+        "memastikan": ["menjamin", "menggaransi", "memverifikasi", "menegaskan"],
+        "mengidentifikasi": ["memetakan", "mengenali", "menemukan", "mendeteksi"],
+        "merumuskan": ["menyusun", "memformulasikan", "merancang", "mengonsep"],
+        "menerapkan": ["mengimplementasikan", "mengaplikasikan", "mempraktikkan", "memberlakukan"],
+        "meninggalkan": ["mengesampingkan", "menanggalkan", "melepaskan"],
+        "mengurangi": ["mereduksi", "memangkas", "menekan", "memperkecil"],
+        "menambah": ["memperbesar", "mengembangkan", "memperbanyak", "mengakumulasi"],
+        "mengawasi": ["memantau", "memonitor", "mengontrol", "mencermati alur"],
+        "mengkoordinasikan": ["menyinkronkan", "menyelaraskan", "menghubungkan", "menjembatani"],
+        "mempersiapkan": ["menyiapkan", "merancang", "mematangkan", "mengantisipasi"],
+        "menghubungkan": ["mengaitkan", "menjembatani", "mengharmonisasikan", "mengintegrasikan"],
+        "menyelesaikan": ["menuntaskan", "merampungkan", "mengakhiri", "memuntaskan"],
+        "menghindari": ["mencegah", "menepis", "mengantisipasi", "menghindarkan diri dari"],
+        "memperjelas": ["menerangkan", "mengelaborasi", "mempertajam", "mempertegas"],
+        "mengajukan": ["menyodorkan", "mengemukakan", "menyampaikan", "menawarkan"],
+        "membangun": ["membina", "mengonstruksi", "mendirikan", "mengembangkan"],
+        "mempertahankan": ["menjaga konsistensi", "memelihara", "mengamankan", "merawat"],
+        "memperbandingkan": ["mengomparasikan", "menandingkan", "menyejajarkan"],
+        "menyerap": ["mengadopsi", "mengasimilasi", "mengakomodasi"],
+        "memantau": ["memonitor", "mengamati secara berkala", "mengontrol"],
+        "mengamati": ["mencermati", "meninjau", "memperhatikan"],
+        "menilai": ["menakar", "mengestimasi", "mengukur", "mengevaluasi"],
+        "menetapkan": ["memutuskan", "menggariskan", "mematok", "menentukan"],
+        "mengukur": ["mengalkulasi", "menakar", "menguji skala", "mengkuantifikasi"],
+        "mengindikasikan": ["menandakan", "memperlihatkan sinyal", "mencerminkan"],
+        "mengklarifikasi": ["memperjelas", "mengurai keraguan", "meluruskan"],
+        "merekrut": ["menjaring", "menerima", "menarik talenta"],
+        "menyederhanakan": ["meringkas", "mempermudah alur", "mengefisienkan"],
+        "mengalokasikan": ["mengarahkan", "menyalurkan", "membagikan pos"],
+        "mendukung": ["menunjang", "menyokong", "menguatkan", "mendorong"],
+        "menghambat": ["merintangi", "menahan laju", "mengganjal"],
+        "mengantisipasi": ["menyiapkan mitigasi", "mencegah sejak dini", "mengantisipasi"],
+        "mengarahkan": ["membimbing", "memandu", "mengorientasikan"],
+        "menghimpun": ["mengumpulkan", "mengakomodasi", "mengompilasi"],
+        "meringkas": ["memadatkan", "menyimpulkan", "mengabstraksi"],
+        "memisahkan": ["memilah", "mengisolasi", "mendiferensiasi"],
+        "menyatukan": ["mengintegrasikan", "memadukan", "mengonsolidasikan"],
+        "menguji": ["menguji coba", "mengetes", "mengecek reliabilitas"],
+        "memperbarui": ["mengaktualisasikan", "memodernisasi", "menyegarkan kembali"],
+        "memprediksi": ["mengestimasi", "meramalkan", "memproyeksikan"],
+        "menggambarkan": ["melukiskan", "mempresentasikan", "mencitrakan"],
+        "menyepakati": ["menyetujui", "bermufakat atas", "mengonfirmasi konsensus"],
 
-        // --- NOUNS (Kata Benda, Konsep & Entitas) ---
+        // --- NOUNS (Kata Benda, Konsep, Sistem & Entitas) ---
         "masalah": ["kendala", "tantangan", "persoalan", "hambatan"],
         "kendala": ["hambatan", "rintangan", "persoalan teknis"],
         "tantangan": ["pekerjaan rumah", "ujian tersendiri", "dinamika tantangan"],
@@ -780,6 +831,48 @@ const HUMANIZER_DICTIONARY = {
         "keterampilan": ["keterampilan", "keahlian", "kompetensi"],
         "dunia": ["dunia", "ranah", "lingkup"],
         "waktu": ["waktu", "tempo", "durasi", "waktu"],
+        "informasi": ["keterangan", "data faktual", "informasi", "wawasan"],
+        "teknologi": ["perangkat teknologi", "sistem otomasi", "peranti digital"],
+        "komunikasi": ["interaksi", "alur koordinasi", "penyampaian pesan"],
+        "organisasi": ["kelembagaan", "institusi", "badan usaha", "entitas kerja"],
+        "lingkungan": ["ekosistem", "ranah kerja", "lingkungan sekitar"],
+        "struktur": ["kerangka", "tatanan", "hierarki", "bangunan sistem"],
+        "sumber": ["rujukan", "fondasi", "akar data", "hulu informasi"],
+        "peraturan": ["regulasi", "norma", "kaidah legal", "aturan main"],
+        "tahapan": ["fase", "langkah", "tahapan alur", "termin"],
+        "evaluasi": ["penilaian", "penelaahan mutu", "audit", "tinjauan kritis"],
+        "risiko": ["ancaman", "potensi kerugian", "eksposur bahaya"],
+        "anggaran": ["alokasi dana", "pos biaya", "kemampuan finansial"],
+        "kapasitas": ["daya tampung", "daya dukung", "kapabilitas muat"],
+        "perilaku": ["tindakan", "kebiasaan", "pola sikap", "respons"],
+        "rekan": ["kolega", "rekan sejawat", "mitra"],
+        "pendidikan": ["pembelajaran", "edukasi", "ranah akademik"],
+        "penelitian": ["riset", "studi investigasi", "kajian ilmiah"],
+        "kemajuan": ["akselerasi", "pertumbuhan pesat", "progres nyata"],
+        "kelemahan": ["titik rentan", "kekurangan", "defisit performa"],
+        "kelebihan": ["keunggulan", "nilai kompetitif", "keistimewaan"],
+        "dasar": ["fondasi", "pijakan", "landasan berpijak"],
+        "analisis": ["kajian", "telaah", "pembedahan data"],
+        "pelaksanaan": ["implementasi", "penerapan di lapangan", "eksekusi"],
+        "keputusan": ["ketetapan", "resolusi pilihan", "konklusi final"],
+        "kategori": ["klasifikasi", "kelompok", "golongan"],
+        "pola": ["tipologi", "kecenderungan", "pola ritme"],
+        "tuntutan": ["keharusan", "kebutuhan mendesak", "mandat"],
+        "variabel": ["faktor ukur", "indikator", "parameter ubah"],
+        "indikator": ["tolok ukur", "sinyal penanda", "patokan evaluasi"],
+        "cakupan": ["ruang lingkup", "domain", "jangkauan"],
+        "interaksi": ["hubungan timbal balik", "kontak koordinasi"],
+        "transaksi": ["pertukaran data", "alur niaga", "proses transaksi"],
+        "efektivitas": ["keberdayagunaan", "ketepatan sasaran", "ketercapaian"],
+        "keberlanjutan": ["kesinambungan", "kelangsungan jangka panjang"],
+        "pelanggan": ["konsumen", "pengguna layanan", "klien"],
+        "produk": ["komoditas", "barang jadi", "hasil olahan"],
+        "komponen": ["unsur", "bagian pembentuk", "elemen"],
+        "koordinasi": ["penyelarasan langkah", "kemitraan kerja", "sinkronisasi"],
+        "persaingan": ["kompetisi", "dinamika pasar", "rivalitas usaha"],
+        "komitmen": ["keseriusan janji", "dedikasi", "keteguhan prinsip"],
+        "pelatihan": ["pemberdayaan", "asimilasi keterampilan", "kursus intensif"],
+        "pemahaman": ["wawasan menyeluruh", "daya tangkap", "internalisasi"],
 
         // --- ADJECTIVES & ADVERBS (Kata Sifat & Keterangan) ---
         "penting": ["signifikan", "esensial", "utama", "krusial"],
@@ -819,8 +912,41 @@ const HUMANIZER_DICTIONARY = {
         "sulit": ["sukar", "penuh tantangan", "kompleks"],
         "pasti": ["niscaya", "sudah barang tentu", "terjamin"],
         "mungkin": ["berpotensi", "boleh jadi", "berpeluang"],
+        "komprehensif": ["menyeluruh", "tuntas", "luas dan mendalam"],
+        "terstruktur": ["rapi berpola", "sistematis", "tertata runut"],
+        "transparan": ["terbuka", "akuntabel", "gamblang"],
+        "konsisten": ["ajek", "terus-menerus", "berkelanjutan", "stabil"],
+        "dinamis": ["bergerak luwes", "adaptif terhadap arus", "variatif"],
+        "rasional": ["masuk akal", "logis", "dapat dipertanggungjawabkan"],
+        "prioritas": ["keharusan utama", "fokus primer", "agenda pokok"],
+        "akuntabel": ["dapat diverifikasi", "dapat dipertanggungjawabkan", "sahih"],
+        "maksimal": ["optimal", "puncak capaian", "seutuhnya"],
+        "minimal": ["paling sedikit", "ambang dasar", "sekurang-kurangnya"],
+        "signifikan": ["berarti", "berpengaruh besar", "substansial"],
+        "mendasar": ["fundamental", "pokok", "prinsipil"],
+        "spesifik": ["khusus", "terperinci", "terfokus pada satu hal"],
+        "objektif": ["faktual", "netral tanpa bias", "bebas pretensi"],
+        "intensif": ["mendalam dan berulang", "terkonsentrasi penuh", "seksama"],
+        "mandiri": ["otonom", "berdiri sendiri", "independen"],
+        "berkelanjutan": ["langgeng", "berkesinambungan", "lestari"],
+        "inklusif": ["merangkul semua", "terbuka luas", "menyeluruh"],
+        "konkret": ["riil di lapangan", "nyata kasat mata", "faktual"],
+        "ideal": ["paling tepat", "optimal", "patokan unggul"],
+        "moderat": ["berimbang", "tidak berlebihan", "wajar"],
+        "terbatas": ["minim ruang", "berbatas kuota", "sedikit"],
+        "kritis": ["tajam menelaah", "analitis mendalam", "peka persoalan"],
+        "strategis": ["bernilai kunci", "sangat menentukan posisi", "taktis"],
+        "kompatibel": ["cocok berpadu", "selaras digunakan bersama", "serasi"],
+        "inovatif": ["kreatif terobosan", "segar berbeda", "mutakhir"],
+        "produktif": ["berdaya luaran tinggi", "berkinerja prima"],
+        "kolaboratif": ["sinergis bersama", "gotong royong", "terpadu"],
+        "valid": ["sahih", "terverifikasi benar", "dapat dipercaya"],
+        "kredibel": ["terpercaya", "bereputasi baik", "dapat diandalkan"],
+        "reliabel": ["andal diuji berulang", "konsisten hasilnya", "pasti"],
+        "berkualitas": ["bermutu unggul", "berstandar tinggi"],
+        "profesional": ["berintegritas tinggi", "cakap bertugas", "kompeten"],
 
-        // --- CONNECTORS & CAUSAL MARKERS ---
+        // --- CONNECTORS & DISCOURSE MARKERS ---
         "karena": ["lantaran", "sebab", "mengingat"],
         "sebab": ["karena", "lantaran", "sebab"],
         "tetapi": ["namun", "akan tetapi", "hanya saja"],
@@ -844,7 +970,19 @@ const HUMANIZER_DICTIONARY = {
         "telah": ["sudah", "kini", "telah"],
         "sedang": ["tengah", "sedang"],
         "masih": ["masih", "tetap", "terus"],
-        "tetap": ["tetap", "masih", "konsisten"]
+        "tetap": ["tetap", "masih", "konsisten"],
+        "adapun": ["terkait hal itu,", "mengenai hal tersebut,", "sementara itu,"],
+        "kendati": ["meskipun", "walaupun", "sekalipun"],
+        "sedangkan": ["sementara itu,", "adapun", "di sisi lain,"],
+        "padahal": ["kenyataannya,", "nyatanya,", "faktanya,"],
+        "sementara": ["di waktu bersamaan,", "dalam waktu yang sama,", "sementara itu,"],
+        "sebaliknya": ["justru sebaliknya,", "kontras dengan itu,", "malahan"],
+        "terlebih": ["apalagi,", "khususnya,", "terutama sekali,"],
+        "lagipula": ["di samping itu,", "tambahan pula,", "selain itu,"],
+        "alhasil": ["dampaknya,", "hasilnya,", "akibatnya,"],
+        "nyatanya": ["pada kenyataannya,", "faktanya,", "kenyataannya,"],
+        "lazimnya": ["biasanya,", "secara umum,", "pada umumnya,"],
+        "terkadang": ["pada saat tertentu,", "ada kalanya,", "sesekali"]
     },
 
     en: {
@@ -875,6 +1013,13 @@ const HUMANIZER_DICTIONARY = {
         "require": ["necessitate", "demand", "call for", "mandate"],
         "obtain": ["acquire", "secure", "gain", "derive"],
         "achieve": ["attain", "accomplish", "reach", "realize"],
+        "improve": ["refine", "upgrade", "enhance", "elevate"],
+        "monitor": ["track", "observe", "oversee", "supervise"],
+        "identify": ["pinpoint", "detect", "discern", "distinguish"],
+        "formulate": ["devise", "frame", "craft", "articulate"],
+        "implement": ["execute", "apply", "enforce", "put into practice"],
+        "coordinate": ["align", "synchronize", "harmonize", "integrate"],
+        "facilitate": ["streamline", "ease", "expedite", "promote"],
 
         // --- NOUNS ---
         "problem": ["hurdle", "challenge", "obstacle", "bottleneck"],
@@ -892,6 +1037,11 @@ const HUMANIZER_DICTIONARY = {
         "concept": ["framework", "premise", "construct", "notion"],
         "strategy": ["tactical plan", "roadmap", "blueprint", "scheme"],
         "efficiency": ["productivity", "streamlined execution", "output ratio"],
+        "capacity": ["bandwidth", "capability", "threshold", "volume"],
+        "framework": ["structure", "architecture", "scaffolding", "model"],
+        "guideline": ["directive", "benchmark", "standard", "protocol"],
+        "evaluation": ["assessment", "appraisal", "critique", "review"],
+        "advantage": ["edge", "merit", "asset", "benefit"],
 
         // --- ADJECTIVES & ADVERBS ---
         "important": ["vital", "essential", "significant", "pivotal"],
@@ -908,14 +1058,80 @@ const HUMANIZER_DICTIONARY = {
         "mainly": ["primarily", "predominantly", "chiefly", "largely"],
         "especially": ["notably", "in particular", "specifically"],
         "thoroughly": ["comprehensively", "rigorously", "meticulously"],
+        "consistent": ["steady", "uniform", "unwavering", "reliable"],
+        "strategic": ["tactical", "deliberate", "calculated", "decisive"],
+        "substantial": ["meaningful", "appreciable", "weighty", "pronounced"],
 
         // --- CONNECTORS ---
         "because": ["given that", "since", "as", "owing to"],
         "however": ["nevertheless", "yet", "that said", "on the other hand"],
         "although": ["even though", "while", "despite the fact that"],
         "therefore": ["consequently", "thus", "accordingly", "as a result"],
-        "besides": ["furthermore", "in addition to", "alongside"]
+        "besides": ["furthermore", "in addition to", "alongside"],
+        "meanwhile": ["concurrently", "at the same time", "in the interim"],
+        "similarly": ["likewise", "in a corresponding manner", "by the same token"]
     }
+};
+
+/**
+ * Multi-Word Semantic Phrase Collocations & Idiomatic Equivalents ("Similar Means")
+ * Targets 3-5 gram token sequences to completely break n-gram predictability in Turnitin, Drillbit, Copyleaks, and GPTZero.
+ */
+const SIMILAR_MEANS_DICTIONARY = {
+    id: [
+        { pattern: /\bdalam\s+rangka\s+mencapai\s+tujuan(?:\s+tersebut)?\b/gi, replacements: ["guna mewujudkan sasaran", "demi meraih target yang dituju", "untuk mencapai sasaran"] },
+        { pattern: /\bmemiliki\s+pengaruh\s+yang\s+(?:sangat\s+)?signifikan\b/gi, replacements: ["berdampak nyata pada", "memberikan pengaruh terukur", "sangat menentukan arah"] },
+        { pattern: /\bmengambil\s+langkah\s+konkret\b/gi, replacements: ["menjalankan aksi nyata", "menerapkan tindakan riil", "mengambil langkah taktis"] },
+        { pattern: /\bberdasarkan\s+hasil\s+(?:penelitian|kajian|studi)\b/gi, replacements: ["merujuk temuan riset", "menilik hasil telaah", "berdasarkan data lapangan"] },
+        { pattern: /\bmemberikan\s+kontribusi\s+(?:yang\s+)?positif\b/gi, replacements: ["turut membawa dampak baik", "berkontribusi secara nyata", "memberi nilai tambah"] },
+        { pattern: /\bmempunyai\s+peranan\s+(?:yang\s+)?penting\b/gi, replacements: ["mengambil andil besar", "berperan aktif", "memegang posisi sentral"] },
+        { pattern: /\bmenjadi\s+salah\s+satu\s+faktor\s+penentu\b/gi, replacements: ["turut menentukan keberhasilan", "menjadi variabel kunci", "menjadi penentu utama"] },
+        { pattern: /\bperlu\s+dilakukan\s+evaluasi\s+berkala\b/gi, replacements: ["patut ditinjau secara berkala", "perlu dievaluasi bertahap", "layak dikaji berkesinambungan"] },
+        { pattern: /\bdalam\s+upaya\s+mengoptimalkan\b/gi, replacements: ["demi mendongkrak performa", "guna memaksimalkan capaian", "agar berjalan optimal"] },
+        { pattern: /\bmengalami\s+perkembangan\s+pesat\b/gi, replacements: ["tumbuh kian dinamis", "berkembang sangat akseleratif", "menunjukkan lompatan besar"] },
+        { pattern: /\bmempunyai\s+korelasi\s+yang\s+erat\b/gi, replacements: ["berkaitan langsung dengan", "berjalan beriringan dengan", "berbanding lurus dengan"] },
+        { pattern: /\bsejalan\s+dengan\s+perkembangan\s+zaman\b/gi, replacements: ["mengikuti dinamika masa kini", "menyesuaikan arus modernisasi", "selaras dengan kebutuhan saat ini"] },
+        { pattern: /\bmemberikan\s+solusi\s+yang\s+efektif\b/gi, replacements: ["menghadirkan jalan keluar taktis", "memberikan penyelesaian aplikatif", "menjadi solusi tepat guna"] },
+        { pattern: /\bmenghadapi\s+tantangan\s+yang\s+kompleks\b/gi, replacements: ["menjumpai persoalan berlapis", "berhadapan dengan kendala yang rumit", "menemui dinamika lapangan yang berat"] },
+        { pattern: /\bpada\s+masa\s+yang\s+akan\s+datang\b/gi, replacements: ["di kemudian hari", "dalam jangka panjang ke depan", "pada masa mendatang"] },
+        { pattern: /\bmembuka\s+peluang\s+baru\b/gi, replacements: ["memberi ruang kesempatan anyar", "membuka prospek baru", "menghadirkan peluang segar"] },
+        { pattern: /\bdapat\s+diambil\s+kesimpulan\b/gi, replacements: ["garis besarnya,", "dapat dipastikan bahwa", "intinya,"] },
+        { pattern: /\bmeningkatkan\s+efisiensi\s+dan\s+efektivitas(?:\s+kerja)?\b/gi, replacements: ["mengoptimalkan daya guna sekaligus hasil kerja", "memaksimalkan performa dan efisiensi kerja", "mewujudkan capaian kerja yang terukur"] },
+        { pattern: /\bmengalokasikan\s+sumber\s+daya\b/gi, replacements: ["mengarahkan sarana dan dana", "membagi pos anggaran dan tenaga", "menyalurkan kapasitas operasional"] },
+        { pattern: /\bsesuai\s+dengan\s+ketentuan\s+yang\s+berlaku\b/gi, replacements: ["mengikuti kaidah regulasi terkini", "patuh pada pedoman resmi", "selaras dengan aturan normatif"] },
+        { pattern: /\bmengidentifikasi\s+permasalahan\s+utama\b/gi, replacements: ["memetakan akar persoalan", "menemukan titik simpul kendala", "merumuskan fokus masalah"] },
+        { pattern: /\bmenjadi\s+tolok\s+ukur\s+utama\b/gi, replacements: ["menjadi barometer kunci", "dijadikan parameter rujukan", "menjadi standar penilaian primer"] },
+        { pattern: /\bmelakukan\s+peninjauan\s+kembali\b/gi, replacements: ["mengevaluasi ulang", "meninjau kembali arah kebijakan", "mengoreksi catatan terdahulu"] },
+        { pattern: /\bmempertimbangkan\s+berbagai\s+aspek\b/gi, replacements: ["menimbang sudut pandang menyeluruh", "melihat persoalan dari berbagai dimensi", "memperhitungkan aspek multiperspektif"] },
+        { pattern: /\bmengambil\s+keputusan\s+yang\s+tepat\b/gi, replacements: ["menetapkan langkah presisi", "menentukan pilihan secara matang", "menarik kesimpulan strategis"] },
+        { pattern: /\bmencapai\s+hasil\s+yang\s+optimal\b/gi, replacements: ["memperoleh capaian maksimal", "meraih luaran terbaik", "menghasilkan kinerja prima"] },
+        { pattern: /\bberfungsi\s+sebagai\s+landasan\b/gi, replacements: ["menjadi pijakan mendasar", "berperan sebagai fondasi pokok", "menjadi tumpuan utama"] },
+        { pattern: /\bmenunjukkan\s+kecenderungan\s+bahwa\b/gi, replacements: ["memperlihatkan indikasi kuat bahwa", "memberi sinyal jelas bahwa", "mengarahkan pada pola bahwa"] },
+        { pattern: /\bmemberikan\s+kemudahan\s+bagi\b/gi, replacements: ["mempermudah langkah", "memberikan akses leluasa bagi", "meringankan beban"] },
+        { pattern: /\bberada\s+pada\s+posisi\s+yang\s+strategis\b/gi, replacements: ["menempati posisi sentral", "memiliki peran kunci", "berdiri di titik strategis"] },
+        { pattern: /\bmendapatkan\s+perhatian\s+khusus\b/gi, replacements: ["menjadi sorotan penting", "disorot secara mendalam", "diprioritaskan penanganannya"] },
+        { pattern: /\bmelakukan\s+adaptasi\s+terhadap\b/gi, replacements: ["menyesuaikan diri dengan", "beradaptasi luwes pada", "menyelaraskan langkah dengan"] },
+        { pattern: /\bmeminimalisir\s+risiko\s+yang\s+mungkin\s+terjadi\b/gi, replacements: ["menekan potensi bahaya", "mereduksi potensi kerugian", "memitigasi risiko di lapangan"] },
+        { pattern: /\bmengoptimalkan\s+potensi\s+yang\s+ada\b/gi, replacements: ["mendayagunakan seluruh kapasitas yang tersedia", "menggali kapasitas laten", "memaksimalkan daya dukung"] },
+        { pattern: /\bterdapat\s+perbedaan\s+yang\s+mencolok\b/gi, replacements: ["tampak kontras yang nyata", "terlihat jurang pemisah yang lebar", "terlihat divergensi yang kentara"] },
+        { pattern: /\bberdasarkan\s+pertimbangan\s+tersebut\b/gi, replacements: ["menimbang rangkaian hal itu", "berangkat dari telaah tersebut", "melihat pertimbangan tadi"] },
+        { pattern: /\bmembawa\s+perubahan\s+yang\s+signifikan\b/gi, replacements: ["memicu transformasi nyata", "merombak pola lama secara menyeluruh", "menghadirkan babak baru"] },
+        { pattern: /\bmenuntut\s+adanya\s+kolaborasi\b/gi, replacements: ["mendorong perlunya kerja sama erat", "membutuhkan sinergi nyata", "mengharuskan keterlibatan bersama"] },
+        { pattern: /\bmewujudkan\s+tata\s+kelola\s+yang\s+baik\b/gi, replacements: ["membangun sistem kelola yang akuntabel", "menerapkan tata laksana yang transparan", "menegakkan tata kelola terpercaya"] },
+        { pattern: /\bmemperkuat\s+daya\s+saing\b/gi, replacements: ["meningkatkan keunggulan kompetitif", "mempertajam kapabilitas tanding", "mengukuhkan posisi di bursa"] }
+    ],
+    en: [
+        { pattern: /\bin\s+order\s+to\s+achieve\s+the\s+desired\s+outcome\b/gi, replacements: ["to reach the intended goal", "so as to attain targeted results", "to secure optimal findings"] },
+        { pattern: /\bplays\s+an\s+indispensable\s+role\b/gi, replacements: ["is central to success", "serves as a vital factor", "holds a cornerstone position"] },
+        { pattern: /\bsheds\s+light\s+on\s+the\s+fact\s+that\b/gi, replacements: ["clearly demonstrates that", "underscores that", "reveals that"] },
+        { pattern: /\bin\s+the\s+current\s+fast-paced\s+environment\b/gi, replacements: ["under modern operational conditions", "in today's active climate", "amid rapid operational shifts"] },
+        { pattern: /\bhas\s+a\s+direct\s+bearing\s+on\b/gi, replacements: ["substantially shapes", "directly steers", "strongly dictates"] },
+        { pattern: /\btake\s+into\s+serious\s+consideration\b/gi, replacements: ["carefully evaluate", "closely weigh", "give thoughtful weight to"] },
+        { pattern: /\byield\s+substantial\s+improvements\b/gi, replacements: ["deliver tangible gains", "produce measurable progress", "drive concrete enhancements"] },
+        { pattern: /\bpaves\s+the\s+way\s+for\b/gi, replacements: ["opens opportunities for", "sets the foundation for", "creates viable avenues for"] },
+        { pattern: /\bconduct\s+a\s+thorough\s+examination\b/gi, replacements: ["closely investigate", "rigorously scrutinize", "carefully dissect"] },
+        { pattern: /\bat\s+the\s+present\s+point\s+in\s+time\b/gi, replacements: ["currently", "presently", "at this stage"] }
+    ]
 };
 
 const COMMON_AI_PATTERNS = [
@@ -926,5 +1142,6 @@ const COMMON_AI_PATTERNS = [
 if (typeof window !== 'undefined') {
     window.LANGUAGES = LANGUAGES;
     window.HUMANIZER_DICTIONARY = HUMANIZER_DICTIONARY;
+    window.SIMILAR_MEANS_DICTIONARY = SIMILAR_MEANS_DICTIONARY;
     window.COMMON_AI_PATTERNS = COMMON_AI_PATTERNS;
 }
