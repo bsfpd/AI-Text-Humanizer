@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Antislop Humanizer Engine (Advanced Multi-Layer Architecture)
  * Grounded in Antislop Copywriting & De-Detection Principles:
  * - Never invent facts (R-17, R-36, R-38, C-5)
@@ -101,7 +101,7 @@ class TextHumanizer {
     isSalutationOrOpening(sentence) {
         if (!sentence) return false;
         const s = sentence.trim().toLowerCase();
-        return /^(?:assalamu|wa\s*['’`]?\s*alaikum|wassalamu|salam|yth\.?|kepada\s+(?:yth|yang\s+terhormat)|yang\s+terhormat|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening|day)|to\s+whom|izin\s+(?:menanggapi|menyampaikan|menjawab|memberikan|berpendapat)|greetings)/i.test(s);
+        return /^(?:assalamu|wa\s*['’‘`]?\s*alaikum|wassalamu|salam|yth\.?|kepada\s+(?:yth|yang\s+terhormat)|yang\s+terhormat|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|halo|hai|dengan\s+hormat|dear|hello|hi|good\s+(?:morning|afternoon|evening|day)|to\s+whom|greetings)/i.test(s);
     }
 
     /**
