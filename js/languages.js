@@ -219,7 +219,45 @@ const LANGUAGES = {
             { pattern: /\bmerupakan\s+salah\s+satu\s+aspek\s+kunci\b/gi, replacement: "menjadi aspek penting" },
             { pattern: /\bpada\s+dasarnya\s+dapat\s+dipahami\s+bahwa\b/gi, replacement: "wajar dipahami bahwa" },
             { pattern: /\bdalam\s+konteks\s+ini\s+dapat\s+dikatakan\s+bahwa\b/gi, replacement: "dalam hal ini, " },
-            { pattern: /\blangkah\s+strategis\s+yang\s+harus\s+diambil\s+adalah\b/gi, replacement: "langkah konkretnya yakni" }
+            { pattern: /\blangkah\s+strategis\s+yang\s+harus\s+diambil\s+adalah\b/gi, replacement: "langkah konkretnya yakni" },
+
+            // 11. Anti-slop: 2026 fresh detector targets (Turnitin, GPTZero, Copyleaks, ZeroGPT, Drillbit)
+            // Significance Inflation & Abstract AI Vocabulary (antislop-copywriting §Significance Inflation)
+            { pattern: /\bberkelanjutan\s+dan\s+komprehensif\b/gi, replacement: "menyeluruh dan konsisten" },
+            { pattern: /\bsecara\s+holistik\s+dan\s+berkelanjutan\b/gi, replacement: "secara menyeluruh dan terencana" },
+            { pattern: /\bsinergi\s+(?:yang\s+(?:kuat|harmonis|optimal))?\b/gi, replacement: "koordinasi yang erat" },
+            { pattern: /\bsinergitas\b/gi, replacement: "keselarasan kerja" },
+            { pattern: /\brobust\b/gi, replacement: "andal" },
+            { pattern: /\bproaktif\s+dalam\s+menghadapi\b/gi, replacement: "siap menghadapi" },
+            { pattern: /\bsecara\s+proaktif\b/gi, replacement: "dengan inisiatif" },
+            { pattern: /\bparadigma\s+(?:baru|modern|berpikir)?\b/gi, replacement: "cara pandang" },
+            { pattern: /\bpola\s+pikir\s+yang\s+inovatif\b/gi, replacement: "cara berpikir yang segar" },
+            { pattern: /\bkomprehensif\s+dan\s+mendalam\b/gi, replacement: "menyeluruh dan rinci" },
+            { pattern: /\bkomprehensif\b/gi, replacement: "menyeluruh" },
+
+            // Filler Parallelism & Empty Connectors (antislop-copywriting §Rule of Three Overuse)
+            { pattern: /\bselain\s+itu,?\s+(?:juga\s+)?perlu\s+diperhatikan\s+bahwa,?\s*/gi, replacement: "hal lain yang perlu dicermati, " },
+            { pattern: /\bdi\s+sisi\s+lain,?\s+(?:juga\s+)?perlu\s+diingat\s+bahwa,?\s*/gi, replacement: "sebaliknya, " },
+            { pattern: /\bdalam\s+hal\s+ini,?\s+(?:juga\s+)?(?:harus|perlu)\s+diperhatikan\s+bahwa,?\s*/gi, replacement: "catatannya, " },
+            { pattern: /\byang\s+mana\s+(?:hal\s+ini\s+)?menunjukkan\b/gi, replacement: "yang menunjukkan" },
+            { pattern: /\byang\s+mana\s+(?:hal\s+ini\s+)?membuktikan\b/gi, replacement: "yang membuktikan" },
+            { pattern: /\byang\s+mana\s+/gi, replacement: "yang " },
+
+            // Actorless Passive & Inanimate Subject with Human Verb (antislop-copywriting §Actorless Passive)
+            { pattern: /\bhal\s+ini\s+(?:mengajarkan|memberitahu|mengingatkan)\s+kita\s+bahwa\b/gi, replacement: "dari sini kita tahu bahwa" },
+            { pattern: /\bkita\s+(?:perlu|harus)\s+memahami\s+bahwa\b/gi, replacement: "penting untuk dipahami bahwa" },
+            { pattern: /\bkita\s+(?:perlu|harus)\s+mengakui\s+bahwa\b/gi, replacement: "perlu diakui bahwa" },
+            { pattern: /\bdalam\s+perjalanannya,?\s*/gi, replacement: "seiring berjalannya waktu, " },
+
+            // Empty Positive Conclusions (antislop-copywriting §Generic Positive Conclusion)
+            { pattern: /\bmasa\s+depan\s+(?:yang\s+)?(?:lebih\s+)?cerah\b/gi, replacement: "prospek yang lebih baik" },
+            { pattern: /\bmenuju\s+masa\s+depan\s+yang\s+lebih\s+(?:baik|cerah|gemilang)\b/gi, replacement: "ke arah yang lebih baik" },
+            { pattern: /\bjalan\s+menuju\s+(?:kesuksesan|kejayaan|kemajuan)\b/gi, replacement: "langkah ke depan" },
+            { pattern: /\btanpa\s+ragu\b/gi, replacement: "dengan keyakinan" },
+
+            // Staccato Drama (antislop-copywriting §Staccato Drama)
+            { pattern: /\btanpa\s+ada\s+pengecualian\b/gi, replacement: "secara menyeluruh" },
+            { pattern: /\bdari\s+hati\s+ke\s+hati\b/gi, replacement: "secara terbuka" }
         ],
 
         // Comprehensive Per-Tone Lexical and Rhetorical Replacements (7 Styles)
@@ -490,7 +528,31 @@ Demikian tanggapan yang dapat saya sampaikan, mohon masukan dan koreksi dari Tut
             { pattern: /\bby\s+leveraging\s+these\s+insights\b/gi, replacement: "applying these findings" },
             { pattern: /\bin\s+this\s+comprehensive\s+overview\b/gi, replacement: "across this review" },
             { pattern: /\bnavigating\s+the\s+complexities\s+of\b/gi, replacement: "managing the challenges of" },
-            { pattern: /\ba\s+nuanced\s+understanding\s+of\b/gi, replacement: "a clear perspective on" }
+            { pattern: /\ba\s+nuanced\s+understanding\s+of\b/gi, replacement: "a clear perspective on" },
+
+            // 7. Anti-slop: 2026 detector updates (antislop-copywriting §Empty AI Vocabulary + §Rhythm)
+            { pattern: /\bsynergy\b/gi, replacement: "collaboration" },
+            { pattern: /\bsynergistic\b/gi, replacement: "collaborative" },
+            { pattern: /\brobust\s+(?:framework|solution|approach|system)\b/gi, replacement: "reliable $1" },
+            { pattern: /\brobust\b/gi, replacement: "solid" },
+            { pattern: /\bproactive(?:ly)?\s+address(?:ing)?\b/gi, replacement: "directly addressing" },
+            { pattern: /\bparadigm\s+shift\b/gi, replacement: "fundamental change" },
+            { pattern: /\bnew\s+paradigm\b/gi, replacement: "new approach" },
+            { pattern: /\bcomprehensive\s+and\s+holistic\b/gi, replacement: "thorough and integrated" },
+            { pattern: /\bkey\s+takeaway\s+(?:here\s+)?is\s+that\b/gi, replacement: "the main point is" },
+            { pattern: /\bit\s+is\s+worth\s+mentioning\s+that\b/gi, replacement: "notably," },
+            { pattern: /\bprove\s+to\s+be\s+(?:a\s+)?(?:valuable|crucial|essential|vital)\b/gi, replacement: "turn out to be useful" },
+            { pattern: /\bwhich\s+means\s+that,?\s*/gi, replacement: ". " },
+            { pattern: /\band\s+it\s+is\s+also\s+worth\s+noting\s+that,?\s*/gi, replacement: ". Notably, " },
+            { pattern: /\bright\s+and\s+proper\b/gi, replacement: "proper" },
+            { pattern: /\beach\s+and\s+every\b/gi, replacement: "every" },
+            { pattern: /\bfirst\s+and\s+foremost\b/gi, replacement: "first" },
+
+            // Aphorism formulas (antislop-copywriting §Aphorism Formulas)
+            { pattern: /\bX\s+is\s+the\s+new\s+Y\b/gi, replacement: "" },
+            { pattern: /\bat\s+the\s+end\s+of\s+the\s+day,?\s*/gi, replacement: "ultimately, " },
+            { pattern: /\bwhen\s+all\s+is\s+said\s+and\s+done,?\s*/gi, replacement: "ultimately, " },
+            { pattern: /\bthe\s+bottom\s+line\s+is\s+that,?\s*/gi, replacement: "in short, " }
         ],
 
         toneReplacements: {
@@ -1119,7 +1181,21 @@ const SIMILAR_MEANS_DICTIONARY = {
         { pattern: /\bmenuntut\s+adanya\s+kolaborasi\b/gi, replacements: ["mendorong perlunya kerja sama erat", "membutuhkan sinergi nyata", "mengharuskan keterlibatan bersama"] },
         { pattern: /\bmewujudkan\s+tata\s+kelola\s+yang\s+baik\b/gi, replacements: ["membangun sistem kelola yang akuntabel", "menerapkan tata laksana yang transparan", "menegakkan tata kelola terpercaya"] },
         { pattern: /\bmemperkuat\s+daya\s+saing\b/gi, replacements: ["meningkatkan keunggulan kompetitif", "mempertajam kapabilitas tanding", "mengukuhkan posisi di bursa"] }
-    ],
+    ,
+
+            // 2026 Batch — collocations flagged by Turnitin, Drillbit, GPTZero AI writing patterns
+            { pattern: /\bperlu\s+dilakukan\s+evaluasi\b/gi, replacements: ["perlu dievaluasi secara berkala", "harus dikaji ulang", "perlu ditinjau kembali"] },
+            { pattern: /\bsangat\s+berperan\s+penting\b/gi, replacements: ["memegang peran kunci", "punya andil besar", "berpengaruh langsung"] },
+            { pattern: /\bhal\s+ini\s+membuktikan\b/gi, replacements: ["ini memperlihatkan", "kondisi ini mengonfirmasi", "fakta ini menunjukkan"] },
+            { pattern: /\btidak\s+bisa\s+dilepaskan\s+dari\b/gi, replacements: ["sangat terkait erat dengan", "tidak terpisahkan dari", "berkaitan langsung dengan"] },
+            { pattern: /\bmembutuhkan\s+perhatian\s+(?:lebih|khusus)\b/gi, replacements: ["perlu dicermati lebih lanjut", "butuh perhatian ekstra", "layak mendapat prioritas"] },
+            { pattern: /\bsangat\s+diperlukan\s+dalam\b/gi, replacements: ["menjadi kebutuhan mendasar di", "krusial keberadaannya dalam", "mutlak diperlukan dalam"] },
+            { pattern: /\bdengan\s+cara\s+yang\s+efektif\b/gi, replacements: ["secara efektif", "dengan cara yang tepat sasaran", "dengan pendekatan yang teruji"] },
+            { pattern: /\bupaya\s+peningkatan\s+kualitas\b/gi, replacements: ["langkah perbaikan kualitas", "ikhtiar meningkatkan mutu", "dorongan untuk memperbaiki kualitas"] },
+            { pattern: /\bsebagai\s+salah\s+satu\s+solusi\b/gi, replacements: ["sebagai salah satu opsi", "sebagai pendekatan yang relevan", "sebagai alternatif yang layak dipertimbangkan"] },
+            { pattern: /\bdalam\s+proses\s+pembelajaran\b/gi, replacements: ["dalam alur belajar", "saat menjalani proses belajar", "dalam tahapan pembelajaran"] },
+            { pattern: /\bmemiliki\s+dampak\s+yang\s+signifikan\b/gi, replacements: ["berdampak nyata", "memberikan pengaruh yang cukup besar", "punya dampak yang tak kecil"] },
+            { pattern: /\bdapat\s+disimpulkan\s+bahwa\b/gi, replacements: ["garis besarnya,", "intinya,", "dari sini terlihat bahwa"] }],
     en: [
         { pattern: /\bin\s+order\s+to\s+achieve\s+the\s+desired\s+outcome\b/gi, replacements: ["to reach the intended goal", "so as to attain targeted results", "to secure optimal findings"] },
         { pattern: /\bplays\s+an\s+indispensable\s+role\b/gi, replacements: ["is central to success", "serves as a vital factor", "holds a cornerstone position"] },

@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         viewMode: 'raw', // 'raw', 'diff', 'analysis'
         engineMode: localStorage.getItem('humanize_engine_mode') || 'neural', // 'neural' or 'offline'
         history: [],
-        theme: localStorage.getItem('humanize_theme') || 'system'
+        theme: localStorage.getItem('humanize_theme') || 'system',
+        // Document mode state
+        activeDoc: null    // DocumentProcessor instance when a file is loaded
     };
 
     // 3. Cache DOM Elements
@@ -89,7 +91,20 @@ document.addEventListener('DOMContentLoaded', () => {
         sampleCasual: document.getElementById('sampleCasual'),
 
         toast: document.getElementById('toastNotification'),
-        toastMessage: document.getElementById('toastMessage')
+        toastMessage: document.getElementById('toastMessage'),
+
+        // Document Upload & Download
+        btnUploadDoc:    document.getElementById('btnUploadDoc'),
+        fileInput:       document.getElementById('fileInput'),
+        activeFileBadge: document.getElementById('activeFileBadge'),
+        activeFileName:  document.getElementById('activeFileName'),
+        activeFileType:  document.getElementById('activeFileType'),
+        btnClearDoc:     document.getElementById('btnClearDoc'),
+        btnDownloadDoc:  document.getElementById('btnDownloadDoc'),
+        btnDownloadTxt:  document.getElementById('btnDownloadTxt'),
+        btnDownloadDocx: document.getElementById('btnDownloadDocx'),
+        downloadMenu:    document.getElementById('downloadMenu'),
+        downloadMenuWrap: document.getElementById('downloadMenuWrap')
     };
 
     // 4. Initialize Theme (3-Mode: system / light / dark)
@@ -365,6 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.outputText.value = '';
         elements.diffContainer.innerHTML = '';
         elements.analysisContainer.innerHTML = '';
+        clearActiveDoc();
         updateInputStats();
         elements.outputWordCount.textContent = '0 kata';
         elements.outputCharCount.textContent = '0 karakter';
@@ -619,13 +635,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 17. Download File
-    elements.btnDownload?.addEventListener('click', () => {
+    // 17. Download File (.txt) — always available
+    function downloadTxt() {
         const text = elements.outputText.value;
-        if (!text) {
-            showToast("Tidak ada teks untuk diunduh.", "warning");
-            return;
-        }
+        if (!text) { showToast("Tidak ada teks untuk diunduh.", "warning"); return; }
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -635,8 +648,190 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast("File berhasil diunduh.");
+        showToast("File .txt berhasil diunduh.");
+    }
+
+    // Download dropdown toggle
+    elements.btnDownload?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = elements.downloadMenu;
+        if (!menu) return;
+        menu.classList.toggle('hidden');
     });
+    document.addEventListener('click', (e) => {
+        const wrap = elements.downloadMenuWrap;
+        if (wrap && !wrap.contains(e.target)) {
+            elements.downloadMenu?.classList.add('hidden');
+        }
+    });
+
+    // Download TXT from dropdown
+    elements.btnDownloadTxt?.addEventListener('click', () => {
+        elements.downloadMenu?.classList.add('hidden');
+        downloadTxt();
+    });
+
+    // Download DOCX from dropdown (fresh DOCX from humanized text — no source doc needed)
+    elements.btnDownloadDocx?.addEventListener('click', async () => {
+        elements.downloadMenu?.classList.add('hidden');
+        const text = elements.outputText.value;
+        if (!text) { showToast("Tidak ada teks untuk diunduh.", "warning"); return; }
+
+        if (typeof DocumentProcessor === 'undefined') {
+            showToast("Modul dokumen belum dimuat, coba refresh halaman.", "warning");
+            return;
+        }
+
+        // If there's an active uploaded doc, use format-preserving download
+        if (state.activeDoc) {
+            try {
+                showToast("Menyusun dokumen...");
+                await state.activeDoc.download(text);
+                showToast("Dokumen berhasil diunduh dengan format asli dipertahankan!");
+            } catch (err) {
+                console.error(err);
+                showToast("Gagal menghasilkan dokumen: " + err.message, "warning");
+            }
+        } else {
+            // Create a fresh DOCX from plain humanized text
+            try {
+                const proc = new DocumentProcessor();
+                proc.sourceFile = { name: 'humanized-document.pdf' }; // triggers PDF→DOCX path
+                proc._downloadDocxFromText(text, 'humanized-output.pdf');
+                showToast("Dokumen Word (.docx) berhasil diunduh!");
+            } catch (err) {
+                console.error(err);
+                showToast("Gagal membuat DOCX: " + err.message, "warning");
+            }
+        }
+    });
+
+    // 17b. Document Upload & Format-Preserving Download
+    // ──────────────────────────────────────────────────
+    function showActiveFileBadge(file) {
+        const ext = file.name.split('.').pop().toUpperCase();
+        if (elements.activeFileBadge) elements.activeFileBadge.classList.remove('hidden');
+        if (elements.activeFileName) elements.activeFileName.textContent = file.name;
+        if (elements.activeFileType) elements.activeFileType.textContent = ext;
+        if (elements.btnDownloadDoc) elements.btnDownloadDoc.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function clearActiveDoc() {
+        state.activeDoc = null;
+        if (elements.activeFileBadge) elements.activeFileBadge.classList.add('hidden');
+        if (elements.btnDownloadDoc) elements.btnDownloadDoc.classList.add('hidden');
+        if (elements.fileInput) elements.fileInput.value = '';
+    }
+
+    async function handleDocumentUpload(file) {
+        if (!file) return;
+
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!['pdf', 'docx'].includes(ext)) {
+            showToast("Format tidak didukung. Pilih file .pdf atau .docx", "warning");
+            return;
+        }
+
+        if (typeof DocumentProcessor === 'undefined') {
+            showToast("Modul dokumen belum siap, coba refresh halaman.", "warning");
+            return;
+        }
+
+        // Show loading state
+        if (elements.btnUploadDoc) {
+            elements.btnUploadDoc.disabled = true;
+            const origHtml = elements.btnUploadDoc.innerHTML;
+            elements.btnUploadDoc.innerHTML = '<svg class="animate-spin w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>';
+
+            try {
+                const proc = new DocumentProcessor();
+                const extractedText = await proc.load(file);
+
+                if (!extractedText || !extractedText.trim()) {
+                    showToast("Dokumen tidak mengandung teks yang dapat diproses.", "warning");
+                    return;
+                }
+
+                state.activeDoc = proc;
+                elements.sourceText.value = extractedText;
+                updateInputStats();
+                showActiveFileBadge(file);
+
+                const wordCount = extractedText.trim().split(/s+/).length;
+                showToast(`Dokumen dimuat: ${wordCount} kata dari ${file.name}`);
+
+                // Scroll to input area
+                elements.sourceText.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (err) {
+                console.error(err);
+                showToast("Gagal memuat dokumen: " + err.message, "warning");
+                clearActiveDoc();
+            } finally {
+                elements.btnUploadDoc.disabled = false;
+                elements.btnUploadDoc.innerHTML = origHtml;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+    }
+
+    // Upload button click → open file picker
+    elements.btnUploadDoc?.addEventListener('click', () => {
+        elements.fileInput?.click();
+    });
+
+    // File picker change → process selected file
+    elements.fileInput?.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) handleDocumentUpload(file);
+    });
+
+    // Drag-and-drop onto the source textarea area
+    const dropTarget = elements.sourceText?.closest('.card-soft');
+    if (dropTarget) {
+        dropTarget.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropTarget.classList.add('ring-2', 'ring-indigo-400', 'ring-offset-1');
+        });
+        dropTarget.addEventListener('dragleave', () => {
+            dropTarget.classList.remove('ring-2', 'ring-indigo-400', 'ring-offset-1');
+        });
+        dropTarget.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropTarget.classList.remove('ring-2', 'ring-indigo-400', 'ring-offset-1');
+            const file = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file) handleDocumentUpload(file);
+        });
+    }
+
+    // Clear active document
+    elements.btnClearDoc?.addEventListener('click', () => {
+        clearActiveDoc();
+        elements.sourceText.value = '';
+        elements.outputText.value = '';
+        updateInputStats();
+        elements.outputWordCount.textContent = '0 kata';
+        elements.outputCharCount.textContent = '0 karakter';
+        updateScoreGauge(100);
+        showToast("Dokumen dihapus, area teks dikosongkan.");
+    });
+
+    // "Unduh Dokumen" primary button (only visible when a doc is uploaded)
+    elements.btnDownloadDoc?.addEventListener('click', async () => {
+        const text = elements.outputText.value;
+        if (!text) { showToast("Humanize teks terlebih dahulu sebelum mengunduh.", "warning"); return; }
+        if (!state.activeDoc) { downloadTxt(); return; }
+
+        try {
+            showToast("Menyusun dokumen dengan format asli...");
+            await state.activeDoc.download(text);
+            showToast("Dokumen berhasil diunduh! Format asli (margin, font, spasi) dipertahankan.");
+        } catch (err) {
+            console.error(err);
+            showToast("Gagal mengunduh dokumen: " + err.message, "warning");
+        }
+    });
+
 
     // 18. Settings Modal (BYOK)
     function openSettings() {

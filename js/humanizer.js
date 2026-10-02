@@ -145,9 +145,41 @@ class TextHumanizer {
     /**
      * LAYER 2: De-Slop & Cliché Stripping (R-16, R-36, R-02)
      * Replaces universal AI clichés, announcements, and empty pompous phrasing across tones.
+     * Also strips filler openers and formatting artefacts before cliché rules run.
      */
     replaceCliches(sentence, lang, tone) {
         let modified = sentence;
+
+        // Filler Stripper — remove content-free sentence openers (R-36, antislop-copywriting §Filler Phrases)
+        // Must run BEFORE cliché patterns to prevent double-processing artefacts
+        if (lang === 'id') {
+            modified = modified
+                // Signposting openers with zero informational value
+                .replace(/^(?:perlu diketahui bahwa|perlu dicatat bahwa|perlu dipahami bahwa|patut diketahui bahwa|sudah seharusnya kita sadari bahwa|tidak bisa dipungkiri bahwa),?\s*/i, '')
+                .replace(/^(?:pada hakikatnya|pada intinya|pada umumnya|secara umum dapat dikatakan bahwa|sejatinya adalah bahwa),?\s*/i, '')
+                .replace(/^(?:dengan kata lain,?\s*dapat dikatakan bahwa|artinya dapat kita simpulkan bahwa),?\s*/i, '')
+                // Emoji decoration at line start (antislop-copywriting §Emojis in Headings)
+                .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]+\s*/u, '')
+                // Bold-every-term inline-header list (antislop-copywriting §Inline-Header Lists)
+                .replace(/^\*\*([^*:]{1,40}):\*\*\s*/g, '')
+                // Actorless passive openers — "Dapat dilihat bahwa", "Dapat dikatakan bahwa"
+                .replace(/^(?:dapat dilihat bahwa|dapat dikatakan bahwa|dapat dipahami bahwa|dapat disimpulkan bahwa),?\s*/i, '')
+                // Stacked hedging — "Bisa dikatakan mungkin bahwa"
+                .replace(/\b(?:mungkin saja bisa|kiranya dapat|bisa jadi mungkin)\b/gi, 'bisa');
+        } else if (lang === 'en') {
+            modified = modified
+                // Signposting / chatbot-closer openers (antislop-copywriting §Signposting Announcements, §Chatbot Closers)
+                .replace(/^(?:It is widely acknowledged that|It is commonly understood that|Needless to say,|It goes without saying that|It is worth noting that|It is important to note that|It should be noted that),?\s*/i, '')
+                .replace(/^(?:Let me explain|Allow me to elaborate|In this section[,.]?|Here's what you need to know[.:]),?\s*/i, '')
+                .replace(/^(?:Without further ado,|Let's dive in[.:]),?\s*/i, '')
+                // Emoji decoration
+                .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]+\s*/u, '')
+                // Inline-header bold lists
+                .replace(/^\*\*([^*:]{1,40}):\*\*\s*/g, '')
+                // Stacked hedging
+                .replace(/\b(?:could potentially possibly|may perhaps|might possibly)\b/gi, 'may');
+        }
+
         const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang])
             ? window.LANGUAGES[lang]
             : null;
@@ -170,7 +202,24 @@ class TextHumanizer {
                 .replace(/\bamat\s+sangat\b/gi, "amat")
                 .replace(/\bhanya\s+sekadar\b/gi, "sekadar")
                 .replace(/\bhanya\s+cuma\b/gi, "cuma")
-                .replace(/\bdemi\s+untuk\b/gi, "demi");
+                .replace(/\bdemi\s+untuk\b/gi, "demi")
+                // Additional pleonasms found in AI output
+                .replace(/\bsaling\s+berinteraksi\s+satu\s+sama\s+lain\b/gi, "saling berinteraksi")
+                .replace(/\bnaik\s+meningkat\b/gi, "meningkat")
+                .replace(/\bturun\s+menurun\b/gi, "menurun")
+                .replace(/\bmasuk\s+ke\s+dalam\b/gi, "masuk ke")
+                .replace(/\bkeluar\s+dari\s+dalam\b/gi, "keluar dari");
+        } else if (lang === 'en') {
+            modified = modified
+                .replace(/\beach\s+and\s+every\b/gi, "every")
+                .replace(/\bfirst\s+and\s+foremost\b/gi, "first")
+                .replace(/\bnull\s+and\s+void\b/gi, "void")
+                .replace(/\bright\s+and\s+proper\b/gi, "proper");
+        }
+
+        // Fix capitalization after filler strip left an uncapitalized start
+        if (modified.length > 0 && modified[0] !== modified[0].toUpperCase()) {
+            modified = modified.charAt(0).toUpperCase() + modified.slice(1);
         }
 
         return modified;
@@ -229,8 +278,8 @@ class TextHumanizer {
 
             if (!isSubordinateStart && currentWords.length > 18) {
                 const splitRegex = lang === 'id'
-                    ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s+itu|di\s+mana|yakni|yaitu)\s+)/i
-                    : /(,\s*(?:however|whereas|meaning\s+that|while|whereby|namely)\s+)/i;
+                    ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s*itu|di\s*mana|yakni|yaitu|dan\s+ini|dan\s+hal\s+ini|yang\s+berarti|yang\s+artinya)\s+)/i
+                    : /(,\s*(?:however|whereas|meaning\s*that|while|whereby|namely|which\s*means\s*that|and\s*it\s*also|in\s*order\s*to|and\s*this\s*means)\s+)/i;
 
                 const match = current.match(splitRegex);
                 if (match && match.index > 25 && (current.length - match.index) > 20) {
@@ -428,6 +477,12 @@ class TextHumanizer {
             if (lower === 'langsung' && /\bsecara\s+$/i.test(before)) return match;
 
             // 4. Context-safe synonym injection
+            // Guard: skip function words
+            const STOP_WORDS_ID = new Set(['yang','dan','di','ke','dari','ini','itu','dengan','untuk','pada','oleh','adalah','ada','saja','pun','juga','serta','atau','karena','sebab','jika','bila','meski','agar','atas','bagi','demi','sejak','setelah','sebelum','saat','ketika','hampir','telah','sudah','akan','sedang','bisa','dapat','harus','perlu','boleh','mau','masih','lagi','ya','tidak','tak','jangan','lebih','paling','sangat','amat','begitu','cukup','terlalu','semua','setiap','beberapa','banyak','sedikit','lain','lainnya','satu','dua','pertama','kedua']);
+            const STOP_WORDS_EN = new Set(['the','a','an','in','on','at','to','of','for','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','must','shall','can','i','you','he','she','it','we','they','and','or','but','nor','so','yet','both','either','neither','not','very','just','only','also','even','still','already','always','often','never','soon']);
+            const stopSet = lang === 'id' ? STOP_WORDS_ID : STOP_WORDS_EN;
+            if (stopSet.has(lower)) return match;
+
             if (dictSource[lower] && Math.random() < changeProbability) {
                 const candidates = dictSource[lower];
                 const alternateCandidates = candidates.filter(c => c.toLowerCase() !== lower);
@@ -720,8 +775,13 @@ class TextHumanizer {
         // NEVER replace \n or \r!
         result = result
             .replace(/,\s*,+/g, ',') // Clean up accidental duplicate commas
+            .replace(/\.\s*\.+/g, '.') // Clean up accidental duplicate periods
+            .replace(/,\s*\./g, '.') // Clean comma-period artifact: cliché trailing comma + sentence period
             .replace(/\bsecara\s+secara\b/gi, 'secara')
-            .replace(/\b([a-zA-Zà-ž]+)\s+(?:serta|dan)\s+\1\b/gi, '$1') // Clean accidental duplicate words
+            .replace(/\bdalam\s+dalam\b/gi, 'dalam')
+            .replace(/\byang\s+yang\b/gi, 'yang')
+            .replace(/\b([a-zA-Z\u00C0-\u024F]{3,})\s+\1\b/gi, '$1') // Clean duplicate words (3+ chars)
+            .replace(/\b([a-zA-Z\u00C0-\u024F]+)\s+(?:serta|dan)\s+\1\b/gi, '$1') // Clean X dan X
             .replace(/[ \t]+([,\.!\?;:])/g, '$1')
             .replace(/([,\.!\?;:])([a-zA-Zà-ž])/g, '$1 $2')
             .replace(/[ \t]{2,}/g, ' ')
