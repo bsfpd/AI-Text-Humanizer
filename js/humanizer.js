@@ -1,12 +1,12 @@
-﻿/**
+/**
  * Antislop Humanizer Engine (Advanced Multi-Layer Architecture)
- * Grounded in Antislop Copywriting & De-Detection Principles:
- * - Never invent facts (R-17, R-36, R-38, C-5)
- * - Eliminate empty AI vocabulary & signposting (R-16)
+ * Grounded in Meaning-Aware Rewriting & Antislop Copywriting Principles:
+ * - Strict semantic & factual fidelity: never invent, mutate, or omit facts (R-17, R-36, R-38)
+ * - Eliminate empty AI vocabulary, robotic transitions, and filler signposting (R-16)
  * - Eliminate em dashes (R-02)
- * - Dynamic burstiness & varied sentence length cadence
- * - Deep context-safe lexical variation across all topics
- * - Authentic voice styling across 6 specific tones
+ * - Preserve authentic sentence cadence and natural Indonesian syntax
+ * - Context-safe lexical refinement without reckless thesaurus-bot swapping
+ * - Authentic voice styling across 7 specific tones
  */
 
 class TextHumanizer {
@@ -16,18 +16,18 @@ class TextHumanizer {
             ? window.HUMANIZER_DICTIONARY
             : {
                 id: {
-                    "penting": ["signifikan", "krusial", "utama", "esensial"],
-                    "sangat": ["amat", "cukup", "begitu", "teramat"],
-                    "menunjukkan": ["memperlihatkan", "mengindikasikan", "mencerminkan", "mencatatkan"],
-                    "membantu": ["memudahkan", "menunjang", "mendorong", "menyokong"],
-                    "masalah": ["kendala", "tantangan", "persoalan", "hambatan"],
+                    "penting": ["krusial", "utama", "esensial"],
+                    "sangat": ["amat", "cukup", "teramat"],
+                    "menunjukkan": ["memperlihatkan", "mengindikasikan", "mencerminkan"],
+                    "membantu": ["memudahkan", "menunjang", "menyokong"],
+                    "masalah": ["kendala", "tantangan", "persoalan"],
                     "membuat": ["menjadikan", "menghasilkan", "menciptakan"],
-                    "menggunakan": ["menerapkan", "memanfaatkan", "mengadopsi", "mengoptimalkan"],
+                    "menggunakan": ["menerapkan", "memanfaatkan", "mengadopsi"],
                     "pendekatan": ["metode", "kerangka kerja", "sudut pandang"]
                 },
                 en: {
-                    "important": ["vital", "essential", "significant", "pivotal"],
-                    "shows": ["demonstrates", "reveals", "highlights", "signals"]
+                    "important": ["vital", "essential", "significant"],
+                    "shows": ["demonstrates", "reveals", "highlights"]
                 }
             };
     }
@@ -35,8 +35,12 @@ class TextHumanizer {
     /**
      * LAYER 1: Token Protection Guard
      * Extracts and safeguards elements that MUST NEVER be mutated:
-     * - Formal greetings & salutations (e.g. "Assalamualaikum...", "Yth. Bapak/Ibu...", "Selamat pagi...")
-     * - Technical capitalized acronyms (e.g. APT, CAPM, IHSG, AI, ROE, DNA, etc.)
+     * - Islamic religious greetings & closings (Assalamu'alaikum, etc.)
+     * - Addressed entities and salutations with specific titles/names
+     * - Legal articles & statutory references (e.g. Pasal 27 ayat (2), UU No. 13 Tahun 2003)
+     * - Scientific formulas, equations, and dosages (e.g. fc' = 32,4 MPa, 500 mg, 1,5°C)
+     * - Academic citations (e.g. Sugiyono (2018:137), (Smith, 2020))
+     * - Technical capitalized acronyms (e.g. APT, CAPM, IHSG, AI, ROE, DNA, EKMA4315, etc.)
      * - Numerical values, statistics, percentages, and currencies (e.g. 10%, Rp 50.000, 2024, 3.5)
      * - Text inside quotes and parentheses
      */
@@ -58,25 +62,46 @@ class TextHumanizer {
 
         let protectedText = text;
 
-        // 1. Strictly Protect Islamic religious greetings & closings (Must NEVER be mutated by any tone)
-        // Matches Assalamualaikum, Waalaikumsalam, Wassalamualaikum, with any spellings, apostrophes, and trailing blessings
+        // 1. Strictly Protect Islamic religious greetings & closings (100% intact across all tones)
         protectedText = protectedText.replace(/\b(?:assalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?|wa\s*['’`]?\s*alaikum\s*salam(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?|wassalamu\s*['’`]?\s*alaikum(?:\s+warahmatullahi\s+wabarakatuh|\s+wr\.?\s*wb\.?)?)(?:[,\.]|(?=[!\?\r\n]|$))/gi, (match) => {
             return addIslamicToken(match.trim());
         });
 
-        // 2. Protect parenthetical technical definitions or acronym references (e.g. "(APT)", "(multi-factor model)")
+        // 2. Protect addressed entities (Yth. ...) with specific titles, organizations, or names
+        protectedText = protectedText.replace(/\b(?:Yth\.?|Yang\s+Terhormat)\s+(?:Bapak|Ibu|Sdr|Sdri|Dr|Ir|Prof|Direktur|Dekan|Rektor|Pimpinan|Ketua|Manager|Kepala|Tutor|Dosen|Civitas|Rekan|PT|CV|Instansi|Kepala|Bupati|Gubernur|Walikota)[^\n,]+/gi, (match) => {
+            return addToken(match.trim());
+        });
+
+        // 3. Protect specific citations (e.g. Sugiyono (2018:137), (2018:137), (Smith, 2020))
+        protectedText = protectedText.replace(/\b[A-Z][a-zA-Z\s]{1,30}\s*\(\d{4}(?::\d+)?\)/g, (match) => {
+            return addToken(match);
+        });
+
+        // 4. Protect legal references (Pasal ... ayat ..., UU No. ... Tahun ...)
+        protectedText = protectedText.replace(/\b(?:Pasal\s+\d+(?:\s+ayat\s+\(\d+\))?|UU(?:D)?(?:\s+(?:No\.?\s*)?\d+)?(?:\s+Tahun\s+\d+)?(?:\s+tentang\s+[A-Za-z\s]+)?)\b/gi, (match) => {
+            return addToken(match);
+        });
+
+        // 5. Protect formulas, equations, scientific measurements
+        protectedText = protectedText.replace(/\b[a-zA-Z]+'?(?:\s*=\s*[\d.,]+(?:\s*[A-Za-z]+)?)\b/g, (match) => {
+            return addToken(match);
+        });
+        protectedText = protectedText.replace(/\b\d+(?:[.,]\d+)?\s*(?:mg|kg|g|ml|l|cm|m|km|MPa|ms|RPS|°C)\b/gi, (match) => {
+            return addToken(match);
+        });
+
+        // 6. Protect parenthetical technical definitions or acronym references (e.g. "(APT)", "(multi-factor model)")
         protectedText = protectedText.replace(/\([^\(\)\n]{1,60}\)/g, (match) => {
             return addToken(match);
         });
 
-        // 3. Protect currency, percentages, numbers with units, and multi-digit values
-        // Excludes isolated single/double digits (e.g. "1.", "2.") so list items work properly
+        // 7. Protect currency, percentages, numbers with units, and multi-digit values
         protectedText = protectedText.replace(/(?:Rp\s*[\d\.,]+|\b\d+(?:[\.,]\d+)?\s*%|\b\d+(?:[\.,]\d+)*(?:\s+(?:persen|tahun|ribu|juta|miliar|triliun|km|kg|cm|m|USD|EUR|IDR))\b|\b\d{1,3}(?:\.\d{3})+(?:,\d+)?\b|\b\d{4,}\b)/g, (match) => {
             return addToken(match);
         });
 
-        // 4. Protect uppercase acronyms (2 to 7 letters, e.g. APT, CAPM, IHSG, PPh, ROE, GDP, LLM, GPT)
-        protectedText = protectedText.replace(/\b[A-Z]{2,7}(?:-[A-Z0-9]+)?\b/g, (match) => {
+        // 8. Protect uppercase acronyms (2 to 10 characters, including course codes e.g. APT, CAPM, IHSG, EKMA4315, ADPU4230)
+        protectedText = protectedText.replace(/\b[A-Z]{2,10}(?:[0-9]+)?(?:-[A-Z0-9]+)?\b/g, (match) => {
             return addToken(match);
         });
 
@@ -143,24 +168,22 @@ class TextHumanizer {
     }
 
     /**
-     * LAYER 2: De-Slop & Cliché Stripping (R-16, R-36, R-02)
-     * Replaces universal AI clichés, announcements, and empty pompous phrasing across tones.
-     * Also strips filler openers and formatting artefacts before cliché rules run.
+     * LAYER 2: De-Slop & Cliché Stripping
+     * Cleans up empty AI filler openers, formulaic tropes, and pleonasms.
+     * Preserves sentence structure and repairs capitalization.
      */
     replaceCliches(sentence, lang, tone) {
         let modified = sentence;
 
-        // Filler Stripper — remove content-free sentence openers (R-36, antislop-copywriting §Filler Phrases)
-        // Must run BEFORE cliché patterns to prevent double-processing artefacts
         if (lang === 'id') {
             modified = modified
                 // Signposting openers with zero informational value
                 .replace(/^(?:perlu diketahui bahwa|perlu dicatat bahwa|perlu dipahami bahwa|patut diketahui bahwa|sudah seharusnya kita sadari bahwa|tidak bisa dipungkiri bahwa),?\s*/i, '')
                 .replace(/^(?:pada hakikatnya|pada intinya|pada umumnya|secara umum dapat dikatakan bahwa|sejatinya adalah bahwa),?\s*/i, '')
                 .replace(/^(?:dengan kata lain,?\s*dapat dikatakan bahwa|artinya dapat kita simpulkan bahwa),?\s*/i, '')
-                // Emoji decoration at line start (antislop-copywriting §Emojis in Headings)
+                // Emoji decoration at line start
                 .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]+\s*/u, '')
-                // Bold-every-term inline-header list (antislop-copywriting §Inline-Header Lists)
+                // Bold-every-term inline-header list
                 .replace(/^\*\*([^*:]{1,40}):\*\*\s*/g, '')
                 // Actorless passive openers — "Dapat dilihat bahwa", "Dapat dikatakan bahwa"
                 .replace(/^(?:dapat dilihat bahwa|dapat dikatakan bahwa|dapat dipahami bahwa|dapat disimpulkan bahwa),?\s*/i, '')
@@ -168,15 +191,11 @@ class TextHumanizer {
                 .replace(/\b(?:mungkin saja bisa|kiranya dapat|bisa jadi mungkin)\b/gi, 'bisa');
         } else if (lang === 'en') {
             modified = modified
-                // Signposting / chatbot-closer openers (antislop-copywriting §Signposting Announcements, §Chatbot Closers)
                 .replace(/^(?:It is widely acknowledged that|It is commonly understood that|Needless to say,|It goes without saying that|It is worth noting that|It is important to note that|It should be noted that),?\s*/i, '')
                 .replace(/^(?:Let me explain|Allow me to elaborate|In this section[,.]?|Here's what you need to know[.:]),?\s*/i, '')
                 .replace(/^(?:Without further ado,|Let's dive in[.:]),?\s*/i, '')
-                // Emoji decoration
                 .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]+\s*/u, '')
-                // Inline-header bold lists
                 .replace(/^\*\*([^*:]{1,40}):\*\*\s*/g, '')
-                // Stacked hedging
                 .replace(/\b(?:could potentially possibly|may perhaps|might possibly)\b/gi, 'may');
         }
 
@@ -203,7 +222,6 @@ class TextHumanizer {
                 .replace(/\bhanya\s+sekadar\b/gi, "sekadar")
                 .replace(/\bhanya\s+cuma\b/gi, "cuma")
                 .replace(/\bdemi\s+untuk\b/gi, "demi")
-                // Additional pleonasms found in AI output
                 .replace(/\bsaling\s+berinteraksi\s+satu\s+sama\s+lain\b/gi, "saling berinteraksi")
                 .replace(/\bnaik\s+meningkat\b/gi, "meningkat")
                 .replace(/\bturun\s+menurun\b/gi, "menurun")
@@ -226,19 +244,11 @@ class TextHumanizer {
     }
 
     /**
-     * LAYER 3: Dynamic Burstiness & Syntactic Restructuring (R-02, R-16)
-     * Transforms robotic, evenly spaced AI sentences into dynamic human cadence:
-     * - Breaks overly long, monotonous compound sentences (>22 words) into distinct complete thoughts.
-     * - Blends excessively clipped adjacent fragments.
-     * - Alters monotonous subject-verb-object cadence.
-     */
-    /**
-     * LAYER 3: Dynamic Burstiness & Syntactic Restructuring (R-02, R-16, R-36)
-     * Transforms robotic, evenly spaced AI sentences into dynamic human cadence:
-     * - Breaks overly long, monotonous compound sentences (>18 words) into distinct complete thoughts.
-     * - Blends excessively clipped adjacent fragments.
-     * - Inserts punchy short anchoring statements (2-5 words) to create high variance in sentence length.
-     * - Inverts subordinate clauses for natural human rhythm.
+     * LAYER 3: Sentence Flow & Cadence Refinement
+     * Treats long sentences with respect: Indonesian formal & academic writing
+     * naturally contains well-formed complex sentences (20-30 words).
+     * Only splits genuine run-on sentences (>32 words) with stacked clauses,
+     * using semantically faithful connectors without inventing canned rhetorical commentary.
      */
     modulateBurstiness(sentences, tone, lang, intensity) {
         if (!sentences || sentences.length === 0) return [];
@@ -257,103 +267,31 @@ class TextHumanizer {
                 continue;
             }
 
-            // Clause Inversion in Indonesian (moving purpose/conditional clause forward)
-            if (lang === 'id') {
-                // Invert "pekerja dituntut/perlu X agar/supaya tetap kompetitif di Y" -> "Supaya tetap kompetitif di Y, pekerja perlu X"
-                const purposeMatch = current.match(/^(.*?)\s+(?:agar|supaya)\s+(tetap\s+[^\.,;]+?)\s*,\s*(.*)$/i);
-                if (purposeMatch && purposeMatch[1].length > 15) {
-                    const mainClause = purposeMatch[1].trim();
-                    const purposeClause = purposeMatch[2].trim();
-                    const rest = purposeMatch[3] ? " " + purposeMatch[3].trim() : "";
-                    current = `Agar ${purposeClause}, ${mainClause.charAt(0).toLowerCase() + mainClause.slice(1)}${rest}`;
-                }
-            }
-
             const currentWords = current.split(/\s+/).filter(Boolean);
 
-            // Safe sentence split for overly long AI sentences (>18 words) with coordinating conjunctions or markers
-            // Do NOT split if sentence begins with a subordinate conjunction (e.g. "Ketika...", "Saat...", "Jika...")
-            // because splitting would leave the first part as an incomplete clause fragment!
+            // Safe sentence split: Only applied to genuinely excessive run-ons (>32 words)
+            // or when intensity is 'ultra' on sentences >26 words with heavy stacked coordinate clauses.
+            const splitThreshold = intensity === 'ultra' ? 26 : 34;
             const isSubordinateStart = /^(?:ketika|saat|apabila|jika|meskipun|walaupun|kendati|sebelum|setelah|sewaktu|tatkala|when|while|if|although|despite|even though)\b/i.test(current.trim());
 
-            if (!isSubordinateStart && currentWords.length > 18) {
+            if (!isSubordinateStart && currentWords.length > splitThreshold) {
                 const splitRegex = lang === 'id'
-                    ? /(,\s*(?:namun|tetapi|sedangkan|sehingga|padahal|bahkan|sementara\s*itu|di\s*mana|yakni|yaitu|dan\s+ini|dan\s+hal\s+ini|yang\s+berarti|yang\s+artinya)\s+)/i
-                    : /(,\s*(?:however|whereas|meaning\s*that|while|whereby|namely|which\s*means\s*that|and\s*it\s*also|in\s*order\s*to|and\s*this\s*means)\s+)/i;
+                    ? /(,\s*(?:dan\s+hal\s+ini|yang\s+mana\s+hal\s+ini|sehingga\s+pada\s+akhirnya)\s+)/i
+                    : /(,\s*(?:which\s+consequently\s+means\s+that|and\s+this\s+subsequently\s+leads\s+to)\s+)/i;
 
                 const match = current.match(splitRegex);
-                if (match && match.index > 25 && (current.length - match.index) > 20) {
+                if (match && match.index > 30 && (current.length - match.index) > 25) {
                     const firstPart = current.slice(0, match.index).trim() + '.';
                     let secondPart = current.slice(match.index + match[0].length).trim();
-                    
+
                     if (secondPart.length > 0) {
-                        const rawConnector = match[1].replace(/^[,\s]+|[,\s]+$/g, '');
-                        // Transform connector into natural independent opener tailored to the selected tone
-                        let opener = rawConnector.charAt(0).toUpperCase() + rawConnector.slice(1);
-                        if (opener.toLowerCase() === 'yakni' || opener.toLowerCase() === 'yaitu') {
-                            opener = (tone === 'academic' || tone === 'formal') ? 'Secara khusus,' : (tone === 'tuton' ? 'Yakni,' : (tone === 'simple' ? 'Yakni,' : 'Tepatnya,'));
-                        } else if (opener.toLowerCase() === 'sehingga') {
-                            const openersByTone = {
-                                academic: ['Dengan demikian,', 'Kondisi ini memungkinkan', 'Dampaknya,', 'Hal ini membuat', 'Secara analitis,'],
-                                tuton: ['Dengan begitu,', 'Hal ini memungkinkan', 'Dampaknya,', 'Artinya,', 'Dari sini terlihat bahwa'],
-                                formal: ['Sejalan dengan itu,', 'Langkah ini memungkinkan', 'Implikasinya,', 'Dengan begitu,', 'Secara operasional,'],
-                                casual: ['Makanya,', 'Di sisi lain,', 'Alhasil,', 'Nah, dari sini', 'Untungnya,'],
-                                journalistic: ['Sementara itu,', 'Catatannya,', 'Di saat bersamaan,', 'Kondisi ini membuat', 'Dampaknya,'],
-                                creative: ['Perlahan,', 'Di balik itu,', 'Tanpa disadari,', 'Pada titik ini,', 'Seketika,'],
-                                simple: ['Hasilnya,', 'Artinya,', 'Maka dari itu,', 'Akibatnya,', 'Dengan ini,']
-                            };
-                            const pool = openersByTone[tone] || openersByTone.academic;
-                            opener = pool[Math.floor(Math.random() * pool.length)];
-                        } else if (opener.toLowerCase() === 'namun' || opener.toLowerCase() === 'tetapi') {
-                            const openersByTone = {
-                                academic: ['Namun,', 'Akan tetapi,', 'Hanya saja,', 'Di sisi lain,'],
-                                tuton: ['Hanya saja,', 'Namun demikian,', 'Di sisi lain,', 'Akan tetapi,'],
-                                formal: ['Kendati demikian,', 'Namun secara operasional,', 'Akan tetapi,', 'Di sisi lain,'],
-                                casual: ['Tapi nyatanya,', 'Tapi ya,', 'Hanya saja,', 'Namun,'],
-                                journalistic: ['Namun di lapangan,', 'Sementara itu,', 'Faktanya,', 'Di sisi lain,'],
-                                creative: ['Namun demikian,', 'Di balik tirai itu,', 'Tetapi perlahan,', 'Hanya saja,'],
-                                simple: ['Tapi,', 'Namun,', 'Hanya saja,']
-                            };
-                            const pool = openersByTone[tone] || openersByTone.academic;
-                            opener = pool[Math.floor(Math.random() * pool.length)];
-                        } else if (opener.toLowerCase() === 'sedangkan' || opener.toLowerCase() === 'padahal') {
-                            const openers = ['Padahal,', 'Sebaliknya,', 'Di sisi lain,', 'Sementara itu,'];
-                            opener = openers[Math.floor(Math.random() * openers.length)];
-                        } else if (opener.toLowerCase() === 'sementara itu') {
-                            const openers = ['Sementara itu,', 'Di saat bersamaan,', 'Di waktu yang sama,'];
-                            opener = openers[Math.floor(Math.random() * openers.length)];
-                        } else if (lang === 'en') {
-                            if (/however/i.test(opener)) {
-                                opener = (tone === 'academic' || tone === 'tuton') ? 'Nevertheless,' : (tone === 'casual' ? 'Still,' : 'However,');
-                            } else if (/whereas|while/i.test(opener)) {
-                                opener = (tone === 'academic' || tone === 'tuton') ? 'In contrast,' : 'Meanwhile,';
-                            } else if (/meaning that/i.test(opener)) {
-                                opener = (tone === 'academic' || tone === 'tuton') ? 'Consequently,' : 'As a result,';
-                            }
-                        } else {
-                            opener = `${opener},`;
-                        }
+                        const opener = (tone === 'academic' || tone === 'formal') ? 'Dampaknya,' : 'Hal ini membuat';
                         secondPart = `${opener} ${secondPart.charAt(0).toLowerCase() + secondPart.slice(1)}`;
                         result.push(firstPart);
                         result.push(secondPart);
                         i++;
                         continue;
                     }
-                }
-            }
-
-            // Safe merge of two very short adjacent sentences (<7 words) without questions/exclamations
-            if (next && !this.isSalutationOrOpening(next) && currentWords.length < 7 && !/[?!:]/.test(current)) {
-                const nextWords = next.split(/\s+/).filter(Boolean);
-                if (nextWords.length < 7 && !/[?!:]/.test(next) && Math.random() > 0.50) {
-                    const cleanCurrent = current.replace(/[.!?]+$/, '');
-                    const cleanNext = next.charAt(0).toLowerCase() + next.slice(1);
-                    const glue = lang === 'id'
-                        ? (tone === 'academic' ? ' sekaligus ' : (tone === 'tuton' ? ' serta ' : (tone === 'casual' ? ' dan juga ' : (tone === 'formal' ? ' serta ' : ' dan '))))
-                        : (tone === 'academic' || tone === 'tuton' ? ', whereby ' : ', and ');
-                    result.push(cleanCurrent + glue + cleanNext);
-                    i += 2;
-                    continue;
                 }
             }
 
@@ -366,7 +304,7 @@ class TextHumanizer {
 
     /**
      * LAYER 3.5: Multi-Word Semantic Phrase Collocations ("Similar Means")
-     * Replaces formulaic 3-5 gram phrases identified by modern AI detectors (Turnitin 2026, Drillbit, GPTZero 4.10b, Copyleaks).
+     * Replaces formulaic, verbose, or bureaucratic phrases with concise, natural human equivalents.
      */
     applySimilarMeans(sentence, lang, intensity) {
         if (this.isSalutationOrOpening(sentence) || this.isClosing(sentence)) return sentence;
@@ -378,14 +316,14 @@ class TextHumanizer {
         if (!similarMeansList || similarMeansList.length === 0) return sentence;
 
         let modified = sentence;
-        const changeProb = intensity === 'ultra' ? 0.85 : 0.70;
 
         for (const rule of similarMeansList) {
             if (rule.pattern.test(modified)) {
                 modified = modified.replace(rule.pattern, (match) => {
                     if (match.includes('__ANTISLOP_')) return match;
                     if (rule.replacements && rule.replacements.length > 0) {
-                        const rep = rule.replacements[Math.floor(Math.random() * rule.replacements.length)];
+                        // Pick first natural replacement deterministically or pseudo-randomly
+                        const rep = rule.replacements[0];
                         if (match[0] === match[0].toUpperCase() && match.length > 1) {
                             return rep.charAt(0).toUpperCase() + rep.slice(1);
                         }
@@ -400,11 +338,15 @@ class TextHumanizer {
     }
 
     /**
-     * LAYER 4: Deep Context-Safe Lexical Humanization
-     * Balanced substitution matching parts of speech, avoiding thesaurus-bot over-saturation.
+     * LAYER 4: Context-Safe Lexical Refinement
+     * Never performs indiscriminate thesaurus substitution.
+     * In 'standard' intensity: 0% substitution (keeps original diction).
+     * In 'balanced' intensity: Replaces only known bureaucratic/stiff words with cleaner equivalents.
+     * In 'ultra' intensity: Carefully polishes general descriptors while strictly preserving domain nouns.
      */
     injectPerplexity(sentence, lang, intensity, isNeural = false) {
         if (this.isSalutationOrOpening(sentence) || this.isClosing(sentence)) return sentence;
+        if (intensity === 'standard') return sentence; // Clean & faithful: no word swapping
 
         const dictSource = (typeof window !== 'undefined' && window.HUMANIZER_DICTIONARY && window.HUMANIZER_DICTIONARY[lang])
             ? window.HUMANIZER_DICTIONARY[lang]
@@ -412,88 +354,46 @@ class TextHumanizer {
 
         if (!dictSource) return sentence;
 
-        // Balanced change probability (0.50 - 0.58) ensures authentic human voice without thesaurus stiffness
-        const changeProbability = isNeural ? 0.58 : (intensity === 'ultra' ? 0.55 : (intensity === 'balanced' ? 0.45 : 0.35));
+        // Controlled, conservative probability: 0% for standard, 15% for balanced, 25% for ultra
+        const changeProbability = intensity === 'ultra' ? 0.25 : 0.15;
+
+        // Strict domain terms that must NEVER be mutated
+        const DOMAIN_LOCK_ID = new Set([
+            'laba', 'rugi', 'biaya', 'ongkos', 'harga', 'anggaran', 'kas', 'utang', 'piutang', 'saham', 'obligasi',
+            'dividen', 'modal', 'pasar', 'risiko', 'bunga', 'pajak', 'inflasi', 'ekuitas', 'aktiva', 'pasiva',
+            'metode', 'teori', 'model', 'data', 'sampel', 'populasi', 'variabel', 'regresi', 'korelasi', 'uji',
+            'dosis', 'pasien', 'obat', 'darah', 'ginjal', 'tekanan', 'sel', 'gen', 'virus', 'bakteri',
+            'pasal', 'undang-undang', 'hukum', 'aturan', 'kebijakan', 'birokrasi', 'pemerintah', 'daerah',
+            'modul', 'materi', 'tutor', 'dosen', 'mahasiswa', 'kampus', 'universitas', 'sekolah', 'guru',
+            'sistem', 'aplikasi', 'jaringan', 'server', 'program', 'kode', 'latensi', 'basis', 'arsitektur'
+        ]);
 
         return sentence.replace(/\b([a-zA-Zà-ž]+)\b/g, (match, word, offset, fullStr) => {
-            // 1. Never alter protected tokens
             if (match.startsWith('__ANTISLOP_TOKEN')) return match;
-
-            // 2. Preserve acronyms
-            if (match === match.toUpperCase() && match.length > 1) return match;
+            if (match === match.toUpperCase() && match.length > 1) return match; // Acronyms
 
             const lower = match.toLowerCase();
+            if (DOMAIN_LOCK_ID.has(lower)) return match; // Domain lock
 
-            // 3. Protect fixed collocations (both prefix and suffix)
-            const before = fullStr.slice(0, offset);
-            const after = fullStr.slice(offset + match.length);
-
-            // Protect multi-word proper nouns and business entity names (e.g. Rasa Mandiri, Universitas Terbuka, Bank Mandiri, PT/CV ...)
-            if (match[0] === match[0].toUpperCase() && /\b[A-Z][a-zA-Z0-9_-]+\s+$/.test(before)) return match;
-            if (/\b(?:pt|cv|ud|tb|bank|univ|universitas|fakultas|jurusan|yayasan)\s+(?:[A-Za-z0-9_-]+\s+)?$/i.test(before)) return match;
-
-            if (lower === 'tinggi' && /\bperguruan\s+$/i.test(before)) return match;
-            if (lower === 'perguruan' && /^\s+tinggi\b/i.test(after)) return match;
-            if (lower === 'waktu' && /\b(?:menyisihkan|meluangkan|tenggat|kurun|jangka|luang)\s+$/i.test(before)) return match;
-            if (lower === 'kesempatan' && /\b(?:menyisihkan|meluangkan)\s+$/i.test(before)) return match;
-            if (lower === 'modal' && /\bpasar\s+$/i.test(before)) return match;
-            if (lower === 'pasar' && /^\s+(?:modal|uang|tenaga\s+kerja)\b/i.test(after)) return match;
-            if (lower === 'asumsi' && /^\s+(?:tambahan|dasar|logis)\b/i.test(after)) return match;
-            if (lower === 'tambahan' && /\basumsi\s+$/i.test(before)) return match;
-            if (lower === 'kurva' && /^\s+(?:pembelajaran|belajar)\b/i.test(after)) return match;
-            if ((lower === 'pembelajaran' || lower === 'belajar') && /\bkurva\s+$/i.test(before)) return match;
-            if (lower === 'daya' && /\bsumber\s+$/i.test(before)) return match;
-            if (lower === 'sumber' && /^\s+daya\b/i.test(after)) return match;
-            if (lower === 'kerja' && /\b(?:tata|pola|ruang)\s+$/i.test(before)) return match;
-            if (lower === 'kelola' && /\btata\s+$/i.test(before)) return match;
-            if (lower === 'tata' && /^\s+(?:kelola|kerja|tertib|ruang)\b/i.test(after)) return match;
-            if (lower === 'pasok' && /\brantai\s+$/i.test(before)) return match;
-            if (lower === 'rantai' && /^\s+pasok\b/i.test(after)) return match;
-            if (lower === 'keluar' && /\bjalan\s+$/i.test(before)) return match;
-            if (lower === 'jalan' && /^\s+keluar\b/i.test(after)) return match;
-            if (lower === 'hasil' && /\bimbal\s+$/i.test(before)) return match;
-            if (lower === 'imbal' && /^\s+hasil\b/i.test(after)) return match;
-            if (lower === 'faktor' && /\b(?:banyak|multi)[\s-]*$/i.test(before)) return match;
-            if (lower === 'penghasilan' && /\bpajak\s+$/i.test(before)) return match;
-            if (lower === 'sistematis' && /\brisiko\s+$/i.test(before)) return match;
-            if (lower === 'risiko' && /^\s+(?:pasar|sistematis)\b/i.test(after)) return match;
-            if (lower === 'kas' && /\barus\s+$/i.test(before)) return match;
-            if (lower === 'arus' && /^\s+kas\b/i.test(after)) return match;
-            if (lower === 'saing' && /\bdaya\s+$/i.test(before)) return match;
-            if (lower === 'daya' && /^\s+saing\b/i.test(after)) return match;
-            if (lower === 'impas' && /\btitik\s+$/i.test(before)) return match;
-            if (lower === 'titik' && /^\s+impas\b/i.test(after)) return match;
-            if (lower === 'tetapi' && /\bakan\s+$/i.test(before)) return match;
-            if (lower === 'akan' && /^\s+tetapi\b/i.test(after)) return match;
-            if (lower === 'hanya' && /^\s+saja\b/i.test(after)) return match;
-            if (lower === 'saja' && /\bhanya\s+$/i.test(before)) return match;
-            if (lower === 'hal' && /\b(?:mempelajari|belajar)\s+$/i.test(before)) return match;
-            if (lower === 'operasional' && /\b(?:efisiensi|biaya|kegiatan)\s+$/i.test(before)) return match;
-            if (lower === 'efisiensi' && /^\s+operasional\b/i.test(after)) return match;
-            if (lower === 'informasi' && /\bsistem\s+$/i.test(before)) return match;
-            if (lower === 'sistem' && /^\s+informasi\b/i.test(after)) return match;
-            if (lower === 'potensi' && /^\s+(?:pemangkasan|risiko|bahaya|konflik|kerugian)\b/i.test(after)) return match;
-            if ((lower === 'cepat' || lower === 'singkat') && /\brelatif\s+$/i.test(before)) return match;
-            if (lower === 'langsung' && /\bsecara\s+$/i.test(before)) return match;
-
-            // 4. Context-safe synonym injection
-            // Guard: skip function words
+            // Function & stop words guard
             const STOP_WORDS_ID = new Set(['yang','dan','di','ke','dari','ini','itu','dengan','untuk','pada','oleh','adalah','ada','saja','pun','juga','serta','atau','karena','sebab','jika','bila','meski','agar','atas','bagi','demi','sejak','setelah','sebelum','saat','ketika','hampir','telah','sudah','akan','sedang','bisa','dapat','harus','perlu','boleh','mau','masih','lagi','ya','tidak','tak','jangan','lebih','paling','sangat','amat','begitu','cukup','terlalu','semua','setiap','beberapa','banyak','sedikit','lain','lainnya','satu','dua','pertama','kedua']);
-            const STOP_WORDS_EN = new Set(['the','a','an','in','on','at','to','of','for','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','must','shall','can','i','you','he','she','it','we','they','and','or','but','nor','so','yet','both','either','neither','not','very','just','only','also','even','still','already','always','often','never','soon']);
-            const stopSet = lang === 'id' ? STOP_WORDS_ID : STOP_WORDS_EN;
-            if (stopSet.has(lower)) return match;
+            if (STOP_WORDS_ID.has(lower)) return match;
+
+            // Proper nouns check (preceded by capital word or corporate prefix)
+            const before = fullStr.slice(0, offset);
+            if (match[0] === match[0].toUpperCase() && /\b[A-Z][a-zA-Z0-9_-]+\s+$/.test(before)) return match;
+            if (/\b(?:pt|cv|ud|tb|bank|univ|universitas|fakultas|jurusan|yayasan|rs|rumah\s+sakit)\s+(?:[A-Za-z0-9_-]+\s+)?$/i.test(before)) return match;
 
             if (dictSource[lower] && Math.random() < changeProbability) {
                 const candidates = dictSource[lower];
                 const alternateCandidates = candidates.filter(c => c.toLowerCase() !== lower);
-                const pool = alternateCandidates.length > 0 ? alternateCandidates : candidates;
-                const replacement = pool[Math.floor(Math.random() * pool.length)];
-
-                // Preserve original capitalization
-                if (match[0] === match[0].toUpperCase() && match.length > 1) {
-                    return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+                if (alternateCandidates.length > 0) {
+                    const replacement = alternateCandidates[0]; // Take safest primary synonym
+                    if (match[0] === match[0].toUpperCase() && match.length > 1) {
+                        return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+                    }
+                    return replacement;
                 }
-                return replacement;
             }
 
             return match;
@@ -501,8 +401,8 @@ class TextHumanizer {
     }
 
     /**
-     * LAYER 5: Tone Voice Modulation (All 6 Styles)
-     * Shapes tone-specific vocabulary and rhetorical pacing without robotic transition spam.
+     * LAYER 5: Tone Voice Modulation
+     * Applies tone-specific stylistic refinements cleanly.
      */
     applyToneStyling(sentences, tone, lang, intensity) {
         const langPack = (typeof window !== 'undefined' && window.LANGUAGES && window.LANGUAGES[lang])
@@ -512,7 +412,7 @@ class TextHumanizer {
             ? langPack.toneReplacements[tone]
             : [];
 
-        return sentences.map((sentence, idx) => {
+        return sentences.map((sentence) => {
             let processed = sentence.trim();
 
             if (this.isSalutationOrOpening(processed) || this.isClosing(processed)) {
@@ -524,7 +424,7 @@ class TextHumanizer {
                 processed = processed.replace(rule.pattern, rule.replacement);
             });
 
-            // 2. Rhetorical and syntactic shaping across all 6 tones
+            // 2. Rhetorical and syntactic shaping across tones
             if (tone === 'academic') {
                 processed = processed
                     .replace(/\bsangat\s+bagus\b/gi, "berkualitas tinggi")
@@ -532,67 +432,37 @@ class TextHumanizer {
                     .replace(/\bbikin\b/gi, "menghasilkan")
                     .replace(/\bnggak\b/gi, "tidak")
                     .replace(/\bcuma\b/gi, "hanya")
-                    .replace(/\bbanget\b/gi, "sangat")
-                    .replace(/\bvery\s+good\b/gi, "notably effective")
-                    .replace(/\bbig\s+problem\b/gi, "fundamental challenge");
+                    .replace(/\bbanget\b/gi, "sangat");
             } else if (tone === 'tuton') {
                 processed = processed
                     .replace(/\bsebagai\s+seorang\s+mahasiswa\s*(?:saya\s+memandang\s+bahwa)?/gi, "menurut pemahaman saya,")
                     .replace(/\bdalam\s+hal\s+ini\s+penulis\s+berpendapat\s+bahwa\b/gi, "dari sudut pandang saya,")
                     .replace(/\boleh\s+karena\s+itu\s+sangat\s+disarankan\s+untuk\b/gi, "karena itu, langkah realistisnya adalah")
-                    .replace(/\bsebagaimana\s+telah\s+kita\s+ketahui\b/gi, "seperti yang kita pelajari pada modul,")
-                    .replace(/\bmerupakan\s+hal\s+yang\s+wajar\b/gi, "bisa dipahami secara rasional")
                     .replace(/\bnggak\b/gi, "tidak")
                     .replace(/\bbikin\b/gi, "membuat")
                     .replace(/\bcuma\b/gi, "hanya")
                     .replace(/\bbanget\b/gi, "sangat")
-                    .replace(/\bintinya\b/gi, "poin utamanya,")
-                    .replace(/\bsangat\s+bagus\b/gi, "sangat tepat dan efektif")
-                    .replace(/\bhasilnya\s+bagus\b/gi, "capaiannya optimal");
+                    .replace(/\bintinya\b/gi, "poin utamanya,");
             } else if (tone === 'formal') {
                 processed = processed
                     .replace(/\bkita\s+harus\b/gi, "manajemen perlu")
-                    .replace(/\bwe\s+must\b/gi, "it is recommended to")
-                    .replace(/\bdiharapkan\b/gi, "menjadi fokus utama untuk")
                     .replace(/\bngomong-ngomong\b/gi, "sebagai informasi tambahan")
                     .replace(/\bkasih\s+tahu\b/gi, "menginformasikan")
                     .replace(/\bcek\s+lagi\b/gi, "meninjau ulang")
-                    .replace(/\bcepat-cepat\b/gi, "segera")
-                    .replace(/\bget\s+in\s+touch\b/gi, "coordinate directly");
+                    .replace(/\bcepat-cepat\b/gi, "segera");
             } else if (tone === 'casual') {
                 processed = processed
                     .replace(/\bnamun\s+demikian,?\b/gi, "tapi nyatanya,")
                     .replace(/\boleh\s+karena\s+itu,?\b/gi, "makanya,")
                     .replace(/\bdiperlukan\b/gi, "butuh")
                     .replace(/\bsebenarnya\b/gi, "sebetulnya")
-                    .replace(/\bmenurut\s+pendapat\s+saya\b/gi, "kalau menurut saya pribadi")
-                    .replace(/\btetapi\b/gi, "tapi")
-                    .replace(/\bsungguh-sungguh\b/gi, "beneran")
-                    .replace(/\bconsequently,?\b/gi, "so basically,")
-                    .replace(/\bfurthermore,?\b/gi, "plus,");
-            } else if (tone === 'journalistic') {
-                processed = processed
-                    .replace(/\bdapat\s+dikatakan\s+bahwa\b/gi, "catatannya,")
-                    .replace(/\bmenurut\s+hemat\s+saya\b/gi, "pantauan di lapangan,")
-                    .replace(/\bhal\s+ini\s+sangat\s+menarik\b/gi, "kondisi ini memantik perhatian")
-                    .replace(/\bberdasarkan\s+data\s+yang\s+ada\b/gi, "merujuk data terkini,")
-                    .replace(/\bpihak\s+manajemen\s+menyatakan\b/gi, "manajemen menegaskan")
-                    .replace(/\breports\s+indicate\s+that\b/gi, "field reports reveal");
-            } else if (tone === 'creative') {
-                processed = processed
-                    .replace(/\bpada\s+akhirnya\b/gi, "lambat laun")
-                    .replace(/\bsecara\s+nyata\b/gi, "terasa begitu hidup")
-                    .replace(/\bsangat\s+indah\b/gi, "memesona pandang")
-                    .replace(/\bsangat\s+sunyi\b/gi, "hening mencekam")
-                    .replace(/\bseiring\s+berjalannya\s+waktu,?\s*/gi, "perlahan tapi pasti, ")
-                    .replace(/\bin\s+a\s+vibrant\s+way\b/gi, "vividly alive");
+                    .replace(/\btetapi\b/gi, "tapi");
             } else if (tone === 'simple') {
                 processed = processed
                     .replace(/\b(?:dapat\s+dikatakan\s+bahwa|pada\s+dasarnya|dalam\s+hal\s+ini|sebagaimana\s+diketahui)\b/gi, '')
                     .replace(/\bdalam\s+rangka\s+untuk\b/gi, "untuk")
                     .replace(/\bpada\s+saat\s+ini\b/gi, "kini")
                     .replace(/\bmemiliki\s+kemampuan\s+untuk\b/gi, "bisa")
-                    .replace(/\bmelakukan\s+kegiatan\b/gi, "menjalankan")
                     .replace(/\s{2,}/g, ' ')
                     .trim();
             }
@@ -608,7 +478,7 @@ class TextHumanizer {
 
     /**
      * Adapts general opening salutations and closing sign-offs according to the active Tone,
-     * while strictly protecting Islamic greetings (which are safely shielded in Layer 1).
+     * while strictly protecting Islamic greetings and preserving addressed entities/names.
      */
     harmonizeSalutationsAndClosings(lines, tone, lang) {
         if (!lines || lines.length === 0) return lines;
@@ -618,9 +488,12 @@ class TextHumanizer {
         const targetOpening = langPack.openings[tone];
         const targetClosing = langPack.closings[tone];
 
-        // Comprehensive universal general greeting pattern (Indonesian & English)
-        // Matches salutations with optional trailing recipient/qualification, ending with punctuation or boundary
-        const generalGreetingRegex = /^(?:(?:kepada\s+)?(?:yth\.?|yang\s+terhormat)(?:\s+[^,\.!:;\n]+)?|selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)(?:\s+[^,\.!:;\n]+)?|salam\s+(?:sejahtera|kebajikan|hangat|redaksi|akademis|pembuka|kenal|hormat|santun|mahasiswa|olahraga|sehat|komando|sahabat)(?:\s+[^,\.!:;\n]+)?|salam(?:\s+[^,\.!:;\n]+)?|halo(?:\s+[^,\.!:;\n]+)?|hai(?:\s+[^,\.!:;\n]+)?|dear\s+[^,\.!:;\n]+|dengan\s+hormat(?:\s+[^,\.!:;\n]+)?|good\s+(?:morning|afternoon|evening|day)(?:\s+[^,\.!:;\n]+)?|hello(?:\s+[^,\.!:;\n]+)?|hi(?:\s+[^,\.!:;\n]+)?|greetings(?:\s+[^,\.!:;\n]+)?|to\s+whom\s+it\s+may\s+concern)(?:[,\.!:;]|\s*(?=[A-Z0-9]|$))/i;
+        // Specific recipient title check: If greeting addresses a specific person, company, or institution, NEVER overwrite it!
+        const hasSpecificRecipient = (str) => {
+            return /\b(?:Direktur|Dekan|Rektor|Pimpinan|Ketua|Manager|Kepala|Tutor|Dosen|Bapak|Ibu|Sdr|Dr|Ir|Prof|PT|CV|Instansi|Dinas|Menteri|Bupati|Gubernur|Walikota)\b/i.test(str);
+        };
+
+        const bareGreetingRegex = /^(?:selamat\s+(?:pagi|siang|sore|malam|sejahtera|datang)|salam\s+(?:sejahtera|hangat|redaksi)|halo|hai|dear\s+all|good\s+(?:morning|afternoon|evening|day)|hello|hi|greetings)[,\.!:;]?$/i;
 
         // 1. Detect and harmonize opening greeting (within first 5 non-empty lines)
         let nonEmptiesFound = 0;
@@ -630,52 +503,47 @@ class TextHumanizer {
             if (!trimmed) continue;
             nonEmptiesFound++;
 
-            // If line contains an Islamic greeting token
+            // If line contains an Islamic greeting token, keep 100% intact
             if (/__ANTISLOP_ISLAMIC_TOKEN_\d+__/.test(trimmed)) {
-                // If it ALSO has a general greeting on the same line, e.g. "__ANTISLOP_ISLAMIC_TOKEN_0__, Selamat pagi Tutor UT..."
-                const matchCombo = trimmed.match(/^(__ANTISLOP_ISLAMIC_TOKEN_\d+__[\s,]*)(.+)$/i);
-                if (matchCombo) {
-                    const postIslamic = matchCombo[2].trim();
-                    const greetingMatch = postIslamic.match(generalGreetingRegex);
-                    if (greetingMatch && targetOpening) {
-                        const remainder = postIslamic.slice(greetingMatch[0].length).trim();
-                        const leadingWhitespace = (rawLine.match(/^[ \t]*/) || [""])[0];
-                        lines[i] = leadingWhitespace + matchCombo[1].trim() + (matchCombo[1].trim().endsWith(',') ? ' ' : ', ') + targetOpening + (remainder ? "\n\n" + remainder : "");
-                        break;
-                    }
-                }
-                // If line only contains Islamic greeting, keep it 100% intact and continue checking subsequent lines for general greeting
                 continue;
             }
 
-            // General greeting check on non-Islamic line
-            const greetingMatch = trimmed.match(generalGreetingRegex);
-            if (greetingMatch && targetOpening) {
-                const remainder = trimmed.slice(greetingMatch[0].length).trim();
+            // If line contains a protected entity token (e.g. Yth. Bapak Direktur PT ...)
+            if (/__ANTISLOP_TOKEN_\d+__/.test(trimmed)) {
+                continue;
+            }
+
+            // If line addresses a specific entity or recipient, preserve it!
+            if (hasSpecificRecipient(trimmed)) {
+                continue;
+            }
+
+            // Only adapt bare generic greeting formulas without a specific recipient
+            if (bareGreetingRegex.test(trimmed) && targetOpening) {
                 const leadingWhitespace = (rawLine.match(/^[ \t]*/) || [""])[0];
-                lines[i] = leadingWhitespace + targetOpening + (remainder ? "\n\n" + remainder : "");
+                lines[i] = leadingWhitespace + targetOpening;
                 break;
             }
 
-            // If line is substantive body content (> 80 chars) and does not look like an opening, stop searching
-            if (trimmed.length > 80 && !/^(?:assalamu|salam|yth|selamat|halo|hai|dear|dengan|izin)/i.test(trimmed)) {
+            // If line is substantive body content (> 60 chars) and does not look like an opening, stop searching
+            if (trimmed.length > 60 && !/^(?:salam|yth|selamat|halo|hai|dear|dengan)/i.test(trimmed)) {
                 break;
             }
         }
 
         // 2. Detect and harmonize closing remark (within last 5 non-empty lines)
-        const generalClosingRegex = /(?:demikian(?:\s+(?:yang\s+dapat\s+kami\s+sampaikan|tanggapan\s+(?:dari\s+saya|yang\s+dapat\s+saya\s+sampaikan)|uraian\s+ini|kajian\s+ini|laporan\s+ini|ulasan\s+ini)[^.\n]*)?\.?\s*(?:terima\s+kasih|mohon\s+masukan[^.\n]*)*|terima\s+kasih(?:\s+banyak|\s+atas\s+perhatiannya|\s+atas\s+kerjasamanya|\s+semuanya)?[^.\n]*|sekian(?:\s+dan\s+terima\s+kasih|\s+dari\s+saya|\s+dulu)?[^.\n]*|hormat\s+(?:kami|saya)[^.\n]*|salam\s+hangat[^.\n]*|best\s+regards[^.\n]*|warm\s+regards[^.\n]*|sincerely[^.\n]*|thanks(?:\s+a\s+lot|\s+and\s+regards)?[^.\n]*|thank\s+you(?:\s+very\s+much)?[^.\n]*)\.?$/i;
+        const bareClosingRegex = /^(?:demikian(?:\s+terima\s+kasih)?|sekian(?:\s+dan\s+terima\s+kasih)?|terima\s+kasih|hormat\s+(?:kami|saya)|salam\s+hangat|best\s+regards|warm\s+regards|sincerely|thanks|thank\s+you)\.?$/i;
 
         for (let i = lines.length - 1; i >= Math.max(0, lines.length - 5); i--) {
             const rawLine = lines[i];
             const trimmed = rawLine.trim();
             if (!trimmed) continue;
 
-            // If line contains an Islamic greeting token, keep it intact
             if (/__ANTISLOP_ISLAMIC_TOKEN_\d+__/.test(trimmed)) continue;
+            if (/__ANTISLOP_TOKEN_\d+__/.test(trimmed)) continue;
 
-            const isGeneralClosing = generalClosingRegex.test(trimmed);
-            if (isGeneralClosing && targetClosing) {
+            // Only adapt bare generic closing sign-offs if target closing is defined
+            if (bareClosingRegex.test(trimmed) && targetClosing) {
                 const leadingWhitespace = (rawLine.match(/^[ \t]*/) || [""])[0];
                 lines[i] = leadingWhitespace + targetClosing;
                 break;
@@ -686,7 +554,7 @@ class TextHumanizer {
     }
 
     /**
-     * MAIN HUMANIZATION PIPELINE
+     * MAIN REWRITING PIPELINE
      * Transforms input text into natural, fluent human prose across all topics.
      */
     humanize(text, options = {}) {
@@ -699,33 +567,31 @@ class TextHumanizer {
 
         if (!text || !text.trim()) return "";
 
-        const effectiveIntensity = isNeural ? 'ultra' : intensity;
-
-        // LAYER 1: Token Protection Guard (Islamic greetings, acronyms, numbers, quotes)
+        // LAYER 1: Token Protection Guard (Islamic greetings, acronyms, numbers, legal references, citations)
         const { text: guardedText, tokens } = this.protectTokens(text);
 
         // Split text by lines to preserve 100% of enters, newlines, and paragraph structures
         let lines = guardedText.split(/\r?\n/);
 
-        // Harmonize non-Islamic greetings and closings according to the active Tone
+        // Harmonize bare greetings and closings according to active Tone
         lines = this.harmonizeSalutationsAndClosings(lines, tone, lang);
         lines = lines.join('\n').split(/\r?\n/);
 
         const transformedLines = [];
 
         for (const line of lines) {
-            // If the line is empty or purely whitespace, preserve it exactly (maintains double enters / blank lines)
+            // Preserve empty lines
             if (line.trim().length === 0) {
                 transformedLines.push(line);
                 continue;
             }
 
-            // Preserve leading indentation / whitespace (e.g. tabs or spaces)
+            // Preserve leading whitespace
             const leadingWhitespaceMatch = line.match(/^[ \t]*/);
             const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : "";
             const trimmedLine = line.slice(leadingWhitespace.length);
 
-            // Preserve list prefixes (e.g. "1. ", "a) ", "- ", "• ")
+            // Preserve list prefixes
             const listPrefixMatch = trimmedLine.match(/^(\d+[\.\)]\s*|[-*•]\s*|[a-zA-Z][\.\)]\s*)/);
             let listPrefix = "";
             let contentToProcess = trimmedLine;
@@ -735,57 +601,54 @@ class TextHumanizer {
                 contentToProcess = trimmedLine.slice(listPrefix.length);
             }
 
-            // Check if line is a header / title / label (e.g., "Asumsi Tambahan:", "Catatan:", "### Header")
-            // Preserve headers verbatim to prevent corrupting titles or section labels
+            // Preserve headers verbatim
             const isHeaderOrLabel = /^#{1,6}\s+/.test(contentToProcess) || /^[A-Za-z0-9\s]{1,35}:$/.test(contentToProcess.trim());
             if (isHeaderOrLabel) {
                 transformedLines.push(leadingWhitespace + listPrefix + contentToProcess);
                 continue;
             }
 
-            // Step 1: Split into individual sentences within this line
+            // Step 1: Split into individual sentences
             let sentences = this.splitSentences(contentToProcess);
 
-            // Step 2: Layer 2 - Multi-Word Semantic Collocations ("Similar Means")
-            sentences = sentences.map(s => this.applySimilarMeans(s, lang, effectiveIntensity));
+            // Step 2: Semantic Collocations ("Similar Means")
+            sentences = sentences.map(s => this.applySimilarMeans(s, lang, intensity));
 
-            // Step 3: Layer 3 - De-Slop Cliché & Formulaic AI Removal
+            // Step 3: Cliché & Pleonasm Removal
             sentences = sentences.map(s => this.replaceCliches(s, lang, tone));
 
-            // Step 4: Layer 4 - Dynamic Burstiness & Syntactic Restructuring
-            sentences = this.modulateBurstiness(sentences, tone, lang, effectiveIntensity);
+            // Step 4: Sentence Cadence Refinement
+            sentences = this.modulateBurstiness(sentences, tone, lang, intensity);
 
-            // Step 5: Layer 5 - Deep Context-Safe Lexical Humanization (350+ Dictionary)
-            sentences = sentences.map(s => this.injectPerplexity(s, lang, effectiveIntensity, isNeural));
+            // Step 5: Diction & Clarity Refinement
+            sentences = sentences.map(s => this.injectPerplexity(s, lang, intensity, isNeural));
 
-            // Step 6: Layer 6 - Tone Voice Modulation
-            sentences = this.applyToneStyling(sentences, tone, lang, effectiveIntensity);
+            // Step 6: Tone Voice Modulation
+            sentences = this.applyToneStyling(sentences, tone, lang, intensity);
 
-            // Reassemble line with its original indentation and list prefix
+            // Reassemble line
             const processedContent = sentences.join(' ');
             transformedLines.push(leadingWhitespace + listPrefix + processedContent);
         }
 
         let result = transformedLines.join('\n');
 
-        // LAYER 7: Post-Processing & Token Restoration
+        // LAYER 7: Token Restoration & Post-Processing
         result = this.restoreTokens(result, tokens);
 
-        // Normalize spacing: ONLY touch horizontal whitespace (spaces/tabs)!
-        // NEVER replace \n or \r!
         result = result
-            .replace(/,\s*,+/g, ',') // Clean up accidental duplicate commas
-            .replace(/\.\s*\.+/g, '.') // Clean up accidental duplicate periods
-            .replace(/,\s*\./g, '.') // Clean comma-period artifact: cliché trailing comma + sentence period
+            .replace(/,\s*,+/g, ',')
+            .replace(/\.\s*\.+/g, '.')
+            .replace(/,\s*\./g, '.')
             .replace(/\bsecara\s+secara\b/gi, 'secara')
             .replace(/\bdalam\s+dalam\b/gi, 'dalam')
             .replace(/\byang\s+yang\b/gi, 'yang')
-            .replace(/\b([a-zA-Z\u00C0-\u024F]{3,})\s+\1\b/gi, '$1') // Clean duplicate words (3+ chars)
-            .replace(/\b([a-zA-Z\u00C0-\u024F]+)\s+(?:serta|dan)\s+\1\b/gi, '$1') // Clean X dan X
+            .replace(/\b([a-zA-Z\u00C0-\u024F]{3,})\s+\1\b/gi, '$1')
+            .replace(/\b([a-zA-Z\u00C0-\u024F]+)\s+(?:serta|dan)\s+\1\b/gi, '$1')
             .replace(/[ \t]+([,\.!\?;:])/g, '$1')
             .replace(/([,\.!\?;:])([a-zA-Zà-ž])/g, '$1 $2')
             .replace(/[ \t]{2,}/g, ' ')
-            .replace(/[ \t]+$/gm, '') // Remove trailing whitespace on each line
+            .replace(/[ \t]+$/gm, '')
             .trim();
 
         return result;

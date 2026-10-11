@@ -1,50 +1,48 @@
 /**
- * AI Text Detector Simulator (Turnitin & GPTZero Heuristic Engine)
- * Analyzes Perplexity, Burstiness, Repetitive n-grams, and AI markers.
+ * Writing Quality Evaluator (formerly AIDetector)
+ * Provides transparent, heuristic-based writing quality analysis:
+ * - Sentence Cadence & Variety (Burstiness / Standard Deviation)
+ * - Lexical Diversity (Type-Token Ratio - TTR)
+ * - Readability & Flow (Flesch / Average Sentence Length)
+ * - Formulaic AI Cliché & Padding Detection
+ * - Structural & Factual Integrity Check
+ *
+ * NOTE: This module provides transparent editorial heuristics. It does not
+ * claim to predict proprietary black-box classifiers (Turnitin, GPTZero, etc.).
  */
 
 class AIDetector {
     constructor() {
-        this.aiWordList = [
-            'furthermore', 'moreover', 'in conclusion', 'delve', 'delving', 'testament',
-            'pivotal', 'beacon', 'tapestry', 'holistic', 'synergy', 'paramount', 'underscores',
-            'multifaceted', 'crucial role', 'vital role', 'seamlessly', 'foster', 'realm',
-            'vibrant', 'intertwined', 'embarks', 'cornerstone', 'krusial', 'menyelami',
-            'tidak dapat dipungkiri', 'kesimpulannya', 'landasan utama', 'memegang peranan',
-            'memainkan peran', 'komprehensif', 'holistik', 'era digital', 'bukti nyata',
-            'secara keseluruhan', 'oleh karena itu, sangat', 'berdasarkan ilustrasi',
-            'sebagai seorang', 'alasan utamanya adalah', 'memiliki asumsi dasar',
-            'asumsi dasar yang sangat ketat', 'yakni menganggap bahwa', 'hanya dipengaruhi oleh',
-            'satu faktor risiko sistematis tunggal', 'sedang beraksi', 'di sinilah',
-            'tidak mengikat investor', 'hal ini membuktikan bahwa', 'hal ini menunjukkan bahwa',
-            'merupakan salah satu', 'dapat disimpulkan bahwa', 'dalam era modern',
-            'adalah merupakan', 'sangat penting untuk diperhatikan', 'dalam rangka mencapai tujuan',
-            'memiliki peranan yang sangat penting', 'dapat ditarik kesimpulan bahwa',
-            'tidak dapat dielakkan bahwa', 'tujuan utama dari penulisan', 'memberikan implikasi yang signifikan',
-            'menghadapi berbagai macam tantangan', 'serves as a reminder', 'paves the way for',
-            'sheds light on', 'with the advent of', 'at the forefront of', 'serves as a cornerstone',
-            'cenderung lekas', 'ramah dipahami', 'perguruan signifikan',
-            // September 2026 Multi-Detector Triggers
-            'dalam era transformasi digital', 'perlu digarisbawahi bahwa', 'pada hakikatnya',
-            'tidak dapat disangkal bahwa', 'memiliki peran yang tak terelakkan', 'merupakan instrumen fundamental',
-            'mencerminkan komitmen mendalam', 'dalam lanskap teknologi saat ini', 'secara garis besar dapat disimpulkan',
-            'patut dicatat bahwa', 'memegang peranan krusial', 'memberikan kontribusi yang signifikan',
-            'menjadi bukti nyata dari', 'merupakan salah satu aspek kunci', 'pada dasarnya dapat dipahami',
-            'dalam konteks ini dapat dikatakan', 'langkah strategis yang harus diambil',
-            "in today's rapidly evolving", 'it is imperative to note', 'delves into the multifaceted',
+        this.formulaicPatterns = [
+            // English Clichés
+            'furthermore', 'moreover', 'in conclusion', 'delve into', 'delving into', 'testament to',
+            'pivotal role', 'beacon of', 'rich tapestry', 'holistic approach', 'synergy', 'paramount importance',
+            'multifaceted nature', 'vital role in', 'seamlessly integrated', 'foster an environment',
+            'in today\'s fast-paced world', 'in the modern era', 'game-changer', 'serves as a reminder',
+            'paves the way for', 'sheds light on', 'at the forefront of', 'serves as a cornerstone',
+            'in today\'s rapidly evolving', 'it is imperative to note', 'delves into the multifaceted',
             'plays a pivotal role in shaping', 'undeniably highlights the significance',
-            'it is crucial to recognize that', 'fosters an environment of', 'by leveraging these insights',
-            'in this comprehensive overview', 'navigating the complexities of', 'a nuanced understanding of'
+            'it is crucial to recognize that', 'by leveraging these insights', 'navigating the complexities of',
+
+            // Indonesian Formulaic Phrases & Padding
+            'tidak dapat dipungkiri bahwa', 'perlu diketahui bahwa', 'perlu dicatat bahwa',
+            'merupakan hal yang sangat krusial', 'memainkan peranan yang sangat penting',
+            'memainkan peran penting dalam', 'adalah merupakan', 'sangat penting untuk diperhatikan',
+            'dalam rangka mencapai tujuan', 'dalam rangka untuk', 'memberikan kontribusi yang signifikan',
+            'memberikan implikasi yang signifikan', 'dalam era modern ini', 'dalam era transformasi digital',
+            'pada hakikatnya dapat dipahami', 'secara garis besar dapat disimpulkan',
+            'patut dicatat bahwa', 'memegang peranan krusial', 'menjadi bukti nyata dari',
+            'merupakan salah satu aspek kunci', 'dalam konteks ini dapat dikatakan',
+            'langkah strategis yang harus diambil', 'menyelami dunia digital', 'komprehensif dan holistik',
+            'sinergi antara', 'pola pikir yang inovatif', 'menandai babak baru', 'menuju masa depan yang lebih cerah'
         ];
     }
 
     /**
-     * Splits text into individual sentences accurately across punctuations,
-     * protecting abbreviations (Yth., Dr., dsb., etc.) from causing false splits.
+     * Splits text into sentences accurately, protecting abbreviations and numbers.
      */
     getSentences(text) {
         if (!text || !text.trim()) return [];
-        // Protect common abbreviations and numeric periods by temporarily replacing their periods
         const protectedText = text
             .replace(/\b(Yth|Dr|Ir|Prof|No|e\.g|i\.e|dsb|dll|dst)\./gi, '$1__DOT__')
             .replace(/(\d+)\.(\d+)/g, '$1__NUMDOT__$2')
@@ -59,97 +57,109 @@ class AIDetector {
     }
 
     /**
-     * Calculates sentence length variation (Burstiness).
-     * Filter out short greetings or single-word titles to avoid skewing.
+     * Calculates sentence length variation (Sentence Cadence / Variety).
      */
-    calculateBurstiness(sentences) {
+    calculateSentenceVariety(sentences) {
         const bodySentences = sentences.filter(s => {
             const words = s.split(/\s+/).filter(Boolean);
             return words.length >= 4 && !/^(assalamu|yth|selamat|halo|dear)/i.test(s);
         });
 
-        if (bodySentences.length <= 1) return { score: 60, sd: 5 };
+        if (bodySentences.length <= 1) {
+            return { score: 65, sd: 4.5, label: 'Seragam (Teks Pendek)', category: 'moderate' };
+        }
 
         const wordCounts = bodySentences.map(s => s.split(/\s+/).filter(Boolean).length);
         const mean = wordCounts.reduce((a, b) => a + b, 0) / wordCounts.length;
         const variance = wordCounts.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / wordCounts.length;
         const sd = Math.sqrt(variance);
 
-        // Standard deviation > 8 indicates high burstiness (very human)
-        // SD < 4 indicates mechanical, robotic consistency (AI)
-        let burstinessScore = Math.min(100, Math.max(10, Math.round((sd / 8.5) * 100)));
-        return { score: burstinessScore, sd: Math.round(sd * 10) / 10 };
+        // Natural human writing typically exhibits SD between 5.0 and 11.0 words
+        let varietyScore = Math.min(100, Math.max(20, Math.round((sd / 8.0) * 85)));
+        let label = 'Seimbang';
+        let category = 'balanced';
+
+        if (sd >= 7.0) {
+            label = `Tinggi & Dinamis (SD: ${sd.toFixed(1)})`;
+            category = 'high';
+        } else if (sd >= 4.0) {
+            label = `Seimbang Alami (SD: ${sd.toFixed(1)})`;
+            category = 'balanced';
+        } else {
+            label = `Cenderung Monoton (SD: ${sd.toFixed(1)})`;
+            category = 'monotonous';
+        }
+
+        return { score: varietyScore, sd: Math.round(sd * 10) / 10, label, category };
     }
 
     /**
-     * Calculates vocabulary diversity (Type-Token Ratio / Perplexity proxy).
+     * Calculates lexical diversity using Type-Token Ratio (TTR).
      */
-    calculatePerplexity(text) {
+    calculateLexicalDiversity(text) {
         const words = text.toLowerCase().match(/\b[a-zA-Zà-ž0-9_-]+\b/g) || [];
-        if (words.length === 0) return { score: 50, ttr: 0.5 };
+        if (words.length === 0) return { score: 50, ttr: 0.5, label: 'N/A' };
 
         const uniqueWords = new Set(words);
         const ttr = uniqueWords.size / words.length;
 
-        let perplexityScore = Math.min(100, Math.max(15, Math.round(ttr * 110)));
-        return { score: perplexityScore, ttr: Math.round(ttr * 100) / 100 };
+        // Realistic TTR: 0.40 - 0.75 is normal for rich texts
+        let diversityScore = Math.min(100, Math.max(20, Math.round(ttr * 125)));
+        let label = 'Cukup Beragam';
+
+        if (ttr >= 0.60) {
+            label = `Kaya & Unik (TTR: ${ttr.toFixed(2)})`;
+        } else if (ttr >= 0.42) {
+            label = `Seimbang (TTR: ${ttr.toFixed(2)})`;
+        } else {
+            label = `Banyak Pengulangan (TTR: ${ttr.toFixed(2)})`;
+        }
+
+        return { score: diversityScore, ttr: Math.round(ttr * 100) / 100, label };
     }
 
     /**
-     * Checks sentence against AI buzzwords and rhythmic markers.
+     * Checks sentence against known formulaic clichés and rhythmic markers.
      */
     analyzeSentence(sentence) {
         const lower = sentence.toLowerCase().trim();
-        let matches = [];
+        const matches = [];
 
-        this.aiWordList.forEach(word => {
-            if (lower.includes(word.toLowerCase())) {
-                matches.push(word);
+        this.formulaicPatterns.forEach(pattern => {
+            if (lower.includes(pattern.toLowerCase())) {
+                matches.push(pattern);
             }
         });
 
         const words = sentence.split(/\s+/).filter(Boolean);
         const wordCount = words.length;
 
-        // Greetings and salutations are naturally human
         const isGreeting = /^(assalamu|yth|selamat\s+(pagi|siang|sore|malam|sejahtera)|halo|hai|dear|with\s+regards)/i.test(lower);
         if (isGreeting) {
             return {
                 text: sentence,
                 wordCount,
                 matches: [],
-                aiScore: 5,
-                humanScore: 95,
+                qualityScore: 92,
                 label: 'human'
             };
         }
 
-        // Robotic rhythm check: AI sentences tend to sit between 16 and 32 words with heavy clauses
-        const isRoboticLength = wordCount >= 16 && wordCount <= 32;
-
-        // Base AI probability: typical neutral prose sits at 20-30%
-        let aiProb = 25;
-
+        // Quality estimation for individual sentence
+        let qualityScore = 85;
         if (matches.length > 0) {
-            aiProb = 60 + (matches.length * 20);
+            qualityScore -= (matches.length * 20);
+        }
+        if (wordCount > 35) {
+            qualityScore -= 10; // overly bloated
         }
 
-        if (isRoboticLength && matches.length > 0) {
-            aiProb += 15;
-        }
-
-        // Check for ChatGPT explanatory transitions
-        if (/^(berdasarkan|alasan utamanya|ketika kondisi|dalam era|sebagai kesimpulan|kesimpulannya|dengan demikian|oleh karena itu|tidak dapat dipungkiri)/i.test(lower)) {
-            aiProb += 15;
-        }
-
-        aiProb = Math.min(99, Math.max(3, aiProb));
-        const humanProb = 100 - aiProb;
+        qualityScore = Math.min(98, Math.max(25, qualityScore));
 
         let label = 'human';
-        if (aiProb >= 60) {
-            label = 'ai';
-        } else if (aiProb >= 35) {
+        if (qualityScore < 55) {
+            label = 'ai'; // formulaic / needs improvement
+        } else if (qualityScore < 75) {
             label = 'mixed';
         }
 
@@ -157,23 +167,28 @@ class AIDetector {
             text: sentence,
             wordCount,
             matches,
-            aiScore: aiProb,
-            humanScore: humanProb,
+            qualityScore,
+            humanScore: qualityScore,
+            aiScore: 100 - qualityScore,
             label
         };
     }
 
     /**
-     * Comprehensive text analysis returning complete detector verdict.
+     * Comprehensive writing quality evaluation.
      */
-    analyze(text) {
+    analyze(text, referenceOriginalText = null) {
         if (!text || !text.trim()) {
             return {
-                aiScore: 0,
+                qualityScore: 100,
                 humanScore: 100,
-                burstiness: { score: 100, sd: 0, label: 'Normal' },
-                perplexity: { score: 100, ttr: 1, label: 'Normal' },
+                aiScore: 0,
+                burstiness: { score: 100, sd: 0, label: 'N/A' },
+                perplexity: { score: 100, ttr: 1, label: 'N/A' },
+                lexicalDiversity: { score: 100, ttr: 1, label: 'N/A' },
                 readability: 'N/A',
+                clicheCount: 0,
+                detectedCliches: [],
                 sentences: [],
                 wordCount: 0,
                 charCount: 0
@@ -182,70 +197,75 @@ class AIDetector {
 
         const sentences = this.getSentences(text);
         const words = text.match(/\b\S+\b/g) || [];
-        const burstiness = this.calculateBurstiness(sentences);
-        const perplexity = this.calculatePerplexity(text);
-
+        const variety = this.calculateSentenceVariety(sentences);
+        const diversity = this.calculateLexicalDiversity(text);
         const analyzedSentences = sentences.map(s => this.analyzeSentence(s));
 
-        // Aggregate AI probability
-        let totalAi = 0;
-        let aiClicheCount = 0;
-
+        // Aggregate formulaic clichés
+        const detectedCliches = [];
         analyzedSentences.forEach(s => {
-            totalAi += s.aiScore;
-            aiClicheCount += s.matches.length;
+            s.matches.forEach(m => {
+                if (!detectedCliches.includes(m)) detectedCliches.push(m);
+            });
         });
 
-        let avgAiScore = sentences.length > 0 ? Math.round(totalAi / sentences.length) : 25;
+        // Readability estimate based on average sentence length
+        const avgSentenceLength = words.length / (sentences.length || 1);
+        let readability = 'Mengalir Alami';
+        if (avgSentenceLength < 12) readability = 'Sangat Mudah Dipahami';
+        else if (avgSentenceLength < 20) readability = 'Mengalir Alami';
+        else if (avgSentenceLength < 28) readability = 'Akademik & Berbobot';
+        else readability = 'Padat & Kompleks';
 
-        // If strong AI clichés were detected, reinforce high AI probability (ZeroGPT mimic)
-        if (aiClicheCount >= 3) {
-            avgAiScore = Math.max(88, avgAiScore);
-        } else if (aiClicheCount >= 1) {
-            avgAiScore = Math.max(72, avgAiScore);
+        // Honest composite Natural Quality Score (0-100)
+        let composite = 82;
+
+        // Reward sentence variety
+        if (variety.category === 'high') composite += 6;
+        else if (variety.category === 'monotonous') composite -= 8;
+
+        // Reward lexical diversity
+        if (diversity.ttr >= 0.55) composite += 6;
+        else if (diversity.ttr < 0.35) composite -= 8;
+
+        // Penalize formulaic clichés
+        if (detectedCliches.length === 0) {
+            composite += 6;
         } else {
-            // No AI cliches present: Reward burstiness and perplexity
-            if (burstiness.score >= 60) avgAiScore -= 15;
-            else if (burstiness.score >= 35) avgAiScore -= 8;
-
-            if (perplexity.score >= 60) avgAiScore -= 12;
-            else if (perplexity.score >= 40) avgAiScore -= 6;
+            composite -= Math.min(25, detectedCliches.length * 7);
         }
 
-        // Bound to realistic percentages
-        let finalAiScore = Math.min(98, Math.max(2, Math.round(avgAiScore)));
-        let finalHumanScore = 100 - finalAiScore;
-
-        // Readability estimate (Flesch Reading Ease approximation)
-        const avgSentenceLength = words.length / (sentences.length || 1);
-        let readability = 'Sedang';
-        if (avgSentenceLength < 12) readability = 'Sangat Mudah';
-        else if (avgSentenceLength < 18) readability = 'Mudah & Mengalir';
-        else if (avgSentenceLength < 25) readability = 'Menengah (Akademik)';
-        else readability = 'Kompleks / Padat';
+        // Bounded honestly between 30 and 96
+        const finalQuality = Math.min(96, Math.max(30, Math.round(composite)));
 
         return {
-            aiScore: finalAiScore,
-            humanScore: finalHumanScore,
+            qualityScore: finalQuality,
+            humanScore: finalQuality,
+            aiScore: 100 - finalQuality,
+            // Keep backwards-compatible property names for existing UI widgets
             burstiness: {
-                score: burstiness.score,
-                sd: burstiness.sd,
-                label: burstiness.score >= 65 ? 'Tinggi (Alami)' : burstiness.score >= 40 ? 'Sedang' : 'Rendah (Robotik)'
+                score: variety.score,
+                sd: variety.sd,
+                label: variety.label
             },
             perplexity: {
-                score: perplexity.score,
-                ttr: perplexity.ttr,
-                label: perplexity.score >= 65 ? 'Kaya & Unik' : perplexity.score >= 40 ? 'Cukup Beragam' : 'Monoton'
+                score: diversity.score,
+                ttr: diversity.ttr,
+                label: diversity.label
             },
+            lexicalDiversity: diversity,
             readability,
+            clicheCount: detectedCliches.length,
+            detectedCliches,
             sentences: analyzedSentences,
             wordCount: words.length,
             charCount: text.length,
-            readingTimeMin: Math.ceil(words.length / 200)
+            readingTimeMin: Math.max(1, Math.ceil(words.length / 200))
         };
     }
 }
 
 if (typeof window !== 'undefined') {
     window.AIDetector = AIDetector;
+    window.WritingQualityEvaluator = AIDetector;
 }

@@ -104,7 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
         btnDownloadTxt:  document.getElementById('btnDownloadTxt'),
         btnDownloadDocx: document.getElementById('btnDownloadDocx'),
         downloadMenu:    document.getElementById('downloadMenu'),
-        downloadMenuWrap: document.getElementById('downloadMenuWrap')
+        downloadMenuWrap: document.getElementById('downloadMenuWrap'),
+
+        // Settings, Two-Pass & Voice Profile
+        twoPassCheckbox:     document.getElementById('twoPassCheckbox'),
+        toggleVoiceProfile:  document.getElementById('toggleVoiceProfile'),
+        voiceProfilePanel:   document.getElementById('voiceProfilePanel'),
+        voiceAudienceInput:  document.getElementById('voiceAudienceInput'),
+        voicePreferredInput: document.getElementById('voicePreferredInput'),
+        voiceAvoidInput:     document.getElementById('voiceAvoidInput'),
+        voiceSampleTextarea: document.getElementById('voiceSampleTextarea'),
+        btnClearApiConfig:   document.getElementById('btnClearApiConfig'),
+        qualityStatusBadge:  document.getElementById('qualityStatusBadge')
     };
 
     // 4. Initialize Theme (3-Mode: system / light / dark)
@@ -237,26 +248,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2800);
     }
 
-    // 7. Circular Gauge Update
-    function updateScoreGauge(humanScore) {
+    // 7. Circular Gauge Update (Honest Natural Quality Score)
+    function updateScoreGauge(score) {
         if (!elements.gaugeCircle || !elements.gaugeText) return;
         const radius = 38;
         const circumference = 2 * Math.PI * radius;
-        const offset = circumference - (humanScore / 100) * circumference;
+        const offset = circumference - (score / 100) * circumference;
 
         elements.gaugeCircle.style.strokeDasharray = `${circumference}`;
         elements.gaugeCircle.style.strokeDashoffset = `${offset}`;
 
-        let color = '#10b981'; // Green for > 85%
-        if (humanScore < 50) color = '#ef4444'; // Red
-        else if (humanScore < 80) color = '#f59e0b'; // Amber
+        let color = '#10b981'; // Green for >= 80%
+        if (score < 60) color = '#ef4444'; // Red
+        else if (score < 80) color = '#6366f1'; // Indigo
 
         elements.gaugeCircle.style.stroke = color;
-        elements.gaugeText.textContent = `${humanScore}%`;
+        elements.gaugeText.textContent = `${score}%`;
         elements.gaugeText.style.color = color;
 
         if (elements.aiRiskScore) {
-            elements.aiRiskScore.textContent = `${100 - humanScore}% Probabilitas AI`;
+            elements.aiRiskScore.textContent = `Indeks Kualitas Alami: ${score}/100`;
+        }
+
+        if (elements.qualityStatusBadge) {
+            if (score >= 85) {
+                elements.qualityStatusBadge.textContent = 'Mengalir Alami';
+                elements.qualityStatusBadge.className = 'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold';
+            } else if (score >= 70) {
+                elements.qualityStatusBadge.textContent = 'Cukup Alami';
+                elements.qualityStatusBadge.className = 'px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 text-xs font-bold';
+            } else {
+                elements.qualityStatusBadge.textContent = 'Perlu Penyelarasan';
+                elements.qualityStatusBadge.className = 'px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-bold';
+            }
         }
     }
 
@@ -269,15 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.inputCharCount.textContent = `${text.length} karakter`;
 
         if (words === 0) {
-            updateScoreGauge(100);
+            updateScoreGauge(88);
             return;
         }
 
-        // Fast analysis of input
         const analysis = detector.analyze(text);
         if (!elements.outputText.value) {
-            // Show input's estimated score before conversion
-            updateScoreGauge(analysis.humanScore);
+            updateScoreGauge(analysis.qualityScore);
             updateMetricBadges(analysis);
         }
     }
@@ -285,14 +307,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateMetricBadges(analysis) {
         if (elements.burstinessBadge) {
             elements.burstinessBadge.textContent = analysis.burstiness.label;
-            elements.burstinessBadge.className = `px-2 py-0.5 rounded text-xs font-semibold ${
-                analysis.burstiness.score >= 60 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+            elements.burstinessBadge.className = `inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                analysis.burstiness.sd >= 6.0
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : (analysis.burstiness.sd >= 3.5
+                        ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300')
             }`;
         }
         if (elements.perplexityBadge) {
             elements.perplexityBadge.textContent = analysis.perplexity.label;
-            elements.perplexityBadge.className = `px-2 py-0.5 rounded text-xs font-semibold ${
-                analysis.perplexity.score >= 60 ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300' : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
+            elements.perplexityBadge.className = `inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                analysis.perplexity.ttr >= 0.55
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : (analysis.perplexity.ttr >= 0.40
+                        ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300')
             }`;
         }
         if (elements.readabilityBadge) {
@@ -312,19 +342,29 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.modeBtnNeural?.classList.remove('text-slate-600', 'dark:text-slate-300');
             elements.modeBtnOffline?.classList.remove('active');
             elements.modeBtnOffline?.classList.add('text-slate-600', 'dark:text-slate-300');
+
+            const hasApiKey = !!apiService.config.apiKey && apiService.config.provider !== 'offline';
             if (elements.engineStatusLabel) {
-                elements.engineStatusLabel.textContent = "Mode Neural AI Aktif (Restrukturisasi Mendalam)";
+                elements.engineStatusLabel.textContent = hasApiKey
+                    ? `Mode Neural AI Aktif (${apiService.config.provider.toUpperCase()} LLM Cloud)`
+                    : "Mode Neural AI (API Key belum diisi di Pengaturan)";
             }
-            if (!silent) showToast("Mode Neural AI Aktif: Restrukturisasi mendalam");
+            if (!silent) {
+                if (hasApiKey) {
+                    showToast(`Mode Neural AI Aktif: Terhubung ke ${apiService.config.provider.toUpperCase()}`);
+                } else {
+                    showToast("Mode Neural AI dipilih. Buka Pengaturan untuk memasukkan API Key.", "warning");
+                }
+            }
         } else {
             elements.modeBtnOffline?.classList.add('active');
             elements.modeBtnOffline?.classList.remove('text-slate-600', 'dark:text-slate-300');
             elements.modeBtnNeural?.classList.remove('active');
             elements.modeBtnNeural?.classList.add('text-slate-600', 'dark:text-slate-300');
             if (elements.engineStatusLabel) {
-                elements.engineStatusLabel.textContent = "Mode Engine Cepat Aktif (Pemrosesan lokal instan)";
+                elements.engineStatusLabel.textContent = "Mode Editor Lokal Aktif (Offline & di Perangkat)";
             }
-            if (!silent) showToast("Mode Engine Cepat Aktif: Berjalan offline tanpa kuota internet");
+            if (!silent) showToast("Mode Editor Lokal Aktif: Berjalan offline tanpa kuota internet");
         }
     }
 
@@ -468,34 +508,34 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.diffContainer.innerHTML = html;
     }
 
-    // 14. Render Sentence-by-Sentence AI Analysis
+    // 14. Render Sentence-by-Sentence Writing Quality Analysis
     function renderSentenceAnalysis() {
         if (!state.outputText) {
-            elements.analysisContainer.innerHTML = `<div class="p-8 text-center text-slate-400">Belum ada hasil konversi untuk dianalisis.</div>`;
+            elements.analysisContainer.innerHTML = `<div class="p-8 text-center text-slate-400">Belum ada hasil penyuntingan untuk dianalisis.</div>`;
             return;
         }
 
         const analysis = detector.analyze(state.outputText);
         let html = `<div class="p-4 space-y-3">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold">
-                <span class="text-slate-500">Hasil Pemindaian Kalimat (Turnitin/GPTZero Mimic)</span>
+                <span class="text-slate-500">Pemindaian Kejernihan & Karakteristik Kalimat</span>
                 <div class="flex items-center gap-2">
-                    <span class="flex items-center gap-1 text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Manusia Alami</span>
-                    <span class="flex items-center gap-1 text-amber-600"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Sedang</span>
-                    <span class="flex items-center gap-1 text-rose-600"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Terindikasi AI</span>
+                    <span class="flex items-center gap-1 text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Alami & Mengalir</span>
+                    <span class="flex items-center gap-1 text-indigo-600"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> Cukup Alami</span>
+                    <span class="flex items-center gap-1 text-amber-600"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Perlu Penyelarasan</span>
                 </div>
             </div>`;
 
         analysis.sentences.forEach((s, idx) => {
             let badgeClass = 'highlight-human';
-            let labelText = `${s.humanScore}% Manusia`;
+            let labelText = 'Alami & Mengalir';
 
-            if (s.label === 'ai') {
+            if (s.qualityScore < 60) {
                 badgeClass = 'highlight-ai';
-                labelText = `${s.aiScore}% Risiko AI`;
-            } else if (s.label === 'mixed') {
+                labelText = 'Perlu Penyelarasan Diksi';
+            } else if (s.qualityScore < 80) {
                 badgeClass = 'highlight-mixed';
-                labelText = 'Campuran';
+                labelText = 'Cukup Alami';
             }
 
             html += `<div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 text-sm">
@@ -520,6 +560,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (state.engineMode === 'neural') {
+            if (!apiService.config.apiKey || apiService.config.provider === 'offline') {
+                showToast("Mode Neural AI membutuhkan API Key. Masukkan API Key di Pengaturan, atau beralih ke Editor Lokal.", "warning");
+                openSettings();
+                return;
+            }
+        }
+
         elements.btnHumanize.disabled = true;
         elements.btnHumanize.classList.add('opacity-70', 'cursor-not-allowed');
         const origBtnHtml = elements.btnHumanize.innerHTML;
@@ -528,40 +576,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
-            Mentransformasi & Mem-Bypass...
+            Menyempurnakan Naskah...
         `;
 
         try {
             let result = "";
             let usedEngine = state.engineMode;
-            
+
             if (state.engineMode === 'neural') {
-                // If user set active custom Cloud API Provider with key (Gemini, Groq, OpenAI, etc.)
-                if (apiService.config.provider !== 'offline' && apiService.config.apiKey) {
-                    result = await apiService.humanizeWithAI(text, {
-                        tone: state.tone,
-                        lang: state.lang,
-                        intensity: 'ultra'
-                    });
-                    if (result && result.trim()) {
-                        const lines = humanizer.harmonizeSalutationsAndClosings(result.split(/\r?\n/), state.tone, state.lang);
-                        result = lines.join('\n');
-                    }
-                    usedEngine = 'cloud_ai';
-                } else {
-                    // Client-Side Deep Neural Engine (100% popup-free, login-free & ultra-bypass)
-                    await new Promise(r => setTimeout(r, 600)); // Natural UX pause
-                    result = humanizer.humanize(text, {
-                        tone: state.tone,
-                        lang: state.lang,
-                        intensity: 'ultra',
-                        isNeural: true
-                    });
-                    usedEngine = 'neural';
-                }
+                result = await apiService.humanizeWithAI(text, {
+                    tone: state.tone,
+                    lang: state.lang,
+                    intensity: state.intensity
+                });
+                usedEngine = apiService.config.provider;
             } else {
-                // High-performance smart local transformation engine
-                await new Promise(r => setTimeout(r, 350)); // Natural UX pause
                 result = humanizer.humanize(text, {
                     tone: state.tone,
                     lang: state.lang,
@@ -571,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!result || !result.trim()) {
-                throw new Error("Hasil konversi kosong. Silakan coba lagi.");
+                throw new Error("Hasil penyuntingan kosong. Silakan coba lagi.");
             }
 
             state.outputText = result;
@@ -582,36 +611,26 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.outputWordCount.textContent = `${outWords} kata`;
             elements.outputCharCount.textContent = `${result.length} karakter`;
 
-            // Run verification with the detector simulator
-            const analysis = detector.analyze(result);
-            // Boost score indicator for high-intensity humanization
-            let finalHumanScore = Math.max(95, analysis.humanScore);
-            if (state.intensity === 'ultra' || usedEngine === 'neural' || usedEngine === 'cloud_ai') {
-                finalHumanScore = Math.min(99, Math.max(96, analysis.humanScore + 2));
-            }
-
-            updateScoreGauge(finalHumanScore);
+            // Run genuine writing quality analysis without score faking
+            const analysis = detector.analyze(result, text);
+            updateScoreGauge(analysis.qualityScore);
             updateMetricBadges(analysis);
-            saveHistoryEntry(text, result, finalHumanScore);
+            saveHistoryEntry(text, result, analysis.qualityScore);
 
             // Re-render subviews if active
             if (state.viewMode === 'diff') renderDiff();
             if (state.viewMode === 'analysis') renderSentenceAnalysis();
 
-            const engineName = usedEngine === 'cloud_ai'
-                ? 'Cloud Neural AI'
-                : usedEngine === 'neural'
-                ? 'Neural AI'
-                : 'Engine Cepat';
-            showToast(`Selesai via ${engineName}! Skor Manusia: ${finalHumanScore}%`);
+            const engineLabel = usedEngine === 'offline' ? 'Editor Lokal' : `Neural AI (${usedEngine.toUpperCase()})`;
+            showToast(`Naskah berhasil disempurnakan via ${engineLabel}`);
         } catch (err) {
             console.error(err);
-            showToast(err.message || "Gagal melakukan konversi.", "error");
+            showToast(err.message || "Gagal menyempurnakan naskah.", "error");
         } finally {
             elements.btnHumanize.disabled = false;
             elements.btnHumanize.classList.remove('opacity-70', 'cursor-not-allowed');
             elements.btnHumanize.innerHTML = origBtnHtml;
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
     }
 
@@ -833,11 +852,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // 18. Settings Modal (BYOK)
+    // 18. Settings Modal (BYOK & Voice Profile)
     function openSettings() {
         elements.apiProviderSelect.value = apiService.config.provider || 'offline';
         elements.apiKeyInput.value = apiService.config.apiKey || '';
         elements.apiModelInput.value = apiService.config.model || '';
+        if (elements.twoPassCheckbox) {
+            elements.twoPassCheckbox.checked = !!apiService.config.twoPassReview;
+        }
+        if (elements.voiceAudienceInput) {
+            elements.voiceAudienceInput.value = apiService.voiceProfile.audience || '';
+        }
+        if (elements.voicePreferredInput) {
+            elements.voicePreferredInput.value = apiService.voiceProfile.preferredPhrases || '';
+        }
+        if (elements.voiceAvoidInput) {
+            elements.voiceAvoidInput.value = apiService.voiceProfile.avoidPhrases || '';
+        }
+        if (elements.voiceSampleTextarea) {
+            elements.voiceSampleTextarea.value = apiService.voiceProfile.sampleText || '';
+        }
+
         document.querySelectorAll('.settings-theme-btn').forEach(btn => {
             const choice = btn.getAttribute('data-theme-choice');
             if (choice === state.theme) {
@@ -847,6 +882,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         elements.modalSettings.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
     }
 
     function closeSettings() {
@@ -859,14 +895,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === elements.modalSettings) closeSettings();
     });
 
+    elements.toggleVoiceProfile?.addEventListener('click', () => {
+        elements.voiceProfilePanel?.classList.toggle('hidden');
+        if (window.lucide) lucide.createIcons();
+    });
+
     elements.btnSaveSettings?.addEventListener('click', () => {
         apiService.saveConfig({
             provider: elements.apiProviderSelect.value,
             apiKey: elements.apiKeyInput.value.trim(),
-            model: elements.apiModelInput.value.trim()
+            model: elements.apiModelInput.value.trim(),
+            twoPassReview: elements.twoPassCheckbox ? elements.twoPassCheckbox.checked : false
         });
+        apiService.saveVoiceProfile({
+            audience: elements.voiceAudienceInput ? elements.voiceAudienceInput.value.trim() : '',
+            preferredPhrases: elements.voicePreferredInput ? elements.voicePreferredInput.value.trim() : '',
+            avoidPhrases: elements.voiceAvoidInput ? elements.voiceAvoidInput.value.trim() : '',
+            sampleText: elements.voiceSampleTextarea ? elements.voiceSampleTextarea.value.trim() : ''
+        });
+        applyEngineMode(state.engineMode, true);
         closeSettings();
-        showToast("Pengaturan API berhasil disimpan.");
+        showToast("Pengaturan API dan profil gaya berhasil disimpan.");
+    });
+
+    elements.btnClearApiConfig?.addEventListener('click', () => {
+        apiService.clearConfig();
+        elements.apiKeyInput.value = '';
+        elements.apiModelInput.value = '';
+        elements.apiProviderSelect.value = 'offline';
+        applyEngineMode('offline', true);
+        showToast("Kunci API berhasil dihapus dari browser Anda.");
     });
 
     // 19. History Drawer/Modal
@@ -967,5 +1025,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 21. Load Initial Academic Sample for immediate ready-to-test experience
     loadSampleText('academic');
-    updateScoreGauge(98);
+    updateScoreGauge(88);
 });
