@@ -477,6 +477,263 @@ class TextHumanizer {
     }
 
     /**
+     * LAYER 5B: Author Voice Profile Processing (Offline / On-Device)
+     * Analyzes writing sample and modulates formality, audience, preferred, and avoided expressions.
+     */
+    analyzeVoiceSample(sampleText) {
+        if (!sampleText || typeof sampleText !== 'string' || sampleText.trim().length < 20) {
+            return null;
+        }
+
+        const sentences = this.splitSentences(sampleText.trim()).filter(s => s.trim().length > 0);
+        if (sentences.length === 0) return null;
+
+        let totalWords = 0;
+        const connectorCounts = {};
+        const commonConnectors = [
+            'namun', 'tetapi', 'karena itu', 'oleh karena itu', 'sehingga',
+            'selain itu', 'dengan demikian', 'adapun', 'bahkan', 'padahal',
+            'sementara itu', 'di sisi lain', 'terkait dengan', 'dalam hal ini'
+        ];
+
+        let informalCount = 0;
+        let formalCount = 0;
+        const informalRegex = /\b(?:nggak|enggak|banget|bikin|gimana|kayak|udah|aja|kan|makanya|dong)\b/i;
+        const formalRegex = /\b(?:berdasarkan|sebagaimana|sehubungan|menurut|dikemukakan|substansial|komprehensif|berkenaan|selaras)\b/i;
+
+        sentences.forEach(s => {
+            const words = s.trim().split(/\s+/).filter(Boolean);
+            totalWords += words.length;
+
+            const lower = s.toLowerCase();
+            commonConnectors.forEach(conn => {
+                if (lower.includes(conn)) {
+                    connectorCounts[conn] = (connectorCounts[conn] || 0) + 1;
+                }
+            });
+
+            if (informalRegex.test(lower)) informalCount++;
+            if (formalRegex.test(lower)) formalCount++;
+        });
+
+        const avgSentenceLength = Math.max(1, Math.round(totalWords / sentences.length));
+        let formalityTendency = 'balanced';
+        if (informalCount > formalCount && informalCount > 0) {
+            formalityTendency = 'casual';
+        } else if (formalCount > informalCount && formalCount > 0) {
+            formalityTendency = 'formal';
+        }
+
+        return {
+            avgSentenceLength,
+            connectorCounts,
+            formalityTendency
+        };
+    }
+
+    applyFormality(sentence, formality, lang) {
+        if (lang !== 'id') return sentence;
+        let processed = sentence;
+
+        if (formality === 'very_casual') {
+            processed = processed
+                .replace(/\boleh\s+karena\s+itu,?\b/gi, "karena itu,")
+                .replace(/\bmeskipun\s+demikian,?\b/gi, "walaupun begitu,")
+                .replace(/\bsehubungan\s+dengan\s+hal\s+tersebut,?\b/gi, "mengenai hal itu,")
+                .replace(/\bmengindikasikan\s+bahwa\b/gi, "menunjukkan bahwa")
+                .replace(/\bmerupakan\s+instrumen\s+fundamental\b/gi, "menjadi bagian penting")
+                .replace(/\bterdapat\s+kebutuhan\s+mendesak\b/gi, "kita perlu segera");
+        } else if (formality === 'casual') {
+            processed = processed
+                .replace(/\bsebagaimana\s+diketahui\s+bahwa,?\b/gi, "seperti yang kita tahu,")
+                .replace(/\boleh\s+sebab\s+itu,?\b/gi, "karena itu,")
+                .replace(/\bdalam\s+rangka\b/gi, "untuk")
+                .replace(/\bmemperlihatkan\s+bahwa\b/gi, "menunjukkan bahwa");
+        } else if (formality === 'formal') {
+            processed = processed
+                .replace(/\bkarena\s+itu,?\b/gi, "oleh karena itu,")
+                .replace(/\bmasalah\s+ini\b/gi, "persoalan ini")
+                .replace(/\bbisa\b/gi, "dapat")
+                .replace(/\bsangat\s+penting\b/gi, "memiliki urgensi tinggi");
+        } else if (formality === 'very_formal') {
+            processed = processed
+                .replace(/\b(?:oleh\s+karena\s+itu|karena\s+itu),?\s*/gi, "dengan demikian, berdasarkan pertimbangan tersebut, ")
+                .replace(/\bsejalan\s+dengan\s+itu,?\s*/gi, "selaras dengan ketentuan yang berlaku, ")
+                .replace(/\bharus\s+dilakukan\b/gi, "perlu ditindaklanjuti secara saksama")
+                .replace(/\bmenjelaskan\s+bahwa\b/gi, "menguraikan bahwasanya");
+        }
+
+        return processed;
+    }
+
+    applyAudience(sentence, audience, lang) {
+        if (lang !== 'id' || !audience) return sentence;
+        const audLower = audience.toLowerCase();
+        let processed = sentence;
+
+        if (/dosen|tutor|kampus|universitas|akademik/.test(audLower)) {
+            processed = processed
+                .replace(/\bjelas\s+bahwa\b/gi, "berdasarkan kajian yang ada,")
+                .replace(/\bpokoknya\b/gi, "poin intinya,")
+                .replace(/\bmenurut\s+saya,?\b/gi, "menurut pemahaman saya,")
+                .replace(/\bseperti\s+yang\s+kita\s+tahu,?\b/gi, "sebagaimana dibahas dalam materi,");
+        } else if (/rekan|kerja|tim|kantor|kolaborator/.test(audLower)) {
+            processed = processed
+                .replace(/\bdiharapkan\s+agar\s+segera\b/gi, "mari kita prioritaskan")
+                .replace(/\bperlu\s+dipahami\s+bersama\s+bahwa\b/gi, "sebagai catatan bersama,");
+        } else if (/pimpinan|direktur|atasan|manajemen|kepala/.test(audLower)) {
+            processed = processed
+                .replace(/\bkami\s+meminta\b/gi, "kami memohon pertimbangan dan arahan")
+                .replace(/\bkami\s+laporkan\b/gi, "berikut kami sampaikan ringkasan laporan")
+                .replace(/\bkita\s+harus\b/gi, "kami menyarankan manajemen untuk");
+        } else if (/umum|publik|masyarakat|pembaca\s+umum/.test(audLower)) {
+            processed = processed
+                .replace(/\bsignifikansi\b/gi, "arti penting")
+                .replace(/\bimplementasi\b/gi, "penerapan")
+                .replace(/\bkomprehensif\b/gi, "menyeluruh")
+                .replace(/\binstrumen\b/gi, "sarana");
+        }
+
+        return processed;
+    }
+
+    applyAvoidedPhrases(sentence, avoidPhrases, lang) {
+        if (!avoidPhrases || typeof avoidPhrases !== 'string') return sentence;
+        const avoidList = avoidPhrases
+            .split(',')
+            .map(p => p.trim())
+            .filter(p => p.length >= 2);
+
+        if (avoidList.length === 0) return sentence;
+
+        const knownReplacements = {
+            'krusial': 'penting',
+            'holistik': 'menyeluruh',
+            'secara mendalam': 'secara saksama',
+            'perlu digarisbawahi': 'perlu dicatat',
+            'paradigma': 'kerangka berpikir',
+            'instrumen fundamental': 'fondasi utama',
+            'dalam era digital': 'saat ini',
+            'tidak dapat dipungkiri': 'nyatanya',
+            'menyelami': 'mempelajari',
+            'signifikan': 'berarti',
+            'testament': 'bukti nyata',
+            'delve into': 'examine',
+            'crucial': 'important',
+            'comprehensive': 'detailed'
+        };
+
+        let processed = sentence;
+
+        avoidList.forEach(phrase => {
+            const phraseLower = phrase.toLowerCase();
+            const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
+
+            if (regex.test(processed)) {
+                let repl = knownReplacements[phraseLower];
+                if (!repl) {
+                    // Try dictionary lookup
+                    const dict = (typeof window !== 'undefined' && window.HUMANIZER_DICTIONARY && window.HUMANIZER_DICTIONARY[lang])
+                        ? window.HUMANIZER_DICTIONARY[lang]
+                        : this.fallbackSynonyms[lang];
+                    if (dict && dict[phraseLower] && dict[phraseLower].length > 0) {
+                        repl = dict[phraseLower][0];
+                    }
+                }
+
+                if (repl) {
+                    processed = processed.replace(regex, (match) => {
+                        if (match[0] === match[0].toUpperCase()) {
+                            return repl.charAt(0).toUpperCase() + repl.slice(1);
+                        }
+                        return repl;
+                    });
+                }
+            }
+        });
+
+        return processed;
+    }
+
+    applyPreferredPhrases(sentence, preferredPhrases) {
+        if (!preferredPhrases || typeof preferredPhrases !== 'string') return sentence;
+        const prefList = preferredPhrases
+            .split(',')
+            .map(p => p.trim())
+            .filter(p => p.length >= 2);
+
+        if (prefList.length === 0) return sentence;
+
+        let processed = sentence;
+
+        prefList.forEach(pref => {
+            const prefLower = pref.toLowerCase();
+
+            // Match contextual opportunities without spraying randomly
+            if (/menurut\s+(?:pemahaman|pandangan|hemat)\s+saya/.test(prefLower)) {
+                processed = processed.replace(/\b(?:menurut\s+saya|dalam\s+pandangan\s+saya|hemat\s+saya|berdasarkan\s+telaah\s+kritis|menurut\s+hemat\s+penulis),?\s*/gi, `${pref}, `);
+            } else if (/sejalan\s+dengan/.test(prefLower)) {
+                processed = processed.replace(/\b(?:sesuai\s+dengan\s+itu|berkaitan\s+dengan\s+itu),?\s*/gi, `${pref}, `);
+            } else if (/terbukti\s+bahwa/.test(prefLower) || prefLower === 'terbukti') {
+                processed = processed.replace(/\b(?:terlihat\s+jelas\s+bahwa|tampak\s+bahwa)\b/gi, 'terbukti bahwa');
+            } else if (prefLower === 'oleh karena itu') {
+                processed = processed.replace(/\b(?:karena\s+itu|maka\s+dari\s+itu),?\s*/gi, 'oleh karena itu, ');
+            } else if (prefLower === 'karena itu') {
+                processed = processed.replace(/\b(?:oleh\s+karena\s+itu|maka\s+dari\s+itu),?\s*/gi, 'karena itu, ');
+            }
+        });
+
+        return processed;
+    }
+
+    applyVoiceProfile(sentences, voiceProfile, lang) {
+        if (!voiceProfile || !voiceProfile.enabled) {
+            return sentences;
+        }
+
+        const sampleAnalysis = voiceProfile.sampleText ? this.analyzeVoiceSample(voiceProfile.sampleText) : null;
+        const effectiveFormality = voiceProfile.formality && voiceProfile.formality !== 'balanced'
+            ? voiceProfile.formality
+            : (sampleAnalysis ? sampleAnalysis.formalityTendency : 'balanced');
+
+        return sentences.map(sentence => {
+            let processed = sentence.trim();
+
+            if (this.isSalutationOrOpening(processed) || this.isClosing(processed)) {
+                return processed;
+            }
+
+            // 1. Avoided Phrases Reduction
+            if (voiceProfile.avoidPhrases) {
+                processed = this.applyAvoidedPhrases(processed, voiceProfile.avoidPhrases, lang);
+            }
+
+            // 2. Preferred Phrases Alignment
+            if (voiceProfile.preferredPhrases) {
+                processed = this.applyPreferredPhrases(processed, voiceProfile.preferredPhrases);
+            }
+
+            // 3. Formality Shaping
+            if (effectiveFormality && effectiveFormality !== 'balanced') {
+                processed = this.applyFormality(processed, effectiveFormality, lang);
+            }
+
+            // 4. Target Audience Tuning
+            if (voiceProfile.audience) {
+                processed = this.applyAudience(processed, voiceProfile.audience, lang);
+            }
+
+            // Ensure proper capitalization if not a token
+            if (processed.length > 0 && !processed.startsWith('__ANTISLOP_TOKEN')) {
+                processed = processed.charAt(0).toUpperCase() + processed.slice(1);
+            }
+
+            return processed;
+        });
+    }
+
+    /**
      * Adapts general opening salutations and closing sign-offs according to the active Tone,
      * while strictly protecting Islamic greetings and preserving addressed entities/names.
      */
@@ -557,13 +814,25 @@ class TextHumanizer {
      * MAIN REWRITING PIPELINE
      * Transforms input text into natural, fluent human prose across all topics.
      */
-    humanize(text, options = {}) {
-        const {
-            tone = 'academic',
-            lang = 'id',
-            intensity = 'balanced',
-            isNeural = false
-        } = options;
+    humanize(text, optionsOrTone = {}, intensityArg, langArg, voiceProfileArg) {
+        let tone = 'academic';
+        let lang = 'id';
+        let intensity = 'balanced';
+        let isNeural = false;
+        let voiceProfile = null;
+
+        if (typeof optionsOrTone === 'object' && optionsOrTone !== null) {
+            tone = optionsOrTone.tone || 'academic';
+            lang = optionsOrTone.lang || 'id';
+            intensity = optionsOrTone.intensity || 'balanced';
+            isNeural = !!optionsOrTone.isNeural;
+            voiceProfile = optionsOrTone.voiceProfile || null;
+        } else if (typeof optionsOrTone === 'string') {
+            tone = optionsOrTone;
+            intensity = intensityArg || 'balanced';
+            lang = langArg || 'id';
+            voiceProfile = voiceProfileArg || null;
+        }
 
         if (!text || !text.trim()) return "";
 
@@ -625,6 +894,11 @@ class TextHumanizer {
 
             // Step 6: Tone Voice Modulation
             sentences = this.applyToneStyling(sentences, tone, lang, intensity);
+
+            // Step 7: Author Voice Profile Modulation (Offline / On-Device)
+            if (voiceProfile && voiceProfile.enabled) {
+                sentences = this.applyVoiceProfile(sentences, voiceProfile, lang);
+            }
 
             // Reassemble line
             const processedContent = sentences.join(' ');

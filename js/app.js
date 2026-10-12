@@ -109,13 +109,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Settings, Two-Pass & Voice Profile
         twoPassCheckbox:     document.getElementById('twoPassCheckbox'),
         toggleVoiceProfile:  document.getElementById('toggleVoiceProfile'),
+        voiceProfileAccordionHeader: document.getElementById('voiceProfileAccordionHeader'),
         voiceProfilePanel:   document.getElementById('voiceProfilePanel'),
+        voiceProfileChevron: document.getElementById('voiceProfileChevron'),
+        voiceProfileStatusBadge: document.getElementById('voiceProfileStatusBadge'),
+        voiceProfileSubtitle: document.getElementById('voiceProfileSubtitle'),
+        voiceProfileToggle:  document.getElementById('voiceProfileToggle'),
+        voiceFormalitySelect: document.getElementById('voiceFormalitySelect'),
+        voiceAudienceSelect: document.getElementById('voiceAudienceSelect'),
         voiceAudienceInput:  document.getElementById('voiceAudienceInput'),
         voicePreferredInput: document.getElementById('voicePreferredInput'),
         voiceAvoidInput:     document.getElementById('voiceAvoidInput'),
         voiceSampleTextarea: document.getElementById('voiceSampleTextarea'),
+        btnResetVoiceProfile: document.getElementById('btnResetVoiceProfile'),
         btnClearApiConfig:   document.getElementById('btnClearApiConfig'),
-        qualityStatusBadge:  document.getElementById('qualityStatusBadge')
+        qualityStatusBadge:  document.getElementById('qualityStatusBadge'),
+
+        // Mobile Header & Dropdown
+        btnMobileMenu:       document.getElementById('btnMobileMenu'),
+        mobileMenuDropdown:  document.getElementById('mobileMenuDropdown'),
+        btnMobileHistory:    document.getElementById('btnMobileHistory'),
+        btnMobileSupport:    document.getElementById('btnMobileSupport'),
+        langSelectMobile:    document.getElementById('langSelectMobile')
     };
 
     // 4. Initialize Theme (3-Mode: system / light / dark)
@@ -594,7 +609,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 result = humanizer.humanize(text, {
                     tone: state.tone,
                     lang: state.lang,
-                    intensity: state.intensity
+                    intensity: state.intensity,
+                    voiceProfile: apiService.voiceProfile
                 });
                 usedEngine = 'offline';
             }
@@ -621,7 +637,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.viewMode === 'diff') renderDiff();
             if (state.viewMode === 'analysis') renderSentenceAnalysis();
 
-            const engineLabel = usedEngine === 'offline' ? 'Editor Lokal' : `Neural AI (${usedEngine.toUpperCase()})`;
+            const isProfileActive = !!(apiService.voiceProfile && apiService.voiceProfile.enabled);
+            let engineLabel = usedEngine === 'offline' ? 'Editor Lokal' : `Neural AI (${usedEngine.toUpperCase()})`;
+            if (isProfileActive) engineLabel += ' [Profil Gaya Aktif]';
             showToast(`Naskah berhasil disempurnakan via ${engineLabel}`);
         } catch (err) {
             console.error(err);
@@ -853,12 +871,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // 18. Settings Modal (BYOK & Voice Profile)
+    function updateVoiceProfileUIState() {
+        const isEnabled = elements.voiceProfileToggle ? elements.voiceProfileToggle.checked : false;
+        if (elements.voiceProfileStatusBadge) {
+            if (isEnabled) {
+                elements.voiceProfileStatusBadge.textContent = 'Aktif';
+                elements.voiceProfileStatusBadge.className = 'text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+            } else {
+                elements.voiceProfileStatusBadge.textContent = 'Nonaktif';
+                elements.voiceProfileStatusBadge.className = 'text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+            }
+        }
+
+        if (elements.voiceProfileSubtitle) {
+            elements.voiceProfileSubtitle.textContent = state.engineMode === 'offline'
+                ? 'Editor Lokal (Di Perangkat, Tanpa Cloud LLM)'
+                : 'Neural AI (Prompt Injection LLM)';
+        }
+    }
+
     function openSettings() {
         elements.apiProviderSelect.value = apiService.config.provider || 'offline';
         elements.apiKeyInput.value = apiService.config.apiKey || '';
         elements.apiModelInput.value = apiService.config.model || '';
         if (elements.twoPassCheckbox) {
             elements.twoPassCheckbox.checked = !!apiService.config.twoPassReview;
+        }
+
+        // Voice Profile Configuration
+        if (elements.voiceProfileToggle) {
+            elements.voiceProfileToggle.checked = !!apiService.voiceProfile.enabled;
+        }
+        if (elements.voiceFormalitySelect) {
+            elements.voiceFormalitySelect.value = apiService.voiceProfile.formality || 'balanced';
+        }
+        if (elements.voiceAudienceSelect) {
+            const currentAud = apiService.voiceProfile.audience || '';
+            const opts = Array.from(elements.voiceAudienceSelect.options).map(o => o.value);
+            elements.voiceAudienceSelect.value = opts.includes(currentAud) ? currentAud : '';
         }
         if (elements.voiceAudienceInput) {
             elements.voiceAudienceInput.value = apiService.voiceProfile.audience || '';
@@ -872,6 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.voiceSampleTextarea) {
             elements.voiceSampleTextarea.value = apiService.voiceProfile.sampleText || '';
         }
+        updateVoiceProfileUIState();
 
         document.querySelectorAll('.settings-theme-btn').forEach(btn => {
             const choice = btn.getAttribute('data-theme-choice');
@@ -881,12 +932,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.remove('active');
             }
         });
+
+        document.body.classList.add('modal-open');
         elements.modalSettings.classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
     }
 
     function closeSettings() {
         elements.modalSettings.classList.add('hidden');
+        document.body.classList.remove('modal-open');
     }
 
     elements.btnOpenSettings?.addEventListener('click', openSettings);
@@ -895,11 +949,47 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === elements.modalSettings) closeSettings();
     });
 
-    elements.toggleVoiceProfile?.addEventListener('click', () => {
-        elements.voiceProfilePanel?.classList.toggle('hidden');
+    // Voice Profile Accordion Toggle
+    function toggleVoiceAccordion() {
+        const panel = elements.voiceProfilePanel;
+        if (!panel) return;
+        const isHidden = panel.classList.toggle('hidden');
+        if (elements.voiceProfileChevron) {
+            elements.voiceProfileChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
         if (window.lucide) lucide.createIcons();
+    }
+
+    elements.voiceProfileAccordionHeader?.addEventListener('click', toggleVoiceAccordion);
+    elements.toggleVoiceProfile?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleVoiceAccordion();
     });
 
+    elements.voiceProfileToggle?.addEventListener('change', updateVoiceProfileUIState);
+
+    // Sync audience select with input
+    elements.voiceAudienceSelect?.addEventListener('change', () => {
+        if (elements.voiceAudienceSelect.value && elements.voiceAudienceInput) {
+            elements.voiceAudienceInput.value = elements.voiceAudienceSelect.value;
+        }
+    });
+
+    // Reset Voice Profile
+    elements.btnResetVoiceProfile?.addEventListener('click', () => {
+        apiService.resetVoiceProfile();
+        if (elements.voiceProfileToggle) elements.voiceProfileToggle.checked = false;
+        if (elements.voiceFormalitySelect) elements.voiceFormalitySelect.value = 'balanced';
+        if (elements.voiceAudienceSelect) elements.voiceAudienceSelect.value = '';
+        if (elements.voiceAudienceInput) elements.voiceAudienceInput.value = '';
+        if (elements.voicePreferredInput) elements.voicePreferredInput.value = '';
+        if (elements.voiceAvoidInput) elements.voiceAvoidInput.value = '';
+        if (elements.voiceSampleTextarea) elements.voiceSampleTextarea.value = '';
+        updateVoiceProfileUIState();
+        showToast("Profil gaya penulis berhasil direset ke pengaturan bawaan.");
+    });
+
+    // Save Settings
     elements.btnSaveSettings?.addEventListener('click', () => {
         apiService.saveConfig({
             provider: elements.apiProviderSelect.value,
@@ -907,15 +997,21 @@ document.addEventListener('DOMContentLoaded', () => {
             model: elements.apiModelInput.value.trim(),
             twoPassReview: elements.twoPassCheckbox ? elements.twoPassCheckbox.checked : false
         });
+
+        const effectiveAudience = elements.voiceAudienceInput ? elements.voiceAudienceInput.value.trim() : '';
+
         apiService.saveVoiceProfile({
-            audience: elements.voiceAudienceInput ? elements.voiceAudienceInput.value.trim() : '',
+            enabled: elements.voiceProfileToggle ? elements.voiceProfileToggle.checked : false,
+            formality: elements.voiceFormalitySelect ? elements.voiceFormalitySelect.value : 'balanced',
+            audience: effectiveAudience,
             preferredPhrases: elements.voicePreferredInput ? elements.voicePreferredInput.value.trim() : '',
             avoidPhrases: elements.voiceAvoidInput ? elements.voiceAvoidInput.value.trim() : '',
             sampleText: elements.voiceSampleTextarea ? elements.voiceSampleTextarea.value.trim() : ''
         });
+
         applyEngineMode(state.engineMode, true);
         closeSettings();
-        showToast("Pengaturan API dan profil gaya berhasil disimpan.");
+        showToast("Pengaturan engine dan profil gaya penulis berhasil disimpan.");
     });
 
     elements.btnClearApiConfig?.addEventListener('click', () => {
@@ -925,6 +1021,41 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.apiProviderSelect.value = 'offline';
         applyEngineMode('offline', true);
         showToast("Kunci API berhasil dihapus dari browser Anda.");
+    });
+
+    // Mobile Header Dropdown Menu Handlers
+    elements.btnMobileMenu?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = elements.mobileMenuDropdown;
+        if (!dropdown) return;
+        const isClosed = dropdown.classList.toggle('hidden');
+        elements.btnMobileMenu.setAttribute('aria-expanded', !isClosed);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (elements.mobileMenuDropdown && !elements.mobileMenuDropdown.classList.contains('hidden')) {
+            if (!elements.btnMobileMenu?.contains(e.target) && !elements.mobileMenuDropdown.contains(e.target)) {
+                elements.mobileMenuDropdown.classList.add('hidden');
+                elements.btnMobileMenu?.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+
+    elements.btnMobileHistory?.addEventListener('click', () => {
+        elements.mobileMenuDropdown?.classList.add('hidden');
+        openHistory();
+    });
+
+    elements.btnMobileSupport?.addEventListener('click', () => {
+        elements.mobileMenuDropdown?.classList.add('hidden');
+        openSupport();
+    });
+
+    elements.langSelectMobile?.addEventListener('change', (e) => {
+        state.lang = e.target.value;
+        if (elements.langSelect) elements.langSelect.value = state.lang;
+        elements.mobileMenuDropdown?.classList.add('hidden');
+        showToast(`Bahasa diubah ke ${elements.langSelectMobile.options[elements.langSelectMobile.selectedIndex].text}`);
     });
 
     // 19. History Drawer/Modal
@@ -973,11 +1104,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openHistory() {
         renderHistory();
+        document.body.classList.add('modal-open');
         elements.modalHistory.classList.remove('hidden');
     }
 
     function closeHistory() {
         elements.modalHistory.classList.add('hidden');
+        document.body.classList.remove('modal-open');
     }
 
     elements.btnOpenHistory?.addEventListener('click', openHistory);
@@ -996,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 20. Support QRIS Modal
     function openSupport() {
         if (elements.modalSupport) {
+            document.body.classList.add('modal-open');
             elements.modalSupport.classList.remove('hidden');
         }
     }
@@ -1003,6 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSupport() {
         if (elements.modalSupport) {
             elements.modalSupport.classList.add('hidden');
+            document.body.classList.remove('modal-open');
         }
     }
 

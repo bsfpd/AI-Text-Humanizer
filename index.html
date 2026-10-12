@@ -67,16 +67,17 @@
     </div>
 
     <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
     <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Brand Logo -->
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shadow-sm">
-                    <i data-lucide="feather" class="w-5 h-5"></i>
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shadow-sm shrink-0">
+                    <i data-lucide="feather" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">HumanizeAI</span>
+                        <span class="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">HumanizeAI</span>
                     </div>
                     <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Editor teks alami untuk penulisan akademik dan profesional</p>
                 </div>
@@ -84,16 +85,15 @@
 
             <!-- Right Controls -->
             <div class="flex items-center gap-1.5 sm:gap-2.5">
-                <!-- Support / Dukung Saya Button (Smooth, dignified accent) -->
-                <button id="btnOpenSupport" class="text-xs font-medium px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs min-h-[40px] sm:min-h-0" title="Dukung Pengembang via QRIS">
+                <!-- Support / Dukung Saya (Desktop/Tablet) -->
+                <button id="btnOpenSupport" class="hidden md:flex text-xs font-medium px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70 transition-colors items-center gap-1.5 cursor-pointer shadow-xs min-h-[40px]" title="Dukung Pengembang via QRIS">
                     <i data-lucide="coffee" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-                    <span class="hidden sm:inline">Dukung Saya</span>
-                    <span class="sm:hidden text-[11px]">Support</span>
+                    <span>Dukung Saya</span>
                 </button>
 
-                <!-- Language Selector -->
-                <div class="relative">
-                    <select id="langSelect" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg px-2 sm:px-2.5 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[40px] sm:min-h-0">
+                <!-- Language Selector (Desktop/Tablet) -->
+                <div class="relative hidden sm:block">
+                    <select id="langSelect" class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg px-2 sm:px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[40px]" aria-label="Pilih Bahasa">
                         <option value="id">🇮🇩 ID</option>
                         <option value="en">🇬🇧 EN</option>
                         <option value="es">🇪🇸 ES</option>
@@ -102,20 +102,49 @@
                     </select>
                 </div>
 
-                <!-- Riwayat Drawer Button -->
-                <button id="btnOpenHistory" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Riwayat Konversi">
+                <!-- Riwayat Drawer Button (Desktop/Tablet) -->
+                <button id="btnOpenHistory" class="hidden sm:flex p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] items-center justify-center" title="Riwayat Konversi" aria-label="Riwayat Konversi">
                     <i data-lucide="history" class="w-4 h-4"></i>
                 </button>
 
-                <!-- Settings BYOK Button -->
-                <button id="btnOpenSettings" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Pengaturan Model & API (Opsional)">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
+                <!-- Settings Button (PROMINENT AT ALL VIEWPORT WIDTHS, 320px+) -->
+                <button id="btnOpenSettings" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 sm:bg-slate-100 hover:bg-indigo-100 sm:hover:bg-slate-200 dark:bg-indigo-950/60 sm:dark:bg-slate-800 dark:hover:bg-indigo-900/60 sm:dark:hover:bg-slate-700 text-indigo-700 sm:text-slate-800 dark:text-indigo-300 sm:dark:text-slate-100 border border-indigo-200/80 sm:border-slate-300 dark:border-indigo-800/80 sm:dark:border-slate-700 flex items-center gap-1.5 cursor-pointer min-h-[44px] min-w-[44px] transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs" title="Pengaturan Model, API & Profil Penulis" aria-label="Pengaturan">
+                    <i data-lucide="settings" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                    <span class="inline font-semibold">Pengaturan</span>
                 </button>
 
-                <!-- Theme Toggle Button (3-Mode Cycle: System -> Light -> Dark) -->
-                <button id="themeToggle" class="p-2 sm:p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center" title="Tema: Mengikuti Sistem (Klik untuk ubah)">
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center" title="Tema Tampilan" aria-label="Ubah Tema Tampilan">
                     <i id="themeToggleIcon" data-lucide="laptop" class="w-4 h-4"></i>
                 </button>
+
+                <!-- Mobile More Menu Button (Narrow Viewports < 640px) -->
+                <div class="relative sm:hidden">
+                    <button id="btnMobileMenu" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center border border-slate-200/80 dark:border-slate-700/80" title="Menu Lainnya" aria-label="Buka Menu Lainnya" aria-expanded="false">
+                        <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                    </button>
+                    <!-- Mobile Menu Dropdown -->
+                    <div id="mobileMenuDropdown" class="hidden absolute right-0 top-12 z-50 w-52 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 space-y-1">
+                        <button id="btnMobileHistory" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer min-h-[44px]">
+                            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
+                            <span>Riwayat Konversi</span>
+                        </button>
+                        <button id="btnMobileSupport" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 flex items-center gap-2 cursor-pointer min-h-[44px]">
+                            <i data-lucide="coffee" class="w-4 h-4 text-amber-500"></i>
+                            <span>Dukung Saya (QRIS)</span>
+                        </button>
+                        <div class="pt-1 border-t border-slate-100 dark:border-slate-800 px-3 py-2">
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Bahasa Naskah</label>
+                            <select id="langSelectMobile" class="w-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[40px]" aria-label="Pilih Bahasa Mobile">
+                                <option value="id">🇮🇩 Bahasa Indonesia</option>
+                                <option value="en">🇬🇧 English</option>
+                                <option value="es">🇪🇸 Español</option>
+                                <option value="fr">🇫🇷 Français</option>
+                                <option value="de">🇩🇪 Deutsch</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -460,119 +489,180 @@
 
     </main>
 
-    <!-- Modal: Pengaturan API (BYOK) -->
-    <div id="modalSettings" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="card-soft rounded-2xl max-w-md w-full p-6 space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl modal-fade-enter">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="cpu" class="w-5 h-5 text-indigo-500"></i>
-                    <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Pengaturan Engine & API</h3>
+    <!-- Modal: Pengaturan API & Profil Penulis (BYOK & Offline Voice Profile) -->
+    <div id="modalSettings" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+        <div class="card-soft rounded-t-2xl sm:rounded-2xl max-w-xl w-full max-h-[92dvh] sm:max-h-[88vh] border border-slate-200 dark:border-slate-800 shadow-2xl modal-fade-enter flex flex-col overflow-hidden">
+            <!-- Modal Header (Sticky) -->
+            <div class="px-5 py-3.5 sm:py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between shrink-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <i data-lucide="sliders" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100">Pengaturan &amp; Profil Penulis</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Konfigurasi Engine &amp; Personalisasi Gaya Tulisan</p>
+                    </div>
                 </div>
-                <button id="btnCloseSettings" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+                <button id="btnCloseSettings" class="p-2 -mr-1 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors" aria-label="Tutup Pengaturan">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Platform ini dilengkapi dengan <strong>Editor Lokal Heuristik</strong> yang bekerja 100% gratis, aman, dan offline. Untuk kemampuan penyuntingan yang lebih mendalam, hubungkan API Key LLM Anda (disimpan lokal di browser Anda).
-            </p>
+            <!-- Modal Body (Independently Scrollable) -->
+            <div class="p-4 sm:p-6 overflow-y-auto overscroll-contain flex-1 space-y-4">
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800/60">
+                    Platform ini dilengkapi <strong>Editor Lokal Heuristik</strong> yang bekerja gratis, privat, dan offline di perangkat Anda. Anda juga dapat menghubungkan API Key LLM eksternal (disimpan lokal di browser) untuk mode Neural AI.
+                </p>
 
-            <div class="space-y-3 pt-2">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Pilih Mode Engine</label>
-                    <select id="apiProviderSelect" class="w-full text-xs font-medium bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                        <option value="offline">⚡ Editor Lokal Heuristik (Gratis &amp; Di Perangkat)</option>
-                        <option value="gemini">Google Gemini API (Free tier ready - Disarankan)</option>
-                        <option value="groq">Groq Cloud (Llama 3.3 Versatile)</option>
-                        <option value="openai">OpenAI (GPT-4o Mini)</option>
-                        <option value="openrouter">OpenRouter AI</option>
-                    </select>
-                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Pilih Mode Engine</label>
+                        <select id="apiProviderSelect" class="w-full text-xs font-medium bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[42px]">
+                            <option value="offline">⚡ Editor Lokal Heuristik (Gratis &amp; Di Perangkat)</option>
+                            <option value="gemini">Google Gemini API (Free tier ready - Disarankan)</option>
+                            <option value="groq">Groq Cloud (Llama 3.3 Versatile)</option>
+                            <option value="openai">OpenAI (GPT-4o Mini)</option>
+                            <option value="openrouter">OpenRouter AI</option>
+                        </select>
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">API Key (Opsional)</label>
-                    <input type="password" id="apiKeyInput" placeholder="Masukkan API Key (misal: AIzaSy... / sk-...)" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">API Key (Opsional untuk Mode Neural AI)</label>
+                        <input type="password" id="apiKeyInput" placeholder="Masukkan API Key (misal: AIzaSy... / sk-...)" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[42px]">
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Custom Model Identifier (Opsional)</label>
-                    <input type="text" id="apiModelInput" placeholder="gemini-1.5-flash / llama-3.3-70b-versatile" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Custom Model Identifier (Opsional)</label>
+                        <input type="text" id="apiModelInput" placeholder="gemini-1.5-flash / llama-3.3-70b-versatile" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[42px]">
+                    </div>
 
-                <!-- Two-Pass Quality Review Checkbox -->
-                <div class="p-2.5 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/50 dark:border-indigo-800/40">
-                    <label class="flex items-start gap-2 cursor-pointer text-xs text-slate-700 dark:text-slate-200 font-medium">
-                        <input type="checkbox" id="twoPassCheckbox" class="mt-0.5 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
-                        <div>
-                            <span>Audit Kualitas 2-Pass (Verifikasi Fakta &amp; Makna)</span>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">Menjalankan pass kedua untuk mencocokkan angka, nama, istilah, dan fakta naskah sebelum ditampilkan (berlaku untuk mode API).</p>
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Writing Voice Profile Section -->
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                            <i data-lucide="user-pen" class="w-3.5 h-3.5 text-indigo-500"></i>
-                            <span>Profil Gaya Penulis (Voice Profile)</span>
+                    <!-- Two-Pass Quality Review Checkbox -->
+                    <div class="p-2.5 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/50 dark:border-indigo-800/40">
+                        <label class="flex items-start gap-2 cursor-pointer text-xs text-slate-700 dark:text-slate-200 font-medium">
+                            <input type="checkbox" id="twoPassCheckbox" class="mt-0.5 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                            <div>
+                                <span>Audit Kualitas 2-Pass (Verifikasi Fakta &amp; Makna)</span>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">Menjalankan pass kedua untuk mencocokkan angka, nama, istilah, dan fakta naskah sebelum ditampilkan (berlaku untuk mode API).</p>
+                            </div>
                         </label>
-                        <button type="button" id="toggleVoiceProfile" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                            Tampilkan / Sembunyikan
-                        </button>
                     </div>
-                    <div id="voiceProfilePanel" class="hidden space-y-2.5 pt-1">
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Sasaran Pembaca</label>
-                            <input type="text" id="voiceAudienceInput" placeholder="Contoh: Dosen Penguji, Tutor UT, Rekan Sejawat, Pembaca Umum" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Frasa yang Disukai</label>
-                                <input type="text" id="voicePreferredInput" placeholder="misal: menurut saya, terbukti" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Frasa yang Dihindari</label>
-                                <input type="text" id="voiceAvoidInput" placeholder="misal: krusial, holistik" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Contoh Cuplikan Tulisan Asli Sendiri (Opsional)</label>
-                            <textarea id="voiceSampleTextarea" rows="2" placeholder="Tempel 1-2 paragraf tulisan Anda untuk dipelajari ritmenya..." class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
-                        </div>
-                    </div>
-                </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Tema Tampilan</label>
-                    <div class="grid grid-cols-3 gap-2" id="settingsThemeGroup">
-                        <button type="button" data-theme-choice="system" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
-                            <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
-                            <span>Sistem</span>
-                        </button>
-                        <button type="button" data-theme-choice="light" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
-                            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
-                            <span>Terang</span>
-                        </button>
-                        <button type="button" data-theme-choice="dark" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all">
-                            <i data-lucide="moon" class="w-3.5 h-3.5"></i>
-                            <span>Gelap</span>
-                        </button>
+                    <!-- Writing Voice Profile Section (Shared Offline & Online) -->
+                    <div class="border-t border-slate-200 dark:border-slate-800 pt-3 space-y-2">
+                        <div id="voiceProfileAccordionHeader" class="flex items-center justify-between p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="user-pen" class="w-4 h-4 text-indigo-500"></i>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Profil Gaya Penulis</span>
+                                        <span id="voiceProfileStatusBadge" class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Nonaktif</span>
+                                    </div>
+                                    <p id="voiceProfileSubtitle" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Editor Lokal (Di Perangkat, Tanpa Cloud LLM)</p>
+                                </div>
+                            </div>
+                            <button type="button" id="toggleVoiceProfile" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Buka/Tutup Profil Penulis">
+                                <i id="voiceProfileChevron" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                            </button>
+                        </div>
+
+                        <div id="voiceProfilePanel" class="hidden space-y-3 pt-2 px-1">
+                            <!-- A. Enable Voice Profile Toggle -->
+                            <div class="p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-between">
+                                <div>
+                                    <label for="voiceProfileToggle" class="text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer block">Gunakan Profil Gaya Penulis</label>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Aktifkan untuk menerapkan preferensi diksi, sasaran pembaca, dan irama tulisan</p>
+                                </div>
+                                <input type="checkbox" id="voiceProfileToggle" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            </div>
+
+                            <!-- B. Writing Formality -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tingkat Formalitas Tulisan</label>
+                                <select id="voiceFormalitySelect" class="w-full text-xs font-medium bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[42px]">
+                                    <option value="very_casual">Sangat Santai (Luwes &amp; Percakapan Akrab)</option>
+                                    <option value="casual">Santai (Komunikatif &amp; Mengalir Bersahabat)</option>
+                                    <option value="balanced" selected>Seimbang (Alami &amp; Berimbang)</option>
+                                    <option value="formal">Formal (Resmi, Profesional &amp; Tertib)</option>
+                                    <option value="very_formal">Sangat Formal (Birokratis / Hukum &amp; Statuta)</option>
+                                </select>
+                            </div>
+
+                            <!-- C. Target Audience -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Sasaran Pembaca (Target Audience)</label>
+                                <div class="space-y-1.5">
+                                    <select id="voiceAudienceSelect" class="w-full text-xs font-medium bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-h-[42px]">
+                                        <option value="">Pilih Contoh Sasaran (atau isi kustom di bawah)...</option>
+                                        <option value="Dosen / Tutor Universitas">Dosen / Tutor Universitas</option>
+                                        <option value="Rekan Kerja">Rekan Kerja</option>
+                                        <option value="Pimpinan Instansi">Pimpinan Instansi</option>
+                                        <option value="Pembaca Umum">Pembaca Umum</option>
+                                        <option value="Pembaca Profesional">Pembaca Profesional</option>
+                                    </select>
+                                    <input type="text" id="voiceAudienceInput" placeholder="Atau tentukan sasaran khusus (misal: Mahasiswa Baru, Penguji Skripsi)..." class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[42px]">
+                                </div>
+                            </div>
+
+                            <!-- D & E. Preferred Expressions & Avoided Expressions -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Frasa yang Disukai</label>
+                                    <input type="text" id="voicePreferredInput" placeholder="misal: menurut hemat saya, terbukti, sejalan dengan itu" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[42px]">
+                                    <p class="text-[10px] text-slate-400 mt-1">Diterapkan secara kontekstual jika padanan semantik sesuai.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Frasa yang Dihindari</label>
+                                    <input type="text" id="voiceAvoidInput" placeholder="misal: krusial, holistik, secara mendalam" class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[42px]">
+                                    <p class="text-[10px] text-slate-400 mt-1">Diganti dengan padanan yang lebih sederhana tanpa mengubah arti.</p>
+                                </div>
+                            </div>
+
+                            <!-- F. Writing Sample Textarea -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Contoh Cuplikan Tulisan Asli Sendiri (Opsional)</label>
+                                <textarea id="voiceSampleTextarea" rows="3" placeholder="Tempel 1-2 paragraf tulisan asli Anda. Engine lokal menganalisis pola kalimat dan konjungsi tanpa mengirim data ke server mana pun..." class="w-full text-xs bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y min-h-[75px]"></textarea>
+                            </div>
+
+                            <!-- G. Reset Voice Profile -->
+                            <div class="flex items-center justify-between pt-1">
+                                <button type="button" id="btnResetVoiceProfile" class="text-xs text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 font-medium cursor-pointer transition-colors flex items-center gap-1 min-h-[36px]">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                    <span>Reset Profil Gaya</span>
+                                </button>
+                                <span class="text-[11px] text-slate-400">Tersimpan lokal di browser</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Tema Tampilan</label>
+                        <div class="grid grid-cols-3 gap-2" id="settingsThemeGroup">
+                            <button type="button" data-theme-choice="system" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all min-h-[42px]">
+                                <i data-lucide="laptop" class="w-3.5 h-3.5"></i>
+                                <span>Sistem</span>
+                            </button>
+                            <button type="button" data-theme-choice="light" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all min-h-[42px]">
+                                <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                                <span>Terang</span>
+                            </button>
+                            <button type="button" data-theme-choice="dark" class="settings-theme-btn text-xs font-medium py-2 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition-all min-h-[42px]">
+                                <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                                <span>Gelap</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <button type="button" id="btnClearApiConfig" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 font-medium cursor-pointer">
+            <!-- Modal Footer (Sticky) -->
+            <div class="px-5 py-3.5 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between shrink-0 bg-slate-50/90 dark:bg-slate-900/90 gap-2">
+                <button type="button" id="btnClearApiConfig" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 font-medium cursor-pointer min-h-[44px] px-2 flex items-center">
                     Hapus Kunci API
                 </button>
-                <button id="btnSaveSettings" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-colors cursor-pointer">
+                <button id="btnSaveSettings" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-md transition-colors cursor-pointer min-h-[44px] flex items-center justify-center">
                     Simpan Pengaturan
                 </button>
             </div>
-            <p class="text-[11px] text-slate-400 leading-tight">
-                Kunci API disimpan secara lokal di browser Anda (Local Storage) dan dikirimkan langsung ke endpoint resmi provider saat Anda menggunakan mode AI.
-            </p>
         </div>
     </div>
 
@@ -660,12 +750,12 @@
     </footer>
 
     <!-- App Scripts -->
-    <script src="js/languages.js?v=6"></script>
-    <script src="js/detector.js?v=6"></script>
-    <script src="js/humanizer.js?v=6"></script>
-    <script src="js/api-service.js?v=6"></script>
-    <script src="js/doc-processor.js?v=2"></script>
-    <script src="js/app.js?v=6"></script>
+    <script src="js/languages.js?v=7"></script>
+    <script src="js/detector.js?v=7"></script>
+    <script src="js/humanizer.js?v=7"></script>
+    <script src="js/api-service.js?v=7"></script>
+    <script src="js/doc-processor.js?v=3"></script>
+    <script src="js/app.js?v=7"></script>
     <script>
         // Initialize Lucide icons on start
         lucide.createIcons();

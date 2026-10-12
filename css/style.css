@@ -1,6 +1,11 @@
 /* Custom CSS for HumanizeAI Platform */
 
 @layer base {
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+    }
     body {
         font-feature-settings: "cv02", "cv03", "cv04", "cv11";
         text-rendering: optimizeLegibility;
@@ -236,15 +241,27 @@
 }
 
 /* Mobile & Smartphone Ergonomics (Antislop Layoutmobile & UI) */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
 @media (max-width: 640px) {
     html, body {
         overflow-x: hidden;
     }
 
-    /* Interactive touch targets >= 40-44px */
+    /* Interactive touch targets >= 44px */
     .pill-button,
     .intensity-pill {
-        min-height: 42px;
+        min-height: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -254,6 +271,27 @@
     #btnHumanize {
         min-height: 52px;
         touch-action: manipulation;
+    }
+
+    /* Mobile bottom-sheet slide-up animation */
+    .modal-fade-enter {
+        animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes modalSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Safe area insets for notched devices */
+    #modalSettings > div {
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
     }
 
     /* Prevent mobile text zoom on focus */
@@ -266,4 +304,5 @@
         padding: 1rem;
     }
 }
+
 

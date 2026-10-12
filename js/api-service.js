@@ -49,14 +49,15 @@ class ApiService {
         try {
             const saved = localStorage.getItem('humanize_voice_profile');
             return saved ? JSON.parse(saved) : {
+                enabled: false,
                 audience: '',
-                formality: 'normal',
+                formality: 'balanced',
                 preferredPhrases: '',
                 avoidPhrases: '',
                 sampleText: ''
             };
         } catch (e) {
-            return { audience: '', formality: 'normal', preferredPhrases: '', avoidPhrases: '', sampleText: '' };
+            return { enabled: false, audience: '', formality: 'balanced', preferredPhrases: '', avoidPhrases: '', sampleText: '' };
         }
     }
 
@@ -67,6 +68,23 @@ class ApiService {
         } catch (e) {
             console.error("Could not save voice profile", e);
         }
+    }
+
+    resetVoiceProfile() {
+        this.voiceProfile = {
+            enabled: false,
+            audience: '',
+            formality: 'balanced',
+            preferredPhrases: '',
+            avoidPhrases: '',
+            sampleText: ''
+        };
+        try {
+            localStorage.setItem('humanize_voice_profile', JSON.stringify(this.voiceProfile));
+        } catch (e) {
+            console.error("Could not reset voice profile", e);
+        }
+        return this.voiceProfile;
     }
 
     /**
@@ -160,8 +178,8 @@ PANDUAN UTAMA:
    - Pertahankan pemisahan paragraf asli (enter ganda), baris baru, format daftar (bullet/penomoran), dan judul/subjudul.
    - Jangan menggabungkan paragraf terpisah menjadi satu blok teks panjang.`;
 
-        // Inject Writing Voice Profile if available
-        if (this.voiceProfile && (this.voiceProfile.audience || this.voiceProfile.sampleText || this.voiceProfile.preferredPhrases)) {
+        // Inject Writing Voice Profile if enabled
+        if (this.voiceProfile && this.voiceProfile.enabled && (this.voiceProfile.audience || this.voiceProfile.sampleText || this.voiceProfile.preferredPhrases || this.voiceProfile.avoidPhrases)) {
             systemPrompt += `\n\nPROFIL GAYA PENULIS (VOICE PROFILE):`;
             if (this.voiceProfile.audience) systemPrompt += `\n- Sasaran Pembaca: ${this.voiceProfile.audience}`;
             if (this.voiceProfile.formality) systemPrompt += `\n- Tingkat Formalitas: ${this.voiceProfile.formality}`;
